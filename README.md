@@ -1,6 +1,6 @@
 # ChallengeX
 
-Compose your own "Minecraft, but..." challenge from building blocks: rules (a trigger paired with an effect), an optional goal, and restraints. Server-side Fabric mod for Minecraft 26.2; vanilla clients can join.
+Compose your own "Minecraft, but..." challenge from building blocks: rules (a trigger paired with an effect), an optional goal, and modifiers. Server-side Fabric mod for Minecraft 26.2; vanilla clients can join.
 
 Early development. Nothing is released yet.
 

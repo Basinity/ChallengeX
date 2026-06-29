@@ -3,7 +3,7 @@
   "id": "challengex",
   "version": "${version}",
   "name": "ChallengeX",
-  "description": "Compose your own Minecraft challenge from rules, goals, and restraints.",
+  "description": "Compose your own Minecraft challenge from rules, goals, and modifiers.",
   "authors": [
     "Basinity"
   ],

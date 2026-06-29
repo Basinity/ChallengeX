@@ -3,7 +3,7 @@ package com.basinity.challengex.core;
 import java.util.List;
 
 /**
- * A challenge aggregates any number of rules. Goals and restraints join this
+ * A challenge aggregates any number of rules. Goals and modifiers join this
  * aggregate in the core engine phase.
  *
  * <p>Rules form a plain multiset: the same trigger or effect may appear in any
