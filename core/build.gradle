@@ -16,6 +16,10 @@ repositories {
 }
 
 dependencies {
+    // Preset serialization only; not exposed in the public API. Minecraft
+    // bundles Gson at runtime, so the fabric jar nests nothing extra.
+    implementation 'com.google.code.gson:gson:2.13.1'
+
     testImplementation platform('org.junit:junit-bom:6.1.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

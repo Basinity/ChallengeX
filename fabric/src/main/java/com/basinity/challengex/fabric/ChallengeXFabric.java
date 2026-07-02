@@ -1,7 +1,8 @@
 package com.basinity.challengex.fabric;
 
-import com.basinity.challengex.core.Challenge;
-import com.basinity.challengex.core.Engine;
+import com.basinity.challengex.core.engine.Engine;
+import com.basinity.challengex.core.model.Challenge;
+import com.basinity.challengex.core.registry.CoreCatalog;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +14,9 @@ public class ChallengeXFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        // Walking skeleton: prove the core engine is on the classpath and
-        // constructible. Event wiring follows in the vertical-slice phase.
-        new Engine(Challenge.empty());
+        // Prove the core engine is on the classpath and constructible.
+        // Event wiring follows in the vertical-slice phase.
+        new Engine(Challenge.empty(), CoreCatalog.createRegistries());
         LOGGER.info("ChallengeX initialized.");
     }
 }
