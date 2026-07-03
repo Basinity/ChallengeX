@@ -168,8 +168,8 @@ class PresetCodecTest {
                   "schemaVersion": 1,
                   "name": "Overscoped",
                   "rules": [{"trigger": {"id": "trigger.weather_change", "scope": "every_player"},
-                             "effect": {"id": "effect.broadcast",
-                                        "params": {"text": "hi"}, "scope": "every_player"}}],
+                             "effect": {"id": "effect.change_time",
+                                        "params": {"value": "day"}, "scope": "every_player"}}],
                   "modifiers": [{"id": "modifier.buff_hostile_mobs", "scope": "every_player"}]
                 }""";
 
@@ -177,7 +177,7 @@ class PresetCodecTest {
                 assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
 
         assertTrue(rejection.getMessage().contains("'trigger.weather_change' has no player dimension"));
-        assertTrue(rejection.getMessage().contains("'effect.broadcast' has no player dimension"));
+        assertTrue(rejection.getMessage().contains("'effect.change_time' has no player dimension"));
         assertTrue(rejection.getMessage().contains("'modifier.buff_hostile_mobs' has no player dimension"));
     }
 

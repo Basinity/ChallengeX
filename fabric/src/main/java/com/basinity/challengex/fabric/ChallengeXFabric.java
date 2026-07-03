@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class ChallengeXFabric implements ModInitializer {
 
     public static final String MOD_ID = "challengex";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     private ChallengeRun activeRun;
 
@@ -45,6 +45,7 @@ public class ChallengeXFabric implements ModInitializer {
                         new FabricEffectExecutor(server, LOGGER)));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> activeRun = null);
         ServerLivingEntityEvents.AFTER_DEATH.register(this::onEntityDeath);
+        ChallengeXDevCommand.register();
         LOGGER.info("ChallengeX initialized.");
     }
 

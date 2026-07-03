@@ -39,12 +39,12 @@ class CoreCatalogTest {
     @Test
     void effectIdsAreFrozen() {
         assertEquals(Set.of(
-                "effect.apply_status_effect", "effect.remove_item_slot", "effect.lock_item_slot",
+                "effect.apply_status_effect", "effect.remove_item_slot",
                 "effect.drop_held_item", "effect.drop_inventory", "effect.give_random_item",
                 "effect.give_item", "effect.teleport_random", "effect.teleport_up",
                 "effect.spawn_mob", "effect.ignite", "effect.damage", "effect.heal",
                 "effect.drain_hunger", "effect.change_xp", "effect.shuffle_hotbar",
-                "effect.swap_inventory", "effect.clear_effects", "effect.lightning",
+                "effect.swap_inventory", "effect.swap_position", "effect.clear_effects", "effect.lightning",
                 "effect.falling_anvil", "effect.launch", "effect.broadcast", "effect.play_sound",
                 "effect.change_time", "effect.change_weather", "effect.replace_held_random",
                 "effect.kill", "effect.lose_challenge"),
@@ -77,8 +77,7 @@ class CoreCatalogTest {
 
     @Test
     void playerlessEffectsAreFrozen() {
-        assertEquals(Set.of("effect.broadcast", "effect.change_time", "effect.change_weather",
-                        "effect.lose_challenge"),
+        assertEquals(Set.of("effect.change_time", "effect.change_weather", "effect.lose_challenge"),
                 playerlessIds(registries.effects()));
     }
 
