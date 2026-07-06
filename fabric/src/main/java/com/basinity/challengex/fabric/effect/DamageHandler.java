@@ -14,7 +14,7 @@ public final class DamageHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        double hearts = EffectParams.clamp(EffectParams.decimal(command, "hearts", DEFAULT_HEARTS), 0.0, 1024.0);
+        double hearts = Math.max(0.0, EffectParams.decimal(command, "hearts", DEFAULT_HEARTS));
         float amount = (float) (hearts * HALF_HEARTS_PER_HEART);
         for (ServerPlayer target : targets) {
             ServerLevel level = target.level();

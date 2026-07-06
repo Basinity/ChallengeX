@@ -13,7 +13,7 @@ public final class IgniteHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int seconds = EffectParams.clamp(EffectParams.integer(command, "seconds", DEFAULT_SECONDS), 0, 1000);
+        int seconds = Math.max(0, EffectParams.integer(command, "seconds", DEFAULT_SECONDS));
         for (ServerPlayer target : targets) {
             target.igniteForTicks(seconds * TICKS_PER_SECOND);
         }

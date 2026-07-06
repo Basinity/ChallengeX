@@ -48,6 +48,11 @@ public final class Engine {
         this.registries = registries;
     }
 
+    /** The challenge being run; platform trigger sources read what it watches for. */
+    public Challenge challenge() {
+        return challenge;
+    }
+
     public List<EffectCommand> onEvent(GameEvent event) {
         if (outcome != RunOutcome.ONGOING) {
             return List.of();

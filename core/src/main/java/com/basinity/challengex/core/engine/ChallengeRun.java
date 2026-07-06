@@ -31,6 +31,11 @@ public final class ChallengeRun {
         }
     }
 
+    /** The challenge being run; platform trigger sources read what it watches for. */
+    public Challenge challenge() {
+        return engine.challenge();
+    }
+
     /** Advances the run's clock; modifier expiry is measured against it. */
     public void tick(long ticks) {
         engine.tick(ticks);

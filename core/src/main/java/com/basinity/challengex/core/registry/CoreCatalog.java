@@ -41,7 +41,7 @@ public final class CoreCatalog {
         trigger(registry, "block_broken", true, optional("block", STRING));
         trigger(registry, "block_placed", true, optional("block", STRING));
         trigger(registry, "mob_killed", true, optional("mob", STRING));
-        trigger(registry, "player_death", true);
+        trigger(registry, "player_died", true);
         trigger(registry, "damage_taken", true, optional("source", STRING));
         trigger(registry, "damage_dealt", true);
         trigger(registry, "item_crafted", true, optional("item", STRING));
@@ -50,34 +50,33 @@ public final class CoreCatalog {
         trigger(registry, "food_eaten", true, optional("item", STRING));
         trigger(registry, "xp_gained", true);
         trigger(registry, "advancement_earned", true);
-        trigger(registry, "dimension_entered", true, optional("dimension", STRING));
-        trigger(registry, "biome_entered", true, optional("biome", STRING));
+        trigger(registry, "dimension_changed", true, optional("dimension", STRING));
+        trigger(registry, "biome_changed", true, optional("biome", STRING));
         trigger(registry, "height_crossed", true, required("y", INT));
         trigger(registry, "health_below", true, required("hearts", DECIMAL));
         trigger(registry, "hunger_below", true, required("points", INT));
-        trigger(registry, "sleep", true);
-        trigger(registry, "jump", true);
-        trigger(registry, "sneak", true);
-        trigger(registry, "fishing_catch", true);
-        trigger(registry, "villager_trade", true);
+        trigger(registry, "slept", true);
+        trigger(registry, "jumped", true);
+        trigger(registry, "sneaked", true);
+        trigger(registry, "fish_caught", true);
+        trigger(registry, "villager_traded", true);
         trigger(registry, "enchantment_applied", true);
         trigger(registry, "item_smelted", true);
         trigger(registry, "projectile_shot", true);
-        trigger(registry, "fall_damage_taken", true);
         trigger(registry, "mob_tamed", true);
         trigger(registry, "mob_bred", true);
         trigger(registry, "container_opened", true);
-        trigger(registry, "weather_change", false);
+        trigger(registry, "weather_changed", false);
         trigger(registry, "time_of_day", false, required("time", STRING));
         trigger(registry, "fixed_interval", false, required("seconds", INT));
         trigger(registry, "chat_message", true,  optional("message", STRING));
-        trigger(registry, "game_beat", true);
+        trigger(registry, "game_beaten", true);
     }
 
     private static void registerEffects(Registry<EffectDefinition> registry) {
         effect(registry, "apply_status_effect", true, required("effect", STRING), optional("duration", INT), optional("amplifier", INT));
         effect(registry, "remove_item_slot", true);
-        effect(registry, "drop_held_item", true, optional("stack", BOOL));
+        effect(registry, "drop_held_item", true);
         effect(registry, "drop_inventory", true);
         effect(registry, "give_random_item", true);
         effect(registry, "give_item", true, required("item", STRING), optional("amount", INT));
@@ -109,7 +108,7 @@ public final class CoreCatalog {
         goal(registry, "kill_mob", List.of(new GoalRequirement(Set.of("trigger.mob_killed"), Map.of("mob", fromGoalParam("mob")))), required("mob", STRING));
         goal(registry, "obtain_item", List.of(new GoalRequirement(Set.of("trigger.item_picked_up", "trigger.item_crafted"), Map.of("item", fromGoalParam("item")))), required("item", STRING));
         goal(registry, "earn_advancement", List.of(new GoalRequirement(Set.of("trigger.advancement_earned"), Map.of("advancement", fromGoalParam("advancement")))), required("advancement", STRING));
-        goal(registry, "beat_game", List.of(new GoalRequirement(Set.of("trigger.game_beat"), Map.of())));
+        goal(registry, "beat_game", List.of(new GoalRequirement(Set.of("trigger.game_beaten"), Map.of())));
     }
 
     private static void registerModifiers(Registry<ModifierDefinition> registry) {

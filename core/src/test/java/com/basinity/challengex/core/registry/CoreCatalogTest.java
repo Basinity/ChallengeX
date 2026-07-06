@@ -22,17 +22,17 @@ class CoreCatalogTest {
     void triggerIdsAreFrozen() {
         assertEquals(Set.of(
                 "trigger.block_broken", "trigger.block_placed", "trigger.mob_killed",
-                "trigger.player_death", "trigger.damage_taken", "trigger.damage_dealt",
+                "trigger.player_died", "trigger.damage_taken", "trigger.damage_dealt",
                 "trigger.item_crafted", "trigger.item_picked_up", "trigger.item_dropped",
                 "trigger.food_eaten", "trigger.xp_gained", "trigger.advancement_earned",
-                "trigger.dimension_entered", "trigger.biome_entered", "trigger.height_crossed",
-                "trigger.health_below", "trigger.hunger_below", "trigger.sleep",
-                "trigger.jump", "trigger.sneak",
-                "trigger.fishing_catch", "trigger.villager_trade", "trigger.enchantment_applied",
-                "trigger.item_smelted", "trigger.projectile_shot", "trigger.fall_damage_taken",
+                "trigger.dimension_changed", "trigger.biome_changed", "trigger.height_crossed",
+                "trigger.health_below", "trigger.hunger_below", "trigger.slept",
+                "trigger.jumped", "trigger.sneaked",
+                "trigger.fish_caught", "trigger.villager_traded", "trigger.enchantment_applied",
+                "trigger.item_smelted", "trigger.projectile_shot",
                 "trigger.mob_tamed", "trigger.mob_bred", "trigger.container_opened",
-                "trigger.weather_change", "trigger.time_of_day", "trigger.fixed_interval",
-                "trigger.chat_message", "trigger.game_beat"),
+                "trigger.weather_changed", "trigger.time_of_day", "trigger.fixed_interval",
+                "trigger.chat_message", "trigger.game_beaten"),
                 registries.triggers().ids());
     }
 
@@ -71,7 +71,7 @@ class CoreCatalogTest {
 
     @Test
     void playerlessTriggersAreFrozen() {
-        assertEquals(Set.of("trigger.weather_change", "trigger.time_of_day", "trigger.fixed_interval"),
+        assertEquals(Set.of("trigger.weather_changed", "trigger.time_of_day", "trigger.fixed_interval"),
                 playerlessIds(registries.triggers()));
     }
 

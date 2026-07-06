@@ -15,7 +15,7 @@ public final class TeleportRandomHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int radius = EffectParams.clamp(EffectParams.integer(command, "radius", DEFAULT_RADIUS), 1, 100_000);
+        int radius = Math.max(1, EffectParams.integer(command, "radius", DEFAULT_RADIUS));
         for (ServerPlayer target : targets) {
             RandomSource random = target.getRandom();
             int x = (int) target.getX() + random.nextInt(radius * 2 + 1) - radius;

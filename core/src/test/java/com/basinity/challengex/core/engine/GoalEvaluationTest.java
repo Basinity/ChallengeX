@@ -58,11 +58,11 @@ class GoalEvaluationTest {
 
     @Test
     void winningStopsFurtherDispatch() {
-        Engine engine = engineWithGoal(defeatDragon(), Rule.of("trigger.jump", "effect.heal"));
+        Engine engine = engineWithGoal(defeatDragon(), Rule.of("trigger.jumped", "effect.heal"));
 
         engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
                 Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
 
-        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jump", "alice")));
+        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jumped", "alice")));
     }
 }

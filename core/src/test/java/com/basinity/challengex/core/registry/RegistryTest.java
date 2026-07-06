@@ -30,19 +30,19 @@ class RegistryTest {
     @Test
     void rejectsDuplicateId() {
         Registry<TriggerDefinition> registry = new Registry<>("trigger");
-        registry.register(new TriggerDefinition("trigger.jump", true, List.of()));
+        registry.register(new TriggerDefinition("trigger.jumped", true, List.of()));
         assertThrows(IllegalArgumentException.class,
-                () -> registry.register(new TriggerDefinition("trigger.jump", true, List.of())));
+                () -> registry.register(new TriggerDefinition("trigger.jumped", true, List.of())));
     }
 
     @Test
     void findsRegisteredDefinitions() {
         Registry<TriggerDefinition> registry = new Registry<>("trigger");
-        TriggerDefinition definition = new TriggerDefinition("trigger.jump", true, List.of());
+        TriggerDefinition definition = new TriggerDefinition("trigger.jumped", true, List.of());
         registry.register(definition);
 
-        assertEquals(definition, registry.require("trigger.jump"));
-        assertTrue(registry.find("trigger.sneak").isEmpty());
-        assertThrows(IllegalArgumentException.class, () -> registry.require("trigger.sneak"));
+        assertEquals(definition, registry.require("trigger.jumped"));
+        assertTrue(registry.find("trigger.sneaked").isEmpty());
+        assertThrows(IllegalArgumentException.class, () -> registry.require("trigger.sneaked"));
     }
 }

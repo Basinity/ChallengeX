@@ -52,7 +52,7 @@ class PresetCodecTest {
     void playerlessEntriesRoundTripWithoutScopeFields() throws PresetFormatException {
         Preset original = new Preset("Nightfall", new Challenge(
                 List.of(new Rule(
-                        TriggerSpec.playerless("trigger.weather_change"),
+                        TriggerSpec.playerless("trigger.weather_changed"),
                         new EffectSpec("effect.change_time",
                                 Map.of("value", ParamValue.of("night")), Optional.empty()))),
                 Optional.empty(),
@@ -100,7 +100,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "No mob picked",
-                  "rules": [{"trigger": {"id": "trigger.jump"}, "effect": {"id": "effect.spawn_mob"}}]
+                  "rules": [{"trigger": {"id": "trigger.jumped"}, "effect": {"id": "effect.spawn_mob"}}]
                 }""";
 
         PresetFormatException rejection =
@@ -115,7 +115,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Typed wrong",
-                  "rules": [{"trigger": {"id": "trigger.jump"},
+                  "rules": [{"trigger": {"id": "trigger.jumped"},
                              "effect": {"id": "effect.apply_status_effect",
                                         "params": {"effect": "minecraft:poison", "duration": "long"}}}]
                 }""";
@@ -133,7 +133,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Extra param",
-                  "rules": [{"trigger": {"id": "trigger.jump"},
+                  "rules": [{"trigger": {"id": "trigger.jumped"},
                              "effect": {"id": "effect.heal", "params": {"strength": 5}}}]
                 }""";
 
@@ -149,14 +149,14 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Unscoped",
-                  "rules": [{"trigger": {"id": "trigger.jump"}, "effect": {"id": "effect.heal"}}],
+                  "rules": [{"trigger": {"id": "trigger.jumped"}, "effect": {"id": "effect.heal"}}],
                   "modifiers": [{"id": "modifier.keep_inventory"}]
                 }""";
 
         PresetFormatException rejection =
                 assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
 
-        assertTrue(rejection.getMessage().contains("missing scope for 'trigger.jump'"));
+        assertTrue(rejection.getMessage().contains("missing scope for 'trigger.jumped'"));
         assertTrue(rejection.getMessage().contains("missing scope for 'effect.heal'"));
         assertTrue(rejection.getMessage().contains("missing scope for 'modifier.keep_inventory'"));
     }
@@ -167,7 +167,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Overscoped",
-                  "rules": [{"trigger": {"id": "trigger.weather_change", "scope": "every_player"},
+                  "rules": [{"trigger": {"id": "trigger.weather_changed", "scope": "every_player"},
                              "effect": {"id": "effect.change_time",
                                         "params": {"value": "day"}, "scope": "every_player"}}],
                   "modifiers": [{"id": "modifier.buff_hostile_mobs", "scope": "every_player"}]
@@ -176,7 +176,7 @@ class PresetCodecTest {
         PresetFormatException rejection =
                 assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
 
-        assertTrue(rejection.getMessage().contains("'trigger.weather_change' has no player dimension"));
+        assertTrue(rejection.getMessage().contains("'trigger.weather_changed' has no player dimension"));
         assertTrue(rejection.getMessage().contains("'effect.change_time' has no player dimension"));
         assertTrue(rejection.getMessage().contains("'modifier.buff_hostile_mobs' has no player dimension"));
     }
@@ -187,7 +187,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Scoped wrong",
-                  "rules": [{"trigger": {"id": "trigger.jump", "scope": "per_player"},
+                  "rules": [{"trigger": {"id": "trigger.jumped", "scope": "per_player"},
                              "effect": {"id": "effect.heal"}}]
                 }""";
 
@@ -203,7 +203,7 @@ class PresetCodecTest {
                 {
                   "schemaVersion": 1,
                   "name": "Whole hearts",
-                  "rules": [{"trigger": {"id": "trigger.jump", "scope": "every_player"},
+                  "rules": [{"trigger": {"id": "trigger.jumped", "scope": "every_player"},
                              "effect": {"id": "effect.damage", "params": {"hearts": 3},
                                         "scope": "per_player"}}]
                 }""";

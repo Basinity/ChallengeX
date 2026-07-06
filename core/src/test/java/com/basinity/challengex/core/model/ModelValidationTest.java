@@ -14,7 +14,7 @@ class ModelValidationTest {
         assertThrows(NullPointerException.class,
                 () -> new Rule(null, EffectSpec.of("effect.heal")));
         assertThrows(NullPointerException.class,
-                () -> new Rule(TriggerSpec.of("trigger.jump"), null));
+                () -> new Rule(TriggerSpec.of("trigger.jumped"), null));
         assertThrows(IllegalArgumentException.class, () -> TriggerSpec.of(""));
         assertThrows(IllegalArgumentException.class, () -> EffectSpec.of(""));
     }

@@ -12,7 +12,7 @@ public final class TeleportUpHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int blocks = EffectParams.clamp(EffectParams.integer(command, "blocks", DEFAULT_BLOCKS), 0, 1024);
+        int blocks = Math.max(0, EffectParams.integer(command, "blocks", DEFAULT_BLOCKS));
         for (ServerPlayer target : targets) {
             target.teleportTo(target.getX(), target.getY() + blocks, target.getZ());
         }

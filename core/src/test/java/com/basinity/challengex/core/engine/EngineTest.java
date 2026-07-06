@@ -46,10 +46,10 @@ class EngineTest {
     @Test
     void rulesStackFreelyOnTheSameTrigger() {
         Engine engine = engineFor(
-                Rule.of("trigger.jump", "effect.damage"),
-                Rule.of("trigger.jump", "effect.drain_hunger"));
+                Rule.of("trigger.jumped", "effect.damage"),
+                Rule.of("trigger.jumped", "effect.drain_hunger"));
 
-        List<EffectCommand> commands = engine.onEvent(GameEvent.of("trigger.jump", "alice"));
+        List<EffectCommand> commands = engine.onEvent(GameEvent.of("trigger.jumped", "alice"));
 
         assertEquals(List.of("effect.damage", "effect.drain_hunger"),
                 commands.stream().map(EffectCommand::effectId).toList());
@@ -72,86 +72,86 @@ class EngineTest {
     @Test
     void specificPlayerTriggerWatchesOnlyThosePlayers() {
         Engine engine = engineFor(new Rule(
-                new TriggerSpec("trigger.jump", Map.of(), Optional.of(Scope.players("alice"))),
+                new TriggerSpec("trigger.jumped", Map.of(), Optional.of(Scope.players("alice"))),
                 EffectSpec.of("effect.heal")));
 
-        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jump", "bob")));
-        assertEquals(1, engine.onEvent(GameEvent.of("trigger.jump", "alice")).size());
+        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jumped", "bob")));
+        assertEquals(1, engine.onEvent(GameEvent.of("trigger.jumped", "alice")).size());
     }
 
     @Test
     void everyPlayerEffectTargetsAllPlayers() {
         Engine engine = engineFor(new Rule(
-                TriggerSpec.of("trigger.player_death"),
+                TriggerSpec.of("trigger.player_died"),
                 new EffectSpec("effect.drop_inventory", Map.of(), Optional.of(Scope.EVERY_PLAYER))));
 
         assertEquals(List.of(new EffectCommand("effect.drop_inventory", Map.of(),
                         EffectCommand.Target.ALL_PLAYERS)),
-                engine.onEvent(GameEvent.of("trigger.player_death", "alice")));
+                engine.onEvent(GameEvent.of("trigger.player_died", "alice")));
     }
 
     @Test
     void specificPlayerEffectTargetsChosenPlayers() {
         Engine engine = engineFor(new Rule(
-                TriggerSpec.of("trigger.player_death"),
+                TriggerSpec.of("trigger.player_died"),
                 new EffectSpec("effect.heal", Map.of(), Optional.of(Scope.players("carol", "dave")))));
 
         assertEquals(List.of(new EffectCommand("effect.heal", Map.of(),
                         new EffectCommand.Target.Players(Set.of("carol", "dave")))),
-                engine.onEvent(GameEvent.of("trigger.player_death", "alice")));
+                engine.onEvent(GameEvent.of("trigger.player_died", "alice")));
     }
 
     @Test
     void perPlayerEffectOnPlayerlessTriggerFallsBackToEveryone() {
         Engine engine = engineFor(new Rule(
-                TriggerSpec.playerless("trigger.weather_change"),
+                TriggerSpec.playerless("trigger.weather_changed"),
                 EffectSpec.of("effect.heal")));
 
         assertEquals(List.of(new EffectCommand("effect.heal", Map.of(),
                         EffectCommand.Target.ALL_PLAYERS)),
-                engine.onEvent(GameEvent.playerless("trigger.weather_change")));
+                engine.onEvent(GameEvent.playerless("trigger.weather_changed")));
     }
 
     @Test
     void playerlessEffectTargetsEveryone() {
         Engine engine = engineFor(new Rule(
-                TriggerSpec.of("trigger.jump"),
+                TriggerSpec.of("trigger.jumped"),
                 new EffectSpec("effect.change_weather",
                         Map.of("value", ParamValue.of("clear")), Optional.empty())));
 
         assertEquals(List.of(new EffectCommand("effect.change_weather",
                         Map.of("value", ParamValue.of("clear")), EffectCommand.Target.ALL_PLAYERS)),
-                engine.onEvent(GameEvent.of("trigger.jump", "alice")));
+                engine.onEvent(GameEvent.of("trigger.jumped", "alice")));
     }
 
     @Test
     void specificPlayerTriggerIgnoresPlayerlessEvents() {
         Engine engine = engineFor(new Rule(
-                new TriggerSpec("trigger.jump", Map.of(), Optional.of(Scope.players("alice"))),
+                new TriggerSpec("trigger.jumped", Map.of(), Optional.of(Scope.players("alice"))),
                 EffectSpec.of("effect.heal")));
 
-        assertEquals(List.of(), engine.onEvent(GameEvent.playerless("trigger.jump")));
+        assertEquals(List.of(), engine.onEvent(GameEvent.playerless("trigger.jumped")));
     }
 
     @Test
     void loseChallengeEffectEndsRunAsLossWithoutDispatching() {
         Engine engine = engineFor(new Rule(
-                TriggerSpec.of("trigger.player_death"),
+                TriggerSpec.of("trigger.player_died"),
                 EffectSpec.playerless("effect.lose_challenge")));
 
-        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.player_death", "alice")));
+        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.player_died", "alice")));
         assertEquals(RunOutcome.LOSS, engine.outcome());
     }
 
     @Test
     void noDispatchAfterTheRunEnds() {
         Engine engine = engineFor(
-                new Rule(TriggerSpec.of("trigger.player_death"),
+                new Rule(TriggerSpec.of("trigger.player_died"),
                         EffectSpec.playerless("effect.lose_challenge")),
-                Rule.of("trigger.jump", "effect.heal"));
-        engine.onEvent(GameEvent.of("trigger.player_death", "alice"));
+                Rule.of("trigger.jumped", "effect.heal"));
+        engine.onEvent(GameEvent.of("trigger.player_died", "alice"));
 
-        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jump", "alice")));
+        assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jumped", "alice")));
     }
 
     @Test

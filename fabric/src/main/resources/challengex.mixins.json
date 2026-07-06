@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "package": "com.basinity.challengex.fabric.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "AdvancementEarnedMixin",
+    "BlockItemMixin",
+    "ContainerOpenedMixin",
+    "EnchantmentAppliedMixin",
+    "FishingCatchMixin",
+    "FoodEatenMixin",
+    "FurnaceResultSlotMixin",
+    "GameBeatMixin",
+    "ItemDropMixin",
+    "ItemPickupMixin",
+    "JumpMixin",
+    "MobBredMixin",
+    "MobTamedMixin",
+    "ProjectileShotMixin",
+    "ResultSlotMixin",
+    "VillagerTradeMixin",
+    "XpGainedMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

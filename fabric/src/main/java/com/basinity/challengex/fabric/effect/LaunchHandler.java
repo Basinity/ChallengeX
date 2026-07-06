@@ -12,7 +12,7 @@ public final class LaunchHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        double strength = EffectParams.clamp(EffectParams.decimal(command, "strength", DEFAULT_STRENGTH), 0.0, 100.0);
+        double strength = Math.max(0.0, EffectParams.decimal(command, "strength", DEFAULT_STRENGTH));
         for (ServerPlayer target : targets) {
             target.setDeltaMovement(0.0, strength, 0.0);
             // Forces a velocity packet so the client actually moves.

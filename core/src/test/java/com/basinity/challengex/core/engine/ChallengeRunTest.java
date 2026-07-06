@@ -49,10 +49,10 @@ class ChallengeRunTest {
     void loseChallengeNeverReachesTheExecutor() {
         List<EffectCommand> executed = new ArrayList<>();
         ChallengeRun run = runFor(executed::add, new Rule(
-                TriggerSpec.of("trigger.player_death"),
+                TriggerSpec.of("trigger.player_died"),
                 EffectSpec.playerless("effect.lose_challenge")));
 
-        run.handle(GameEvent.of("trigger.player_death", "alice"));
+        run.handle(GameEvent.of("trigger.player_died", "alice"));
 
         assertTrue(executed.isEmpty());
         assertEquals(RunOutcome.LOSS, run.outcome());

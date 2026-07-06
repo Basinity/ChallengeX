@@ -33,4 +33,8 @@ public record GameEvent(String triggerId, Optional<String> playerId, Map<String,
     public static GameEvent playerless(String triggerId) {
         return new GameEvent(triggerId, Optional.empty(), Map.of());
     }
+
+    public static GameEvent playerless(String triggerId, Map<String, ParamValue> context) {
+        return new GameEvent(triggerId, Optional.empty(), context);
+    }
 }
