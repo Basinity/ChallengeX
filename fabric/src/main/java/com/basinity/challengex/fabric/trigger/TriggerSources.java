@@ -33,6 +33,12 @@ public final class TriggerSources {
                 new HeightCrossedTriggerSource(),
                 new HealthBelowTriggerSource(),
                 new HungerBelowTriggerSource(),
+                new LevelReachedTriggerSource(),
+                new LevelIntervalTriggerSource(),
+                new StartedGlidingTriggerSource(),
+                new ItemUsedTriggerSource(),
+                new BlockInteractedTriggerSource(),
+                new EffectGainedTriggerSource(),
                 new WeatherChangeTriggerSource(),
                 new TimeOfDayTriggerSource(),
                 new FixedIntervalTriggerSource());

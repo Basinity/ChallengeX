@@ -42,6 +42,13 @@ public final class EffectHandlers {
         handlers.put("effect.teleport_random", new TeleportRandomHandler());
         handlers.put("effect.swap_inventory", new SwapInventoryHandler());
         handlers.put("effect.swap_position", new SwapPositionHandler());
+        handlers.put("effect.random_effect", new RandomEffectHandler());
+        handlers.put("effect.freeze", new FreezeHandler());
+        handlers.put("effect.knockback", new KnockbackHandler());
+        handlers.put("effect.explode", new ExplodeHandler());
+        handlers.put("effect.clear_inventory", new ClearInventoryHandler());
+        handlers.put("effect.repair_held_item", new RepairHeldItemHandler());
+        handlers.put("effect.damage_held_item", new DamageHeldItemHandler());
         return Map.copyOf(handlers);
     }
 }

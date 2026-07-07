@@ -8,12 +8,17 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** {@code effect.spawn_mob}: spawns the named mob at each target's feet, count times. */
+/**
+ * {@code effect.spawn_mob}: spawns the named mob at each target's feet, count
+ * times. With {@code baby} true, ageable mobs spawn as babies.
+ */
 public final class SpawnMobHandler implements EffectHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpawnMobHandler.class);
@@ -33,10 +38,14 @@ public final class SpawnMobHandler implements EffectHandler {
             return;
         }
         int count = EffectParams.clamp(EffectParams.integer(command, "count", 1), 1, 100);
+        boolean baby = EffectParams.bool(command, "baby", false);
         for (ServerPlayer target : targets) {
             ServerLevel level = target.level();
             for (int i = 0; i < count; i++) {
-                type.spawn(level, target.blockPosition(), EntitySpawnReason.COMMAND);
+                Entity spawned = type.spawn(level, target.blockPosition(), EntitySpawnReason.COMMAND);
+                if (baby && spawned instanceof AgeableMob ageable) {
+                    ageable.setBaby(true);
+                }
             }
         }
     }

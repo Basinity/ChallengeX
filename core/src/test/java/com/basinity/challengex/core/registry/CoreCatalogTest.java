@@ -26,11 +26,15 @@ class CoreCatalogTest {
                 "trigger.item_crafted", "trigger.item_picked_up", "trigger.item_dropped",
                 "trigger.food_eaten", "trigger.xp_gained", "trigger.advancement_earned",
                 "trigger.dimension_changed", "trigger.biome_changed", "trigger.height_crossed",
-                "trigger.health_below", "trigger.hunger_below", "trigger.slept",
+                "trigger.health_below", "trigger.hunger_below",
+                "trigger.level_reached", "trigger.level_interval", "trigger.slept",
                 "trigger.jumped", "trigger.sneaked",
                 "trigger.fish_caught", "trigger.villager_traded", "trigger.enchantment_applied",
                 "trigger.item_smelted", "trigger.projectile_shot",
                 "trigger.mob_tamed", "trigger.mob_bred", "trigger.container_opened",
+                "trigger.item_used", "trigger.block_interacted", "trigger.started_gliding",
+                "trigger.mounted", "trigger.effect_gained", "trigger.tool_broke",
+                "trigger.crit_landed", "trigger.shield_blocked",
                 "trigger.weather_changed", "trigger.time_of_day", "trigger.fixed_interval",
                 "trigger.chat_message", "trigger.game_beaten"),
                 registries.triggers().ids());
@@ -47,6 +51,8 @@ class CoreCatalogTest {
                 "effect.swap_inventory", "effect.swap_position", "effect.clear_effects", "effect.lightning",
                 "effect.falling_anvil", "effect.launch", "effect.broadcast", "effect.play_sound",
                 "effect.change_time", "effect.change_weather", "effect.replace_held_random",
+                "effect.random_effect", "effect.freeze", "effect.knockback", "effect.explode",
+                "effect.clear_inventory", "effect.repair_held_item", "effect.damage_held_item",
                 "effect.kill", "effect.lose_challenge"),
                 registries.effects().ids());
     }
