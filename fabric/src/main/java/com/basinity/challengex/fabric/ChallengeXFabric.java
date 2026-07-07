@@ -68,7 +68,8 @@ public class ChallengeXFabric implements ModInitializer {
     private void registerTriggerSources() {
         // The dev watch wraps the real context to echo fired triggers; it taps
         // emit and leaves production dispatch untouched.
-        TriggerContext context = new DevTriggerWatch(new FabricTriggerContext(() -> activeRun), () -> server);
+        TriggerContext context = new DevTriggerWatch(new FabricTriggerContext(() -> activeRun), () -> server,
+                () -> activeRun);
         // Mixins reach the run through the static bridge; event and poll sources
         // take the same context directly.
         MixinTriggerBridge.arm(context);

@@ -3,6 +3,7 @@ package com.basinity.challengex.fabric;
 import com.basinity.challengex.core.engine.EffectCommand;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.EffectSpec;
+import com.basinity.challengex.core.model.Goal;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.model.Scope;
@@ -26,10 +27,13 @@ import net.minecraft.server.level.ServerPlayer;
  * fire <effect> [key=value ...]} runs a single effect against the sender,
  * {@code /challengex-dev watch on|off} echoes every fired trigger to chat so the
  * triggers can be checked in-world without a rule wired to each one, and
- * {@code /challengex-dev challenge slice|triggers} swaps the active challenge:
+ * {@code /challengex-dev challenge slice|triggers|goal} swaps the active challenge:
  * {@code slice} is the mob-kill-poisons-killer default, {@code triggers} configures
  * the five threshold and schedule triggers (which fire only when a rule watches
- * for them) so they can be exercised before preset import exists.
+ * for them) so they can be exercised before preset import exists, and {@code goal
+ * <goalId> [key=value ...]} loads a challenge carrying only that goal so its
+ * completion (announced as {@code [outcome] WIN} by the trigger watch) can be
+ * checked without wiring a rule to whatever event completes it.
  *
  * <p>This is not the production command surface: it is gated only on being a
  * player and is removed once phase 5 lands the permission-node-backed tree.
@@ -56,7 +60,13 @@ final class ChallengeXDevCommand {
                                 .then(Commands.literal("slice").executes(context ->
                                         load(context, "slice", ChallengeXFabric.verticalSliceChallenge())))
                                 .then(Commands.literal("triggers").executes(context ->
-                                        load(context, "triggers", thresholdTestChallenge()))))));
+                                        load(context, "triggers", thresholdTestChallenge())))
+                                .then(Commands.literal("goal")
+                                        .then(Commands.argument("goal", StringArgumentType.word())
+                                                .executes(context -> goal(context, ""))
+                                                .then(Commands.argument("params", StringArgumentType.greedyString())
+                                                        .executes(context -> goal(context,
+                                                                StringArgumentType.getString(context, "params")))))))));
     }
 
     private static int watch(CommandContext<CommandSourceStack> context, boolean on) {
@@ -70,6 +80,17 @@ final class ChallengeXDevCommand {
         ChallengeXFabric.instance().loadChallenge(challenge);
         context.getSource().sendSuccess(() -> Component.literal("Loaded challenge: " + name), false);
         return 1;
+    }
+
+    /** Loads a challenge carrying only the given goal, no rules, so completing it in-world reaches WIN. */
+    private static int goal(CommandContext<CommandSourceStack> context, String rawParams) {
+        String goalId = StringArgumentType.getString(context, "goal");
+        if (!goalId.startsWith("goal.")) {
+            goalId = "goal." + goalId;
+        }
+        Challenge challenge = new Challenge(List.of(),
+                Optional.of(new Goal(goalId, parseParams(rawParams))), List.of());
+        return load(context, goalId, challenge);
     }
 
     /**

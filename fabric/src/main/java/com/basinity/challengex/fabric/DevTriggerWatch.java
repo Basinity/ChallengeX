@@ -1,6 +1,8 @@
 package com.basinity.challengex.fabric;
 
+import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.GameEvent;
+import com.basinity.challengex.core.engine.RunOutcome;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.fabric.trigger.TriggerContext;
 import java.util.List;
@@ -20,6 +22,12 @@ import net.minecraft.server.MinecraftServer;
  *
  * <p>Without it, most triggers have nothing visible to test against until preset
  * import exists, since the only loaded rule reacts to a single trigger.
+ *
+ * <p>It also always announces a run reaching {@link RunOutcome#WIN} or {@link
+ * RunOutcome#LOSS}, regardless of the watch toggle: nothing in the adapter reads
+ * {@link ChallengeRun#outcome()} otherwise, so a goal completing (or a
+ * lose-challenge effect firing) is invisible in-game until phase 6 builds the
+ * real run-lifecycle handling.
  */
 final class DevTriggerWatch implements TriggerContext {
 
@@ -27,10 +35,12 @@ final class DevTriggerWatch implements TriggerContext {
 
     private final TriggerContext delegate;
     private final Supplier<MinecraftServer> server;
+    private final Supplier<ChallengeRun> activeRun;
 
-    DevTriggerWatch(TriggerContext delegate, Supplier<MinecraftServer> server) {
+    DevTriggerWatch(TriggerContext delegate, Supplier<MinecraftServer> server, Supplier<ChallengeRun> activeRun) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");
         this.server = Objects.requireNonNull(server, "server");
+        this.activeRun = Objects.requireNonNull(activeRun, "activeRun");
     }
 
     static void setEnabled(boolean on) {
@@ -46,7 +56,26 @@ final class DevTriggerWatch implements TriggerContext {
         if (enabled) {
             announce(event);
         }
+        RunOutcome before = outcomeNow();
         delegate.emit(event);
+        RunOutcome after = outcomeNow();
+        if (before == RunOutcome.ONGOING && after != RunOutcome.ONGOING) {
+            announceOutcome(after);
+        }
+    }
+
+    private RunOutcome outcomeNow() {
+        ChallengeRun run = activeRun.get();
+        return run == null ? RunOutcome.ONGOING : run.outcome();
+    }
+
+    private void announceOutcome(RunOutcome outcome) {
+        MinecraftServer current = server.get();
+        if (current == null) {
+            return;
+        }
+        current.getPlayerList().broadcastSystemMessage(
+                Component.literal("[outcome] " + outcome), false);
     }
 
     @Override

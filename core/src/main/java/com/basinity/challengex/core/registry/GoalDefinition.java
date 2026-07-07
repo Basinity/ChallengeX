@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * A goal catalog entry: parameters plus the requirements whose joint
  * fulfillment completes the goal. Declaring completion as data keeps the
- * engine generic and lets compound goals reuse the same evaluation.
+ * engine generic and let's compound goals reuse the same evaluation.
  */
 public record GoalDefinition(String id, List<GoalRequirement> requirements, List<ParamSpec> params) implements Definition {
 
