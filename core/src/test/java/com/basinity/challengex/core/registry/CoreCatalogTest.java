@@ -68,10 +68,10 @@ class CoreCatalogTest {
     @Test
     void modifierIdsAreFrozen() {
         assertEquals(Set.of(
-                "modifier.disable_action", "modifier.block_interaction", "modifier.no_natural_regen",
-                "modifier.time_limit", "modifier.randomize_recipes", "modifier.randomize_block_drops",
-                "modifier.randomize_mob_drops", "modifier.buff_hostile_mobs", "modifier.impair_sense",
-                "modifier.keep_inventory", "modifier.no_hunger_drain", "modifier.night_vision"),
+                "modifier.disable_jump", "modifier.disable_item_use", "modifier.block_interaction",
+                "modifier.no_natural_regen", "modifier.time_limit",
+                "modifier.randomize_block_drops", "modifier.randomize_mob_drops", "modifier.buff_hostile_mobs",
+                "modifier.status_effect", "modifier.keep_inventory", "modifier.no_hunger_drain"),
                 registries.modifiers().ids());
     }
 

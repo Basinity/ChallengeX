@@ -8,6 +8,12 @@ import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.model.Scope;
 import com.basinity.challengex.core.model.TriggerSpec;
 import com.basinity.challengex.core.registry.CoreCatalog;
+import com.basinity.challengex.fabric.modifier.FabricModifierContext;
+import com.basinity.challengex.fabric.modifier.ModifierBridge;
+import com.basinity.challengex.fabric.modifier.ModifierContext;
+import com.basinity.challengex.fabric.modifier.ModifierEnforcementTickSource;
+import com.basinity.challengex.fabric.modifier.ModifierSource;
+import com.basinity.challengex.fabric.modifier.ModifierSources;
 import com.basinity.challengex.fabric.trigger.MixinTriggerBridge;
 import com.basinity.challengex.fabric.trigger.TriggerContext;
 import com.basinity.challengex.fabric.trigger.TriggerSource;
@@ -51,6 +57,7 @@ public class ChallengeXFabric implements ModInitializer {
             server = null;
         });
         registerTriggerSources();
+        registerModifierEnforcement();
         ChallengeXDevCommand.register();
         LOGGER.info("ChallengeX initialized.");
     }
@@ -74,6 +81,17 @@ public class ChallengeXFabric implements ModInitializer {
         // take the same context directly.
         MixinTriggerBridge.arm(context);
         for (TriggerSource source : TriggerSources.all()) {
+            source.register(context);
+        }
+    }
+
+    private void registerModifierEnforcement() {
+        ModifierContext context = new FabricModifierContext(() -> activeRun);
+        // Mixins reach the active modifiers through the static bridge; the tick
+        // enforcer and event-cancel sources take the same context directly.
+        ModifierBridge.arm(context);
+        new ModifierEnforcementTickSource().register(context);
+        for (ModifierSource source : ModifierSources.all()) {
             source.register(context);
         }
     }

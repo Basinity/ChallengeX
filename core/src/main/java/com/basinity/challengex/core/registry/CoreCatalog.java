@@ -110,7 +110,7 @@ public final class CoreCatalog {
         effect(registry, "change_time", false, required("value", STRING));
         effect(registry, "change_weather", false, required("value", STRING));
         effect(registry, "replace_held_random", true);
-        effect(registry, "random_effect", true, optional("type", STRING));
+        effect(registry, "random_effect", true, optional("type", STRING), optional("seconds", DECIMAL));
         effect(registry, "freeze", true, optional("seconds", INT));
         effect(registry, "knockback", true, optional("strength", DECIMAL));
         effect(registry, "explode", true, optional("power", DECIMAL));
@@ -129,18 +129,17 @@ public final class CoreCatalog {
     }
 
     private static void registerModifiers(Registry<ModifierDefinition> registry) {
-        modifier(registry, "disable_action", true, required("action", STRING));
+        modifier(registry, "disable_jump", true);
+        modifier(registry, "disable_item_use", true, optional("item", STRING));
         modifier(registry, "block_interaction", true, required("target", STRING));
         modifier(registry, "no_natural_regen", true);
         modifier(registry, "time_limit", false, required("minutes", INT));
-        modifier(registry, "randomize_recipes", true, optional("seed", INT), optional("per_player", BOOL));
         modifier(registry, "randomize_block_drops", true, optional("seed", INT), optional("per_player", BOOL));
         modifier(registry, "randomize_mob_drops", true, optional("seed", INT), optional("per_player", BOOL));
         modifier(registry, "buff_hostile_mobs", false);
-        modifier(registry, "impair_sense", true, required("sense", STRING));
+        modifier(registry, "status_effect", true, required("effect", STRING), optional("amplifier", INT));
         modifier(registry, "keep_inventory", true);
         modifier(registry, "no_hunger_drain", true);
-        modifier(registry, "night_vision", true);
     }
 
     private static void trigger(Registry<TriggerDefinition> registry, String name, boolean scoped, ParamSpec... params) {

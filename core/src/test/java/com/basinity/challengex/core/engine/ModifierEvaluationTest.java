@@ -32,7 +32,7 @@ class ModifierEvaluationTest {
 
     @Test
     void targetedModifierIsInForceOnlyForItsTargets() {
-        Engine engine = engineFor(new Modifier("modifier.night_vision",
+        Engine engine = engineFor(new Modifier("modifier.disable_jump",
                 Map.of(), Optional.of(Scope.players("alice")), OptionalLong.empty()));
 
         assertEquals(1, engine.activeModifiersFor("alice").size());

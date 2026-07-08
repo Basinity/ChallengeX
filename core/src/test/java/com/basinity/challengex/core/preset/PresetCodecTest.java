@@ -38,8 +38,8 @@ class PresetCodecTest {
                 Optional.of(new Goal("goal.kill_mob",
                         Map.of("mob", ParamValue.of("minecraft:ender_dragon")))),
                 List.of(
-                        new Modifier("modifier.disable_action",
-                                Map.of("action", ParamValue.of("jump")),
+                        new Modifier("modifier.disable_jump",
+                                Map.of(),
                                 Optional.of(Scope.players("bob")), OptionalLong.of(6000)),
                         new Modifier("modifier.time_limit",
                                 Map.of("minutes", ParamValue.of(30)),
