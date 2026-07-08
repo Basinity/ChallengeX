@@ -24,6 +24,11 @@ public final class ModifierParams {
         return modifier.params().get(name) instanceof ParamValue.OfBool value ? value.value() : fallback;
     }
 
+    /** Whether the modifier carries a value for the named parameter at all. */
+    public static boolean has(Modifier modifier, String name) {
+        return modifier.params().get(name) != null;
+    }
+
     public static int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));
     }
