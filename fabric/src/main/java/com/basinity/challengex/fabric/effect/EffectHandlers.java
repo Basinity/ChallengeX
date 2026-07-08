@@ -21,6 +21,7 @@ public final class EffectHandlers {
         handlers.put("effect.ignite", new IgniteHandler());
         handlers.put("effect.kill", new KillHandler());
         handlers.put("effect.damage", new DamageHandler());
+        handlers.put("effect.change_max_health", new ChangeMaxHealthHandler());
         handlers.put("effect.give_item", new GiveItemHandler());
         handlers.put("effect.drop_held_item", new DropHeldItemHandler());
         handlers.put("effect.remove_item_slot", new RemoveItemSlotHandler());

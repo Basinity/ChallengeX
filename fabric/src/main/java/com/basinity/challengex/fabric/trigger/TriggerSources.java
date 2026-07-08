@@ -22,6 +22,7 @@ public final class TriggerSources {
         return List.of(
                 new BlockBrokenTriggerSource(),
                 new MobKilledTriggerSource(),
+                new KillPlayerTriggerSource(),
                 new PlayerDeathTriggerSource(),
                 new DamageTakenTriggerSource(),
                 new DamageDealtTriggerSource(),

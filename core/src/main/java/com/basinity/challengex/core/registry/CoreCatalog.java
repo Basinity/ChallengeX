@@ -41,6 +41,7 @@ public final class CoreCatalog {
         trigger(registry, "block_broken", true, optional("block", STRING));
         trigger(registry, "block_placed", true, optional("block", STRING));
         trigger(registry, "mob_killed", true, optional("mob", STRING));
+        trigger(registry, "kill_player", true, optional("name", STRING));
         trigger(registry, "player_died", true, optional("source", STRING));
         trigger(registry, "damage_taken", true, optional("source", STRING));
         trigger(registry, "damage_dealt", true, optional("source", STRING), optional("target", STRING));
@@ -96,6 +97,7 @@ public final class CoreCatalog {
         effect(registry, "ignite", true, optional("seconds", INT));
         effect(registry, "damage", true, optional("hearts", DECIMAL));
         effect(registry, "heal", true, optional("hearts", DECIMAL));
+        effect(registry, "change_max_health", true, required("hearts", DECIMAL));
         effect(registry, "drain_hunger", true, optional("amount", INT));
         effect(registry, "change_xp", true, required("amount", INT), optional("set", BOOL), optional("levels", BOOL));
         effect(registry, "shuffle_hotbar", true);

@@ -22,6 +22,7 @@ class CoreCatalogTest {
     void triggerIdsAreFrozen() {
         assertEquals(Set.of(
                 "trigger.block_broken", "trigger.block_placed", "trigger.mob_killed",
+                "trigger.kill_player",
                 "trigger.player_died", "trigger.damage_taken", "trigger.damage_dealt",
                 "trigger.item_crafted", "trigger.item_picked_up", "trigger.item_dropped",
                 "trigger.food_eaten", "trigger.xp_gained", "trigger.advancement_earned",
@@ -47,6 +48,7 @@ class CoreCatalogTest {
                 "effect.drop_held_item", "effect.drop_inventory", "effect.give_random_item",
                 "effect.give_item", "effect.teleport_random", "effect.teleport_up",
                 "effect.spawn_mob", "effect.ignite", "effect.damage", "effect.heal",
+                "effect.change_max_health",
                 "effect.drain_hunger", "effect.change_xp", "effect.shuffle_hotbar",
                 "effect.swap_inventory", "effect.swap_position", "effect.clear_effects", "effect.lightning",
                 "effect.falling_anvil", "effect.launch", "effect.broadcast", "effect.play_sound",
