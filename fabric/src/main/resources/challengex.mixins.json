@@ -17,6 +17,7 @@
     "ItemPickupMixin",
     "JumpMixin",
     "KeepInventoryMixin",
+    "KeepInventoryRespawnMixin",
     "MobBredMixin",
     "MobTamedMixin",
     "MountedMixin",
