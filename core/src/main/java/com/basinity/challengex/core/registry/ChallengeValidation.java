@@ -94,6 +94,6 @@ public final class ChallengeValidation {
 
     private static String unknownId(String where, String id) {
         return where + ": unknown id '" + id
-                + "' — not in this build's catalog; the preset may need a newer ChallengeX";
+                + "' — not in this build's catalog (check the id for typos, or the preset may need a newer ChallengeX version)";
     }
 }
