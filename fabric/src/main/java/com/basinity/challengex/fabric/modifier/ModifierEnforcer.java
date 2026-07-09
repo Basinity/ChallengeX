@@ -25,4 +25,13 @@ public interface ModifierEnforcer {
 
     default void stop(ServerPlayer player, Modifier modifier, MinecraftServer server) {
     }
+
+    /**
+     * Clears any cross-player state the enforcer holds outside per-player
+     * lifecycle, on server stop. Most enforcers keep no such state and need not
+     * override this; a shared-across-players enforcer uses it so a fresh world
+     * starts from a clean slate rather than inheriting the previous world's.
+     */
+    default void serverStopped() {
+    }
 }

@@ -30,7 +30,10 @@ public final class ModifierEnforcementTickSource {
 
     public void register(ModifierContext context) {
         ServerTickEvents.END_SERVER_TICK.register(server -> tick(server, context));
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> activeByPlayer.clear());
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            activeByPlayer.clear();
+            enforcers.values().forEach(ModifierEnforcer::serverStopped);
+        });
     }
 
     private void tick(MinecraftServer server, ModifierContext context) {

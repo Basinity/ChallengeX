@@ -142,6 +142,7 @@ public final class CoreCatalog {
         modifier(registry, "status_effect", true, required("effect", STRING), optional("amplifier", INT));
         modifier(registry, "keep_inventory", true);
         modifier(registry, "no_hunger_drain", true);
+        modifier(registry, "share_inventory", true);
     }
 
     private static void trigger(Registry<TriggerDefinition> registry, String name, boolean scoped, ParamSpec... params) {

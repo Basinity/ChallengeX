@@ -19,6 +19,7 @@ public final class ModifierEnforcers {
         enforcers.put("modifier.disable_jump", new DisableJumpEnforcer());
         enforcers.put("modifier.status_effect", new StatusEffectEnforcer());
         enforcers.put("modifier.no_hunger_drain", new NoHungerDrainEnforcer());
+        enforcers.put("modifier.share_inventory", new SharedInventoryEnforcer());
         return Map.copyOf(enforcers);
     }
 }
