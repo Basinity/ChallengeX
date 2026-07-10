@@ -5,6 +5,8 @@ import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.command.ChallengeCommand;
 import com.basinity.challengex.fabric.command.PresetStore;
+import com.basinity.challengex.fabric.lifecycle.RunController;
+import com.basinity.challengex.fabric.lifecycle.TimerConfig;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
 import com.basinity.challengex.fabric.modifier.ModifierContext;
@@ -53,9 +55,13 @@ public class ChallengeXFabric implements ModInitializer {
         });
         registerTriggerSources();
         registerModifierEnforcement();
+        TimerConfig timerConfig = new TimerConfig(LOGGER);
+        timerConfig.load();
+        RunController runController = new RunController(() -> activeRun, timerConfig);
+        runController.register();
         PresetStore presetStore = new PresetStore(LOGGER);
         presetStore.ensureDir();
-        new ChallengeCommand(presetStore).register();
+        new ChallengeCommand(presetStore, runController, timerConfig).register();
         LOGGER.info("ChallengeX initialized.");
     }
 
@@ -67,6 +73,11 @@ public class ChallengeXFabric implements ModInitializer {
 
     public static ChallengeXFabric instance() {
         return instance;
+    }
+
+    /** The active run, or null before the server has started. */
+    public ChallengeRun activeRun() {
+        return activeRun;
     }
 
     private void registerTriggerSources() {

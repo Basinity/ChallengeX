@@ -22,6 +22,9 @@ public final class CoreCatalog {
     /** Ends the run as a loss; handled by the engine itself, never dispatched to an adapter. */
     public static final String EFFECT_LOSE_CHALLENGE = "effect.lose_challenge";
 
+    /** Counts the run clock down and ends it as a loss on expiry; read by the engine, never enforced per player. */
+    public static final String MODIFIER_TIME_LIMIT = "modifier.time_limit";
+
     private CoreCatalog() {
     }
 

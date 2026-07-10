@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 
 /**
@@ -33,9 +34,12 @@ import java.util.Set;
  */
 public final class Engine {
 
+    private static final long TICKS_PER_MINUTE = 60L * 20L;
+
     private final Challenge challenge;
     private final Registries registries;
     private final Set<Integer> metGoalRequirements = new HashSet<>();
+    private final OptionalLong timeLimitTicks;
     private long elapsedTicks;
     private RunOutcome outcome = RunOutcome.ONGOING;
 
@@ -46,6 +50,27 @@ public final class Engine {
         }
         this.challenge = challenge;
         this.registries = registries;
+        this.timeLimitTicks = computeTimeLimit(challenge);
+    }
+
+    /**
+     * The run's time budget in ticks, taken from the shortest {@code time_limit}
+     * modifier's minutes, or empty when the run has none. The clock counts down
+     * from it and the run is lost when it reaches zero.
+     */
+    private static OptionalLong computeTimeLimit(Challenge challenge) {
+        long shortest = Long.MAX_VALUE;
+        boolean found = false;
+        for (Modifier modifier : challenge.modifiers()) {
+            if (!CoreCatalog.MODIFIER_TIME_LIMIT.equals(modifier.modifierId())) {
+                continue;
+            }
+            if (modifier.params().get("minutes") instanceof ParamValue.OfInt minutes && minutes.value() > 0) {
+                shortest = Math.min(shortest, minutes.value() * TICKS_PER_MINUTE);
+                found = true;
+            }
+        }
+        return found ? OptionalLong.of(shortest) : OptionalLong.empty();
     }
 
     /** The challenge being run; platform trigger sources read what it watches for. */
@@ -73,16 +98,41 @@ public final class Engine {
         return List.copyOf(commands);
     }
 
-    /** Advances the run's clock; modifier expiry is measured against it. */
+    /**
+     * Advances the run's clock; modifier expiry is measured against it. When a
+     * time-limit budget is set and the elapsed time reaches it, an ongoing run
+     * ends as a loss (a run already decided keeps its outcome).
+     */
     public void tick(long ticks) {
         if (ticks <= 0) {
             throw new IllegalArgumentException("Ticks must be positive");
         }
         elapsedTicks += ticks;
+        if (outcome == RunOutcome.ONGOING
+                && timeLimitTicks.isPresent()
+                && elapsedTicks >= timeLimitTicks.getAsLong()) {
+            outcome = RunOutcome.LOSS;
+        }
     }
 
     public long elapsedTicks() {
         return elapsedTicks;
+    }
+
+    /** The run's time budget in ticks, or empty when it has no time limit. */
+    public OptionalLong timeLimitTicks() {
+        return timeLimitTicks;
+    }
+
+    /**
+     * What the run clock should read: the ticks remaining down from a time
+     * limit when one is set (never below zero), otherwise the ticks elapsed.
+     */
+    public long displayTicks() {
+        if (timeLimitTicks.isEmpty()) {
+            return elapsedTicks;
+        }
+        return Math.max(0L, timeLimitTicks.getAsLong() - elapsedTicks);
     }
 
     /**

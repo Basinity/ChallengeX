@@ -1,10 +1,15 @@
 package com.basinity.challengex.fabric.command;
 
+import com.basinity.challengex.core.engine.ChallengeRun;
+import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.preset.Preset;
 import com.basinity.challengex.core.preset.PresetCodec;
 import com.basinity.challengex.core.preset.PresetFormatException;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.ChallengeXFabric;
+import com.basinity.challengex.fabric.lifecycle.RunController;
+import com.basinity.challengex.fabric.lifecycle.TimerColors;
+import com.basinity.challengex.fabric.lifecycle.TimerConfig;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -37,26 +42,53 @@ public final class ChallengeCommand {
 
     private final PresetStore store;
     private final PresetCodec codec;
+    private final RunController controller;
+    private final TimerConfig timerConfig;
 
     /** The last preset imported this session, so {@code reload} knows what to re-read. */
     private String activePresetName;
 
-    public ChallengeCommand(PresetStore store) {
+    public ChallengeCommand(PresetStore store, RunController controller, TimerConfig timerConfig) {
         this.store = store;
+        this.controller = controller;
+        this.timerConfig = timerConfig;
         this.codec = new PresetCodec(CoreCatalog.createRegistries());
     }
 
+    /**
+     * The tree root carries no permission gate: every mutating leaf (import,
+     * reload, start, reset, pause, resume) gates itself on op level 2, while the
+     * read-only {@code info} view stays open to all players. That is what lets
+     * the clickable "view configuration" control on the run-end message work for
+     * everyone in the run, not just the operator.
+     */
     public void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(Commands.literal("challenge")
-                        .requires(Perms.requireAdmin())
-                        .then(Commands.literal("import")
+                        .then(Commands.literal("import").requires(Perms.requireAdmin())
                                 .executes(this::listPresets)
                                 .then(Commands.argument("file", StringArgumentType.greedyString())
                                         .suggests(this::suggestPresets)
                                         .executes(this::importNamed)))
-                        .then(Commands.literal("reload")
-                                .executes(this::reload))));
+                        .then(Commands.literal("reload").requires(Perms.requireAdmin())
+                                .executes(this::reload))
+                        .then(Commands.literal("start").requires(Perms.requireAdmin())
+                                .executes(this::start))
+                        .then(Commands.literal("reset").requires(Perms.requireAdmin())
+                                .executes(this::reset))
+                        .then(Commands.literal("pause").requires(Perms.requireAdmin())
+                                .executes(this::pause))
+                        .then(Commands.literal("resume").requires(Perms.requireAdmin())
+                                .executes(this::resume))
+                        .then(Commands.literal("config").requires(Perms.requireAdmin())
+                                .executes(this::configShow)
+                                .then(Commands.literal("timer_color")
+                                        .executes(this::timerColorShow)
+                                        .then(Commands.argument("color", StringArgumentType.word())
+                                                .suggests(this::suggestColors)
+                                                .executes(this::timerColorSet))))
+                        .then(Commands.literal("info")
+                                .executes(this::info))));
     }
 
     private int listPresets(CommandContext<CommandSourceStack> context) {
@@ -108,10 +140,138 @@ public final class ChallengeCommand {
             return 0;
         }
         ChallengeXFabric.instance().loadChallenge(preset.challenge());
+        controller.onChallengeReplaced(source.getServer());
         activePresetName = name;
-        source.sendSuccess(() -> Component.literal("Imported '" + preset.name() + "' — now active.")
+        source.sendSuccess(() -> Component.literal(
+                "Imported '" + preset.name() + "'. Run /challenge start to begin.")
                 .withStyle(ChatFormatting.GREEN), true);
         return 1;
+    }
+
+    /** A run wrapping the empty starting challenge: nothing has been imported yet. */
+    private static boolean noChallengeLoaded(ChallengeRun run) {
+        return run == null || (run.challenge().rules().isEmpty()
+                && run.challenge().goal().isEmpty() && run.challenge().modifiers().isEmpty());
+    }
+
+    private int start(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ChallengeRun run = ChallengeXFabric.instance().activeRun();
+        if (noChallengeLoaded(run)) {
+            source.sendFailure(Component.literal("No challenge loaded. Use /challenge import <file> first."));
+            return 0;
+        }
+        switch (run.state()) {
+            case RUNNING, PAUSED -> {
+                source.sendFailure(Component.literal("A challenge is already running. Use /challenge reset first."));
+                return 0;
+            }
+            case FINISHED -> {
+                source.sendFailure(Component.literal("This run has finished. Use /challenge reset to play it again."));
+                return 0;
+            }
+            case NOT_STARTED -> {
+                controller.start();
+                source.sendSuccess(() -> Component.literal("Challenge started.").withStyle(ChatFormatting.GREEN), true);
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private int reset(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        controller.reset(source.getServer());
+        source.sendSuccess(() -> Component.literal("Challenge reset. Run /challenge start to begin again.")
+                .withStyle(ChatFormatting.GREEN), true);
+        return 1;
+    }
+
+    private int pause(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ChallengeRun run = ChallengeXFabric.instance().activeRun();
+        if (run == null || run.state() != RunState.RUNNING) {
+            source.sendFailure(Component.literal("No running challenge to pause."));
+            return 0;
+        }
+        controller.pause(source.getServer());
+        source.sendSuccess(() -> Component.literal("Challenge paused.").withStyle(ChatFormatting.YELLOW), true);
+        return 1;
+    }
+
+    private int resume(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ChallengeRun run = ChallengeXFabric.instance().activeRun();
+        if (run == null || run.state() != RunState.PAUSED) {
+            source.sendFailure(Component.literal("No paused challenge to resume."));
+            return 0;
+        }
+        controller.resume(source.getServer());
+        source.sendSuccess(() -> Component.literal("Challenge resumed.").withStyle(ChatFormatting.GREEN), true);
+        return 1;
+    }
+
+    private int info(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ChallengeRun run = ChallengeXFabric.instance().activeRun();
+        if (noChallengeLoaded(run)) {
+            source.sendSuccess(() -> Component.literal("No challenge loaded.").withStyle(ChatFormatting.YELLOW), false);
+            return 1;
+        }
+        for (Component line : ChallengeSummary.describe(run.challenge(), activePresetName, run.state())) {
+            source.sendSuccess(() -> line, false);
+        }
+        return 1;
+    }
+
+    private int configShow(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        source.sendSuccess(() -> Component.literal("Timer color: " + timerConfig.timerColor())
+                .withStyle(ChatFormatting.GOLD), false);
+        source.sendSuccess(() -> Component.literal("Change it with /challenge config timer_color <color>.")
+                .withStyle(ChatFormatting.GRAY), false);
+        return 1;
+    }
+
+    private int timerColorShow(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        source.sendSuccess(() -> Component.literal("Timer color: " + timerConfig.timerColor()
+                + " (click a color to use it):").withStyle(ChatFormatting.GOLD), false);
+        for (String color : TimerColors.names()) {
+            source.sendSuccess(() -> colorLink(color), false);
+        }
+        return 1;
+    }
+
+    private int timerColorSet(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        String color = StringArgumentType.getString(context, "color");
+        if (!timerConfig.setTimerColor(color)) {
+            source.sendFailure(Component.literal("Unknown color '" + color + "'. Options: "
+                    + String.join(", ", TimerColors.names())));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.literal("Timer color set to " + color + ".")
+                .withStyle(ChatFormatting.GREEN), true);
+        return 1;
+    }
+
+    private Component colorLink(String color) {
+        return Component.literal("  • " + color).withStyle(style -> style
+                .withColor(ChatFormatting.YELLOW)
+                .withClickEvent(new ClickEvent.RunCommand("/challenge config timer_color " + color))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Use the " + color + " timer"))));
+    }
+
+    private CompletableFuture<Suggestions> suggestColors(CommandContext<CommandSourceStack> context,
+            SuggestionsBuilder builder) {
+        String prefix = builder.getRemaining().toLowerCase(Locale.ROOT);
+        for (String color : TimerColors.names()) {
+            if (color.startsWith(prefix)) {
+                builder.suggest(color);
+            }
+        }
+        return builder.buildFuture();
     }
 
     private CompletableFuture<Suggestions> suggestPresets(CommandContext<CommandSourceStack> context,
