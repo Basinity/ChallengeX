@@ -19,12 +19,18 @@ public final class TimerColors {
     /** The default color. */
     public static final String DEFAULT = "white";
 
-    /** Characters of text spanned by one full trip through a ramp. */
-    private static final double CHARS_PER_CYCLE = 7.0;
+    /**
+     * Characters of text spanned by scrolling one ramp stop's distance. A full
+     * band is this times the ramp's length, so the per-stop distance between
+     * adjacent characters stays the same whether a ramp has two stops or the
+     * rainbow's twenty-four, mirroring how TICKS_PER_STOP keeps per-stop speed
+     * constant below.
+     */
+    private static final double CHARS_PER_STOP = 3.5;
     /**
      * Ticks to scroll from one ramp color to the next; lower is faster. A full
      * band is this times the ramp's length, so the per-color speed stays the same
-     * whether a ramp has two stops or the rainbow's eight.
+     * whether a ramp has two stops or the rainbow's twenty-four.
      */
     private static final double TICKS_PER_STOP = 40.0;
 
@@ -54,7 +60,18 @@ public final class TimerColors {
         RAMPS.put("yellow", new int[] {0xFFFF55, 0xCCCC45});
         RAMPS.put("white", new int[] {0xFFFFFF, 0xD8D8D8});
         RAMPS.put("rainbow", new int[] {
-                0xFF5555, 0xFFAA00, 0xFFFF55, 0x55FF55, 0x55FFFF, 0x5599FF, 0xAA66FF, 0xFF66CC});
+                // red -> yellow (G rises)
+                0xFF0000, 0xFF4000, 0xFF8000, 0xFFC000,
+                // yellow -> green (R falls)
+                0xFFFF00, 0xC0FF00, 0x80FF00, 0x40FF00,
+                // green -> cyan (B rises)
+                0x00FF00, 0x00FF40, 0x00FF80, 0x00FFC0,
+                // cyan -> blue (G falls)
+                0x00FFFF, 0x00C0FF, 0x0080FF, 0x0040FF,
+                // blue -> magenta (R rises)
+                0x0000FF, 0x4000FF, 0x8000FF, 0xC000FF,
+                // magenta -> red (B falls)
+                0xFF00FF, 0xFF00C0, 0xFF0080, 0xFF0040});
     }
 
     private TimerColors() {
@@ -81,7 +98,7 @@ public final class TimerColors {
     public static Component gradient(int[] ramp, String text, int animTick) {
         MutableComponent line = Component.empty();
         for (int i = 0; i < text.length(); i++) {
-            double phase = (i / CHARS_PER_CYCLE) - (animTick / (TICKS_PER_STOP * ramp.length));
+            double phase = (i / (CHARS_PER_STOP * ramp.length)) - (animTick / (TICKS_PER_STOP * ramp.length));
             TextColor color = TextColor.fromRgb(sample(ramp, phase));
             line.append(Component.literal(String.valueOf(text.charAt(i)))
                     .withStyle(style -> style.withColor(color).withBold(true)));
