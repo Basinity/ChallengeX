@@ -17,6 +17,15 @@ import net.minecraft.server.level.ServerPlayer;
  */
 public interface ModifierEnforcer {
 
+    /**
+     * One-time registration at mod init, for an enforcer that needs to hook
+     * server events beyond the per-tick lifecycle (a share-inventory enforcer
+     * re-points a player's inventory on respawn and reconnect through Fabric
+     * events). Most enforcers keep to start/tick/stop and need not override this.
+     */
+    default void register() {
+    }
+
     default void start(ServerPlayer player, Modifier modifier, MinecraftServer server) {
     }
 

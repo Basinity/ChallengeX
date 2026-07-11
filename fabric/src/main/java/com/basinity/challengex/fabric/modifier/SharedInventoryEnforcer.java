@@ -2,18 +2,16 @@ package com.basinity.challengex.fabric.modifier;
 
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.Scope;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 
 /**
  * {@code modifier.share_inventory}: the players in the modifier's scope share
@@ -24,14 +22,21 @@ import net.minecraft.world.item.ItemStack;
  * screen is open stays private, because the cursor lives on the container menu
  * rather than in the inventory.
  *
- * <p>Sync is a per-tick diff rather than event hooks: nearly every inventory
- * mutation path would otherwise need its own hook, so instead each tick every
- * member's inventory is compared to the last synced state, and whoever changed
- * becomes the new shared state, pushed to the rest (up to a one-tick delay,
- * imperceptible in play). When the modifier first activates for a group the
- * first member seen seeds the shared inventory and the rest receive a copy,
- * which is also how a player joining an in-progress run is handed the group's
- * inventory.
+ * <p>Sharing is by reference, not by copying: every group member's {@code
+ * Inventory.items} list and their equipment's armor/offhand map point at one
+ * {@link SharedInventory} object per group (through {@link
+ * SharedInventoryAccess}, a Mixin seam on {@code Inventory}). A mutation is
+ * therefore inherently visible to everyone with no per-tick diffing and no
+ * same-tick loss when two members change the inventory in the same tick. {@link
+ * #tick} does nothing; the wiring lives in {@link #start}/{@link #stop} and, for
+ * the player objects vanilla rebuilds, in the respawn and reconnect events
+ * hooked by {@link #register}.
+ *
+ * <p>When the modifier first activates for a group the first member seen seeds
+ * the shared inventory and later members receive it, which is also how a player
+ * joining an in-progress run is handed the group's inventory. Leaving the group
+ * ({@link #stop}) detaches with a private copy, so the departing player keeps
+ * the items and the shared object lives on for the rest.
  *
  * <p>The shared state is keyed per group: an {@code every_player} scope is one
  * group, and each distinct {@code specific_players} set is its own, so two
@@ -43,112 +48,70 @@ public final class SharedInventoryEnforcer implements ModifierEnforcer {
 
     private static final String EVERY_PLAYER_GROUP = "*";
 
-    /** Group key to its shared inventory (one item per addressable slot). */
-    private final Map<String, List<ItemStack>> canonicalByGroup = new HashMap<>();
-    /** Player to the shared inventory they were last synced to, for change detection. */
-    private final Map<UUID, List<ItemStack>> lastSyncedByPlayer = new HashMap<>();
+    /** Group key to its shared inventory object every member points at. */
+    private final Map<String, SharedInventory> sharedByGroup = new HashMap<>();
     /** Group key to its current member players, so a group's state is dropped once empty. */
     private final Map<String, Set<UUID>> membersByGroup = new HashMap<>();
+    /**
+     * Player to the group they belong to, kept across disconnect and respawn so
+     * the respawn and reconnect events can re-point a rebuilt inventory without
+     * the enforcer's start/stop having to fire again.
+     */
+    private final Map<UUID, String> groupByPlayer = new HashMap<>();
+
+    @Override
+    public void register() {
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> rewire(newPlayer));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> rewire(handler.player));
+    }
 
     @Override
     public void start(ServerPlayer player, Modifier modifier, MinecraftServer server) {
         String group = groupKey(modifier);
         membersByGroup.computeIfAbsent(group, ignored -> new HashSet<>()).add(player.getUUID());
-        List<ItemStack> canonical = canonicalByGroup.get(group);
-        if (canonical == null) {
-            canonical = read(player);
-            canonicalByGroup.put(group, canonical);
-        } else {
-            applyTo(player, canonical);
+        groupByPlayer.put(player.getUUID(), group);
+        SharedInventoryAccess inventory = (SharedInventoryAccess) player.getInventory();
+        SharedInventory shared = sharedByGroup.get(group);
+        if (shared == null) {
+            shared = new SharedInventory();
+            inventory.challengex$seedInto(shared);
+            sharedByGroup.put(group, shared);
         }
-        lastSyncedByPlayer.put(player.getUUID(), canonical);
-    }
-
-    @Override
-    public void tick(ServerPlayer player, Modifier modifier, MinecraftServer server) {
-        if (!hasChanged(player, lastSyncedByPlayer.get(player.getUUID()))) {
-            return;
-        }
-        String group = groupKey(modifier);
-        List<ItemStack> canonical = read(player);
-        canonicalByGroup.put(group, canonical);
-        for (ServerPlayer member : groupMembers(modifier, server)) {
-            if (!member.getUUID().equals(player.getUUID())) {
-                applyTo(member, canonical);
-            }
-            lastSyncedByPlayer.put(member.getUUID(), canonical);
-        }
+        inventory.challengex$share(shared);
     }
 
     @Override
     public void stop(ServerPlayer player, Modifier modifier, MinecraftServer server) {
-        lastSyncedByPlayer.remove(player.getUUID());
+        ((SharedInventoryAccess) player.getInventory()).challengex$detach();
+        groupByPlayer.remove(player.getUUID());
         String group = groupKey(modifier);
         Set<UUID> members = membersByGroup.get(group);
         if (members != null) {
             members.remove(player.getUUID());
             if (members.isEmpty()) {
                 membersByGroup.remove(group);
-                canonicalByGroup.remove(group);
+                sharedByGroup.remove(group);
             }
         }
     }
 
     @Override
     public void serverStopped() {
-        canonicalByGroup.clear();
-        lastSyncedByPlayer.clear();
+        sharedByGroup.clear();
         membersByGroup.clear();
+        groupByPlayer.clear();
     }
 
-    /** Whether the player's live inventory differs from the shared state they last synced to. */
-    private boolean hasChanged(ServerPlayer player, List<ItemStack> lastSynced) {
-        Inventory inventory = player.getInventory();
-        if (lastSynced == null || lastSynced.size() != inventory.getContainerSize()) {
-            return true;
+    /** Re-points a rebuilt player inventory at its group's shared object, if it has one. */
+    private void rewire(ServerPlayer player) {
+        String group = groupByPlayer.get(player.getUUID());
+        if (group == null) {
+            return;
         }
-        for (int slot = 0; slot < lastSynced.size(); slot++) {
-            if (!ItemStack.matches(inventory.getItem(slot), lastSynced.get(slot))) {
-                return true;
-            }
+        SharedInventory shared = sharedByGroup.get(group);
+        if (shared != null) {
+            ((SharedInventoryAccess) player.getInventory()).challengex$share(shared);
         }
-        return false;
-    }
-
-    /** A fresh copy of every addressable inventory slot, for the shared state. */
-    private List<ItemStack> read(ServerPlayer player) {
-        Inventory inventory = player.getInventory();
-        int size = inventory.getContainerSize();
-        List<ItemStack> slots = new ArrayList<>(size);
-        for (int slot = 0; slot < size; slot++) {
-            slots.add(inventory.getItem(slot).copy());
-        }
-        return slots;
-    }
-
-    /** Overwrites the player's inventory with a copy of the shared state. */
-    private void applyTo(ServerPlayer player, List<ItemStack> canonical) {
-        Inventory inventory = player.getInventory();
-        int size = Math.min(inventory.getContainerSize(), canonical.size());
-        for (int slot = 0; slot < size; slot++) {
-            inventory.setItem(slot, canonical.get(slot).copy());
-        }
-    }
-
-    /** The online players sharing this modifier's inventory. */
-    private List<ServerPlayer> groupMembers(Modifier modifier, MinecraftServer server) {
-        Scope.Absolute scope = modifier.scope().orElseThrow();
-        List<ServerPlayer> online = server.getPlayerList().getPlayers();
-        if (scope instanceof Scope.SpecificPlayers specific) {
-            List<ServerPlayer> members = new ArrayList<>();
-            for (ServerPlayer player : online) {
-                if (specific.playerIds().contains(player.getScoreboardName())) {
-                    members.add(player);
-                }
-            }
-            return members;
-        }
-        return online;
     }
 
     /** A stable key for the group a scope defines: one for every-player, one per specific roster. */

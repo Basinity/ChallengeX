@@ -29,6 +29,7 @@ public final class ModifierEnforcementTickSource {
     private final Map<String, ModifierEnforcer> enforcers = ModifierEnforcers.byId();
 
     public void register(ModifierContext context) {
+        enforcers.values().forEach(ModifierEnforcer::register);
         ServerTickEvents.END_SERVER_TICK.register(server -> tick(server, context));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             activeByPlayer.clear();
