@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.server.MinecraftServer;
@@ -15,10 +16,16 @@ public final class SwapPositionHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
+        Set<ServerPlayer> swapped = new HashSet<>();
         for (ServerPlayer target : targets) {
-            ServerPlayer other = Players.randomOther(target, server);
+            if (swapped.contains(target)) {
+                continue;
+            }
+            ServerPlayer other = Players.randomOther(target, server, swapped);
             if (other != null) {
                 swapPositions(target, other);
+                swapped.add(target);
+                swapped.add(other);
             }
         }
     }
