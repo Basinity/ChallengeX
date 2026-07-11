@@ -18,6 +18,16 @@ public interface TriggerContext {
     void emit(GameEvent event);
 
     /**
+     * Ticks the active run has actually spent {@code RUNNING}: frozen while
+     * paused or not yet started, and back to zero after a reset or a fresh
+     * import. Zero when no run is active. Schedule sources anchor themselves
+     * to this rather than server uptime, so a period stays locked to when the
+     * run itself started instead of whatever gap sat before {@code /challenge
+     * start}.
+     */
+    long elapsedTicks();
+
+    /**
      * The distinct values the active challenge configures for a trigger
      * parameter, across every rule using that trigger. Threshold and schedule
      * sources ask this to learn what to watch for, since "below 5 hearts" and

@@ -39,4 +39,10 @@ final class FabricTriggerContext implements TriggerContext {
         ChallengeRun run = activeRun.get();
         return run == null ? List.of() : run.challenge().triggerParamValues(triggerId, paramName);
     }
+
+    @Override
+    public long elapsedTicks() {
+        ChallengeRun run = activeRun.get();
+        return run == null ? 0 : run.elapsedTicks();
+    }
 }

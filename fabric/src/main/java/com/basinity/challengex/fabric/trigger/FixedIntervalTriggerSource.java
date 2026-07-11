@@ -3,7 +3,6 @@ package com.basinity.challengex.fabric.trigger;
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;
 import java.util.Map;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 /**
@@ -12,10 +11,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
  * event, so the source reads the configured periods and schedules them itself.
  * Playerless: a clock ticking over is nobody's doing.
  *
- * <p>It counts real server ticks, not the world clock, so it keeps its pace
- * through a slept night or a changed time. The count runs from server start,
- * the same stand-in the loaded-challenge-is-active rule uses until the
- * run-lifecycle phase lands a real run clock to measure from.
+ * <p>It schedules off the run's own elapsed clock ({@link
+ * TriggerContext#elapsedTicks()}) rather than server uptime, so the period is
+ * anchored to when the run actually started and freezes along with it while
+ * paused, instead of carrying forward whatever gap sat between server start
+ * and {@code /challenge start} as a permanent offset from the action-bar
+ * clock.
  */
 public final class FixedIntervalTriggerSource implements TriggerSource {
 
@@ -24,12 +25,13 @@ public final class FixedIntervalTriggerSource implements TriggerSource {
     private static final long MIN_SECONDS = 1;
     private static final long MAX_SECONDS = 24 * 60 * 60;
 
-    private long ticks;
-
     @Override
     public void register(TriggerContext context) {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            ticks++;
+            long ticks = context.elapsedTicks();
+            if (ticks == 0) {
+                return;
+            }
             for (ParamValue configured : context.configured(TRIGGER_ID, "seconds")) {
                 long period = clamp(TriggerParams.integer(configured));
                 if (ticks % (period * TICKS_PER_SECOND) == 0) {
@@ -37,7 +39,6 @@ public final class FixedIntervalTriggerSource implements TriggerSource {
                 }
             }
         });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> ticks = 0);
     }
 
     private static long clamp(long seconds) {
