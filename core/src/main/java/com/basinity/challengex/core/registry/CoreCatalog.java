@@ -83,7 +83,7 @@ public final class CoreCatalog {
         trigger(registry, "weather_changed", false, optional("weather", STRING));
         trigger(registry, "time_of_day", false, required("time", STRING));
         trigger(registry, "fixed_interval", false, required("seconds", INT));
-        trigger(registry, "chat_message", true,  optional("message", STRING));
+        trigger(registry, "chat_message", true, optional("message", STRING));
         trigger(registry, "game_beaten", true);
     }
 
