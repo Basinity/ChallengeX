@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 /**
  * The mod's persistent settings, held in {@code config/challengex/config.json}
  * alongside the presets folder. For now it holds one thing: the run-clock
- * colour. It is read once at startup and rewritten whenever a setting changes,
+ * color. It is read once at startup and rewritten whenever a setting changes,
  * so an edit through {@code /challenge config} lands in the file and the running
  * gradient picks it up on its next frame.
  */
@@ -53,12 +53,12 @@ public final class TimerConfig {
         return timerColor;
     }
 
-    /** The colour ramp the action-bar clock should draw in right now. */
+    /** The color ramp the action-bar clock should draw in right now. */
     public int[] timerRamp() {
         return TimerColors.ramp(timerColor);
     }
 
-    /** Sets and persists the run-clock colour; false when the name is not a known colour. */
+    /** Sets and persists the run-clock color; false when the name is not a known color. */
     public boolean setTimerColor(String name) {
         if (!TimerColors.has(name)) {
             return false;
