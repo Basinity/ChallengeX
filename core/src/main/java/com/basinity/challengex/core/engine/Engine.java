@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -150,6 +151,31 @@ public final class Engine {
 
     public RunOutcome outcome() {
         return outcome;
+    }
+
+    /** The indices of the goal requirements already met, for a run snapshot. */
+    public Set<Integer> goalProgress() {
+        return Set.copyOf(metGoalRequirements);
+    }
+
+    /**
+     * Rebuilds an engine mid-run from a saved snapshot's state without replaying
+     * the events that produced it: the elapsed clock, the decided outcome, and
+     * the goal requirements already met are restored directly. The challenge is
+     * validated as it is on a fresh engine, and the time-limit budget is
+     * recomputed from it rather than stored.
+     */
+    public static Engine restore(Challenge challenge, Registries registries,
+            long elapsedTicks, RunOutcome outcome, Set<Integer> goalProgress) {
+        Objects.requireNonNull(outcome, "outcome");
+        if (elapsedTicks < 0) {
+            throw new IllegalArgumentException("elapsedTicks must not be negative");
+        }
+        Engine engine = new Engine(challenge, registries);
+        engine.elapsedTicks = elapsedTicks;
+        engine.outcome = outcome;
+        engine.metGoalRequirements.addAll(goalProgress);
+        return engine;
     }
 
     private boolean matches(Rule rule, GameEvent event) {

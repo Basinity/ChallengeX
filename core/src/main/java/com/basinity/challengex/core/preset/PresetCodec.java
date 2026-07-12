@@ -57,7 +57,16 @@ public final class PresetCodec {
         JsonObject root = new JsonObject();
         root.addProperty("schemaVersion", SCHEMA_VERSION);
         root.addProperty("name", preset.name());
-        Challenge challenge = preset.challenge();
+        writeChallenge(root, preset.challenge());
+        return new GsonBuilder().setPrettyPrinting().create().toJson(root);
+    }
+
+    /**
+     * Writes a challenge's rules, goal, and modifiers onto the given object. The
+     * run-snapshot codec reuses this so a persisted run's composition is written
+     * exactly as a preset's is.
+     */
+    void writeChallenge(JsonObject target, Challenge challenge) {
         if (!challenge.rules().isEmpty()) {
             JsonArray rules = new JsonArray();
             for (Rule rule : challenge.rules()) {
@@ -68,10 +77,10 @@ public final class PresetCodec {
                         rule.effect().scope()));
                 rules.add(ruleJson);
             }
-            root.add("rules", rules);
+            target.add("rules", rules);
         }
         challenge.goal().ifPresent(goal ->
-                root.add("goal", blockJson(goal.goalId(), goal.params(), Optional.empty())));
+                target.add("goal", blockJson(goal.goalId(), goal.params(), Optional.empty())));
         if (!challenge.modifiers().isEmpty()) {
             JsonArray modifiers = new JsonArray();
             for (Modifier modifier : challenge.modifiers()) {
@@ -80,9 +89,8 @@ public final class PresetCodec {
                 modifier.expiryTicks().ifPresent(ticks -> modifierJson.addProperty("expiryTicks", ticks));
                 modifiers.add(modifierJson);
             }
-            root.add("modifiers", modifiers);
+            target.add("modifiers", modifiers);
         }
-        return new GsonBuilder().setPrettyPrinting().create().toJson(root);
     }
 
     public Preset fromJson(String json) throws PresetFormatException {
@@ -105,18 +113,33 @@ public final class PresetCodec {
 
         List<String> problems = new ArrayList<>();
         String name = readName(root, problems);
-        List<Rule> rules = readRules(root, problems);
-        Optional<Goal> goal = readGoal(root, problems);
-        List<Modifier> modifiers = readModifiers(root, problems);
+        Challenge challenge = readChallenge(root, problems);
 
         if (problems.isEmpty()) {
-            Challenge challenge = new Challenge(rules, goal, modifiers);
-            problems.addAll(ChallengeValidation.problemsOf(challenge, registries));
-            if (problems.isEmpty()) {
-                return new Preset(name, challenge);
-            }
+            return new Preset(name, challenge);
         }
         throw new PresetFormatException(problems);
+    }
+
+    /**
+     * Reads a challenge's rules, goal, and modifiers from the given object and
+     * validates the whole against the registries. Every problem found is added
+     * to the list; the return is non-null only when the object read cleanly, so
+     * a caller trusts it exactly when it added no problems. The run-snapshot
+     * codec reuses this so a persisted run's composition faces the same strict
+     * validation a preset's does.
+     */
+    Challenge readChallenge(JsonObject source, List<String> problems) {
+        int before = problems.size();
+        List<Rule> rules = readRules(source, problems);
+        Optional<Goal> goal = readGoal(source, problems);
+        List<Modifier> modifiers = readModifiers(source, problems);
+        if (problems.size() > before) {
+            return null;
+        }
+        Challenge challenge = new Challenge(rules, goal, modifiers);
+        problems.addAll(ChallengeValidation.problemsOf(challenge, registries));
+        return problems.size() > before ? null : challenge;
     }
 
     // ---- writing helpers ----

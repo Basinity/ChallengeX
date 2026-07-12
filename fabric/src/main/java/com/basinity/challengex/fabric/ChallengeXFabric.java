@@ -6,6 +6,8 @@ import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.command.ChallengeCommand;
 import com.basinity.challengex.fabric.command.PresetStore;
 import com.basinity.challengex.fabric.lifecycle.RunController;
+import com.basinity.challengex.fabric.lifecycle.RunPersistenceBridge;
+import com.basinity.challengex.fabric.lifecycle.RunStore;
 import com.basinity.challengex.fabric.lifecycle.TimerConfig;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
@@ -45,20 +47,31 @@ public class ChallengeXFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         instance = this;
+        registerTriggerSources();
+        registerModifierEnforcement();
+        TimerConfig timerConfig = new TimerConfig(LOGGER);
+        timerConfig.load();
+        RunStore runStore = new RunStore(LOGGER);
+        RunController runController = new RunController(() -> activeRun, timerConfig, runStore);
+        runController.register();
+        // Autosave and shutdown write the run through the same routine the
+        // lifecycle transitions use, so run.json stays current between them.
+        RunPersistenceBridge.arm(runController::save);
         ServerLifecycleEvents.SERVER_STARTED.register(startedServer -> {
             server = startedServer;
-            loadChallenge(Challenge.empty());
+            // Resume a saved run, else start empty. A restored paused run is
+            // re-frozen and a finished one is not re-announced (onRestored).
+            runStore.load(startedServer).ifPresentOrElse(snapshot -> {
+                activeRun = ChallengeRun.restore(snapshot, CoreCatalog.createRegistries(),
+                        new FabricEffectExecutor(startedServer, LOGGER));
+                runController.onRestored(startedServer, snapshot.state());
+                LOGGER.info("Restored {} run at {} ticks.", snapshot.state(), snapshot.elapsedTicks());
+            }, () -> loadChallenge(Challenge.empty()));
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(stoppedServer -> {
             activeRun = null;
             server = null;
         });
-        registerTriggerSources();
-        registerModifierEnforcement();
-        TimerConfig timerConfig = new TimerConfig(LOGGER);
-        timerConfig.load();
-        RunController runController = new RunController(() -> activeRun, timerConfig);
-        runController.register();
         PresetStore presetStore = new PresetStore(LOGGER);
         presetStore.ensureDir();
         new ChallengeCommand(presetStore, runController, timerConfig).register();

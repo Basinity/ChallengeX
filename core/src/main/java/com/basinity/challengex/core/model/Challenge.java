@@ -24,6 +24,11 @@ public record Challenge(List<Rule> rules, Optional<Goal> goal, List<Modifier> mo
         return new Challenge(List.of(), Optional.empty(), List.of());
     }
 
+    /** Whether nothing has been composed: no rules, no goal, and no modifiers. */
+    public boolean isEmpty() {
+        return rules.isEmpty() && goal.isEmpty() && modifiers.isEmpty();
+    }
+
     /**
      * The distinct values configured for one parameter of one trigger, across
      * every rule using that trigger. Threshold and schedule triggers (health

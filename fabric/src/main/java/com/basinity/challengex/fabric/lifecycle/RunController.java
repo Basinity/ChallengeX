@@ -28,13 +28,15 @@ public final class RunController {
 
     private final Supplier<ChallengeRun> activeRun;
     private final TimerConfig timerConfig;
+    private final RunStore runStore;
     private final PauseControl pause = new PauseControl();
     private RunState previous = RunState.NOT_STARTED;
     private int animTick;
 
-    public RunController(Supplier<ChallengeRun> activeRun, TimerConfig timerConfig) {
+    public RunController(Supplier<ChallengeRun> activeRun, TimerConfig timerConfig, RunStore runStore) {
         this.activeRun = activeRun;
         this.timerConfig = timerConfig;
+        this.runStore = runStore;
     }
 
     public void register() {
@@ -52,6 +54,7 @@ public final class RunController {
         RunState state = run.state();
         if (previous != RunState.FINISHED && state == RunState.FINISHED) {
             RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks());
+            save(server);
         }
         if (state == RunState.PAUSED) {
             pause.holdPlayers(server);
@@ -62,10 +65,11 @@ public final class RunController {
     }
 
     /** Begins a not-started run. The caller has already checked it is startable. */
-    public void start() {
+    public void start(MinecraftServer server) {
         ChallengeRun run = activeRun.get();
         if (run != null) {
             run.start();
+            save(server);
         }
     }
 
@@ -75,6 +79,7 @@ public final class RunController {
         if (run != null) {
             run.pause();
             pause.freeze(server);
+            save(server);
         }
     }
 
@@ -84,6 +89,7 @@ public final class RunController {
         if (run != null) {
             run.resume();
             pause.unfreeze(server);
+            save(server);
         }
     }
 
@@ -95,12 +101,39 @@ public final class RunController {
             run.reset();
         }
         previous = RunState.NOT_STARTED;
+        save(server);
     }
 
     /** A freshly imported challenge starts not-started; lift any freeze from the last run. */
     public void onChallengeReplaced(MinecraftServer server) {
         pause.unfreeze(server);
         previous = RunState.NOT_STARTED;
+        save(server);
+    }
+
+    /**
+     * Syncs the controller to a run restored from disk on server start: a paused
+     * run is re-frozen (the tick-freeze itself does not persist), and marking the
+     * previous state as the restored one keeps a finished run from re-announcing.
+     */
+    public void onRestored(MinecraftServer server, RunState state) {
+        previous = state;
+        if (state == RunState.PAUSED) {
+            pause.freeze(server);
+        }
+    }
+
+    /**
+     * Persists the current run so {@code run.json} mirrors it. An empty,
+     * never-imported challenge writes nothing: there is no run to resume until a
+     * preset is imported.
+     */
+    public void save(MinecraftServer server) {
+        ChallengeRun run = activeRun.get();
+        if (run == null || run.challenge().isEmpty()) {
+            return;
+        }
+        runStore.save(server, run.snapshot());
     }
 
     private void renderActionBar(MinecraftServer server, ChallengeRun run, RunState state) {

@@ -171,7 +171,7 @@ public final class ChallengeCommand {
                 return 0;
             }
             case NOT_STARTED -> {
-                controller.start();
+                controller.start(source.getServer());
                 source.sendSuccess(() -> Component.literal("Challenge started.").withStyle(ChatFormatting.GREEN), true);
                 return 1;
             }

@@ -24,6 +24,7 @@
     "MountedMixin",
     "ProjectileShotMixin",
     "ResultSlotMixin",
+    "ServerSaveMixin",
     "SharedInventoryMixin",
     "ShieldBlockedMixin",
     "ToolBrokeMixin",

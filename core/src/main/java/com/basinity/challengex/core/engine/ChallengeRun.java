@@ -35,6 +35,26 @@ public final class ChallengeRun {
         this.engine = new Engine(challenge, registries);
     }
 
+    /**
+     * Rebuilds a run from a saved snapshot: the engine is restored mid-run and
+     * the lifecycle state is taken from the snapshot, so the run resumes exactly
+     * where it left off rather than reloading as a fresh not-started import.
+     */
+    public static ChallengeRun restore(RunSnapshot snapshot, Registries registries,
+            EffectExecutor executor) {
+        ChallengeRun run = new ChallengeRun(snapshot.challenge(), registries, executor);
+        run.engine = Engine.restore(snapshot.challenge(), registries,
+                snapshot.elapsedTicks(), snapshot.outcome(), snapshot.goalProgress());
+        run.state = snapshot.state();
+        return run;
+    }
+
+    /** Captures the whole run — composition, state, clock, outcome, goal progress. */
+    public RunSnapshot snapshot() {
+        return new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, challenge, state,
+                engine.elapsedTicks(), engine.outcome(), engine.goalProgress());
+    }
+
     public RunState state() {
         return state;
     }

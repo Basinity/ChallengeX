@@ -155,4 +155,42 @@ class ChallengeRunTest {
         assertEquals(60, run.displayTicks());
         assertTrue(run.timeLimitTicks().isEmpty());
     }
+
+    @Test
+    void snapshotAndRestoreResumeARunMidClock() {
+        List<EffectCommand> executed = new ArrayList<>();
+        ChallengeRun run = runFor(executed::add, Rule.of("trigger.jumped", "effect.heal"));
+        run.start();
+        run.pause();
+
+        RunSnapshot snapshot = run.snapshot();
+        assertEquals(RunState.PAUSED, snapshot.state());
+
+        ChallengeRun restored = ChallengeRun.restore(snapshot, registries, executed::add);
+        assertEquals(RunState.PAUSED, restored.state());
+
+        // A paused restored run stays frozen until resumed, then keeps its clock.
+        restored.resume();
+        restored.tick(75);
+        assertEquals(75, restored.elapsedTicks());
+        restored.handle(GameEvent.of("trigger.jumped", "alice"));
+        assertEquals(1, executed.size());
+    }
+
+    @Test
+    void restoringAFinishedRunKeepsItsOutcome() {
+        Challenge challenge = new Challenge(List.of(), Optional.empty(),
+                List.of(new Modifier("modifier.time_limit", Map.of("minutes", ParamValue.of(1)),
+                        Optional.empty(), OptionalLong.empty())));
+        ChallengeRun run = runOf(challenge, command -> { });
+        run.start();
+        run.tick(1200);
+        assertEquals(RunState.FINISHED, run.state());
+
+        ChallengeRun restored = ChallengeRun.restore(run.snapshot(), registries, command -> { });
+
+        assertEquals(RunState.FINISHED, restored.state());
+        assertEquals(RunOutcome.LOSS, restored.outcome());
+        assertEquals(1200, restored.elapsedTicks());
+    }
 }
