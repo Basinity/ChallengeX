@@ -7,16 +7,17 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * {@code trigger.damage_taken}: a player took damage. The {@code source}
- * parameter matches the damage type id ({@code minecraft:lava}); omitting it
- * fires on any damage.
+ * {@code trigger.damage_taken}: a player was hit. A hit that lands but deals
+ * no damage still counts; a hit blocked by a shield does not (that's {@code
+ * trigger.shield_blocked}'s job). The {@code source} parameter matches the
+ * damage type id ({@code minecraft:lava}); omitting it fires on any damage.
  */
 public final class DamageTakenTriggerSource implements TriggerSource {
 
     @Override
     public void register(TriggerContext context) {
         ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
-            if (!(entity instanceof ServerPlayer player)) {
+            if (blocked || !(entity instanceof ServerPlayer player)) {
                 return;
             }
             context.emit(GameEvent.of("trigger.damage_taken", player.getScoreboardName(),
