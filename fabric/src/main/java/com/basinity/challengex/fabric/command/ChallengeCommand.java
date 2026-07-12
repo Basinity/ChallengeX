@@ -9,7 +9,8 @@ import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.ChallengeXFabric;
 import com.basinity.challengex.fabric.lifecycle.RunController;
 import com.basinity.challengex.fabric.lifecycle.TimerColors;
-import com.basinity.challengex.fabric.lifecycle.TimerConfig;
+import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -17,6 +18,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
@@ -25,6 +27,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * The {@code /challenge} command tree: the mod's real admin surface for loading
@@ -32,7 +35,9 @@ import net.minecraft.network.chat.HoverEvent;
  * preset files in the config folder as clickable entries and prints the folder
  * path as click-to-copy text; {@code import <file>} parses that preset and swaps
  * it in as the active challenge; {@code reload} re-reads the last imported file.
- * The whole tree is gated on op level 2.
+ * Every mutating verb is gated on op level 2; {@code info} and {@code config},
+ * which only read the run or edit the caller's own display preferences, are open
+ * to everyone.
  *
  * <p>A rejected preset (unknown ids, bad scopes, malformed JSON) leaves the
  * active challenge untouched and prints every problem the codec found at once,
@@ -43,24 +48,26 @@ public final class ChallengeCommand {
     private final PresetStore store;
     private final PresetCodec codec;
     private final RunController controller;
-    private final TimerConfig timerConfig;
+    private final TimerPreferences preferences;
 
     /** The last preset imported this session, so {@code reload} knows what to re-read. */
     private String activePresetName;
 
-    public ChallengeCommand(PresetStore store, RunController controller, TimerConfig timerConfig) {
+    public ChallengeCommand(PresetStore store, RunController controller, TimerPreferences preferences) {
         this.store = store;
         this.controller = controller;
-        this.timerConfig = timerConfig;
+        this.preferences = preferences;
         this.codec = new PresetCodec(CoreCatalog.createRegistries());
     }
 
     /**
      * The tree root carries no permission gate: every mutating leaf (import,
      * reload, start, reset, pause, resume) gates itself on op level 2, while the
-     * read-only {@code info} view stays open to all players. That is what lets
-     * the clickable "view configuration" control on the run-end message work for
-     * everyone in the run, not just the operator.
+     * read-only {@code info} view and the personal {@code config} preferences
+     * stay open to all players. That is what lets the clickable "view
+     * configuration" control on the run-end message work for everyone in the
+     * run, not just the operator, and what lets every player pick their own
+     * clock color or hide the clock without needing op.
      */
     public void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
@@ -80,13 +87,17 @@ public final class ChallengeCommand {
                                 .executes(this::pause))
                         .then(Commands.literal("resume").requires(Perms.requireAdmin())
                                 .executes(this::resume))
-                        .then(Commands.literal("config").requires(Perms.requireAdmin())
+                        .then(Commands.literal("config")
                                 .executes(this::configShow)
                                 .then(Commands.literal("timer_color")
                                         .executes(this::timerColorShow)
                                         .then(Commands.argument("color", StringArgumentType.word())
                                                 .suggests(this::suggestColors)
-                                                .executes(this::timerColorSet))))
+                                                .executes(this::timerColorSet)))
+                                .then(Commands.literal("hide_timer")
+                                        .executes(this::hideTimerShow)
+                                        .then(Commands.argument("hidden", BoolArgumentType.bool())
+                                                .executes(this::hideTimerSet))))
                         .then(Commands.literal("info")
                                 .executes(this::info))));
     }
@@ -226,16 +237,30 @@ public final class ChallengeCommand {
 
     private int configShow(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.literal("Timer color: " + timerConfig.timerColor())
+        Optional<ServerPlayer> player = caller(source);
+        if (player.isEmpty()) {
+            return 0;
+        }
+        UUID id = player.get().getUUID();
+        source.sendSuccess(() -> Component.literal("Your timer color: " + preferences.timerColor(id))
                 .withStyle(ChatFormatting.GOLD), false);
-        source.sendSuccess(() -> Component.literal("Change it with /challenge config timer_color <color>.")
+        source.sendSuccess(() -> Component.literal("Your timer hidden: " + preferences.hideTimer(id))
+                .withStyle(ChatFormatting.GOLD), false);
+        source.sendSuccess(() -> Component.literal("These are your own settings and affect nobody else."
+                + " Change them with /challenge config timer_color <color>"
+                + " and /challenge config hide_timer <true|false>.")
                 .withStyle(ChatFormatting.GRAY), false);
         return 1;
     }
 
     private int timerColorShow(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.literal("Timer color: " + timerConfig.timerColor()
+        Optional<ServerPlayer> player = caller(source);
+        if (player.isEmpty()) {
+            return 0;
+        }
+        UUID id = player.get().getUUID();
+        source.sendSuccess(() -> Component.literal("Your timer color: " + preferences.timerColor(id)
                 + " (click a color to use it):").withStyle(ChatFormatting.GOLD), false);
         for (String color : TimerColors.names()) {
             source.sendSuccess(() -> colorLink(color), false);
@@ -245,15 +270,58 @@ public final class ChallengeCommand {
 
     private int timerColorSet(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
+        Optional<ServerPlayer> player = caller(source);
+        if (player.isEmpty()) {
+            return 0;
+        }
         String color = StringArgumentType.getString(context, "color");
-        if (!timerConfig.setTimerColor(color)) {
+        if (!preferences.setTimerColor(player.get().getUUID(), color)) {
             source.sendFailure(Component.literal("Unknown color '" + color + "'. Options: "
                     + String.join(", ", TimerColors.names())));
             return 0;
         }
-        source.sendSuccess(() -> Component.literal("Timer color set to " + color + ".")
-                .withStyle(ChatFormatting.GREEN), true);
+        source.sendSuccess(() -> Component.literal("Your timer color is now " + color + ".")
+                .withStyle(ChatFormatting.GREEN), false);
         return 1;
+    }
+
+    private int hideTimerShow(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        Optional<ServerPlayer> player = caller(source);
+        if (player.isEmpty()) {
+            return 0;
+        }
+        UUID id = player.get().getUUID();
+        source.sendSuccess(() -> Component.literal("Your timer hidden: " + preferences.hideTimer(id))
+                .withStyle(ChatFormatting.GOLD), false);
+        return 1;
+    }
+
+    private int hideTimerSet(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        Optional<ServerPlayer> player = caller(source);
+        if (player.isEmpty()) {
+            return 0;
+        }
+        boolean hidden = BoolArgumentType.getBool(context, "hidden");
+        preferences.setHideTimer(player.get().getUUID(), hidden);
+        source.sendSuccess(() -> Component.literal(hidden
+                ? "Your timer is now hidden." : "Your timer is now shown.")
+                .withStyle(ChatFormatting.GREEN), false);
+        return 1;
+    }
+
+    /**
+     * The player whose preferences a {@code config} command reads or edits. These
+     * settings belong to a player, so the console has none to show or change.
+     */
+    private Optional<ServerPlayer> caller(CommandSourceStack source) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.literal(
+                    "/challenge config sets your own display settings, so a player has to run it."));
+        }
+        return Optional.ofNullable(player);
     }
 
     private Component colorLink(String color) {

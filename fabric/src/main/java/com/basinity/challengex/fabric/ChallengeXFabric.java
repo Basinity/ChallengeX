@@ -8,7 +8,7 @@ import com.basinity.challengex.fabric.command.PresetStore;
 import com.basinity.challengex.fabric.lifecycle.RunController;
 import com.basinity.challengex.fabric.lifecycle.RunPersistenceBridge;
 import com.basinity.challengex.fabric.lifecycle.RunStore;
-import com.basinity.challengex.fabric.lifecycle.TimerConfig;
+import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
 import com.basinity.challengex.fabric.modifier.ModifierContext;
@@ -49,10 +49,10 @@ public class ChallengeXFabric implements ModInitializer {
         instance = this;
         registerTriggerSources();
         registerModifierEnforcement();
-        TimerConfig timerConfig = new TimerConfig(LOGGER);
-        timerConfig.load();
+        TimerPreferences preferences = new TimerPreferences(LOGGER);
+        preferences.load();
         RunStore runStore = new RunStore(LOGGER);
-        RunController runController = new RunController(() -> activeRun, timerConfig, runStore);
+        RunController runController = new RunController(() -> activeRun, preferences, runStore);
         runController.register();
         // Autosave and shutdown write the run through the same routine the
         // lifecycle transitions use, so run.json stays current between them.
@@ -74,7 +74,7 @@ public class ChallengeXFabric implements ModInitializer {
         });
         PresetStore presetStore = new PresetStore(LOGGER);
         presetStore.ensureDir();
-        new ChallengeCommand(presetStore, runController, timerConfig).register();
+        new ChallengeCommand(presetStore, runController, preferences).register();
         LOGGER.info("ChallengeX initialized.");
     }
 

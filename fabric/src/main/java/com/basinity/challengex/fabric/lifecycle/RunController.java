@@ -2,6 +2,9 @@ package com.basinity.challengex.fabric.lifecycle;
 
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunState;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
@@ -27,15 +30,15 @@ public final class RunController {
     private static final int ANIMATION_PERIOD_TICKS = 100_000;
 
     private final Supplier<ChallengeRun> activeRun;
-    private final TimerConfig timerConfig;
+    private final TimerPreferences preferences;
     private final RunStore runStore;
     private final PauseControl pause = new PauseControl();
     private RunState previous = RunState.NOT_STARTED;
     private int animTick;
 
-    public RunController(Supplier<ChallengeRun> activeRun, TimerConfig timerConfig, RunStore runStore) {
+    public RunController(Supplier<ChallengeRun> activeRun, TimerPreferences preferences, RunStore runStore) {
         this.activeRun = activeRun;
-        this.timerConfig = timerConfig;
+        this.preferences = preferences;
         this.runStore = runStore;
     }
 
@@ -141,14 +144,25 @@ public final class RunController {
             return;
         }
         String time = RunClock.format(run.displayTicks());
-        MutableComponent bar = Component.empty()
-                .append(TimerColors.gradient(timerConfig.timerRamp(), time, animTick));
+        // The bar is per-player, since color and visibility are per-player
+        // preferences, but most players share a color: build one packet per
+        // distinct color this tick rather than one per player.
+        Map<String, ClientboundSetActionBarTextPacket> byColor = new HashMap<>();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            UUID id = player.getUUID();
+            if (preferences.hideTimer(id)) {
+                continue;
+            }
+            player.connection.send(byColor.computeIfAbsent(preferences.timerColor(id),
+                    color -> bar(TimerColors.ramp(color), time, state)));
+        }
+    }
+
+    private ClientboundSetActionBarTextPacket bar(int[] ramp, String time, RunState state) {
+        MutableComponent bar = Component.empty().append(TimerColors.gradient(ramp, time, animTick));
         if (state == RunState.PAUSED) {
             bar.append(Component.literal("  (paused)").withStyle(ChatFormatting.GRAY));
         }
-        ClientboundSetActionBarTextPacket packet = new ClientboundSetActionBarTextPacket(bar);
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            player.connection.send(packet);
-        }
+        return new ClientboundSetActionBarTextPacket(bar);
     }
 }
