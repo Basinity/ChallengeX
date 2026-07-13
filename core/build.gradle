@@ -28,3 +28,18 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// The web builder renders its forms from this file, so the registries stay the
+// single source of truth for what exists and what it takes. Re-run after adding
+// or changing a catalog entry; the result is committed alongside the site.
+def webCatalog = rootProject.file('web/assets/js/catalog.js')
+
+tasks.register('exportCatalog', JavaExec) {
+    group = 'build'
+    description = 'Regenerates the web builder catalog from the core registries.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.basinity.challengex.core.registry.CatalogExportMain'
+    args webCatalog.absolutePath
+    inputs.files(sourceSets.main.output)
+    outputs.file(webCatalog)
+}
