@@ -15,6 +15,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -30,7 +31,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * The {@code /challenge} command tree: the mod's real admin surface for loading
+ * The {@code /challengex} command tree: the mod's real admin surface for loading
  * challenges without a server restart. {@code import} with no argument lists the
  * preset files in the config folder as clickable entries and prints the folder
  * path as click-to-copy text; {@code import <file>} parses that preset and swaps
@@ -53,6 +54,9 @@ public final class ChallengeCommand {
     /** The last preset imported this session, so {@code reload} knows what to re-read. */
     private String activePresetName;
 
+    /** The companion web builder, where challenges are composed outside the game. */
+    private static final String BUILDER_URL = "https://challengex.basinity.com";
+
     public ChallengeCommand(PresetStore store, RunController controller, TimerPreferences preferences) {
         this.store = store;
         this.controller = controller;
@@ -71,7 +75,8 @@ public final class ChallengeCommand {
      */
     public void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                dispatcher.register(Commands.literal("challenge")
+                dispatcher.register(Commands.literal("challengex")
+                        .executes(this::about)
                         .then(Commands.literal("import").requires(Perms.requireAdmin())
                                 .executes(this::listPresets)
                                 .then(Commands.argument("file", StringArgumentType.greedyString())
@@ -102,14 +107,30 @@ public final class ChallengeCommand {
                                 .executes(this::info))));
     }
 
+    /**
+     * The bare {@code /challengex} landing line: what the mod is, plus a clickable
+     * link to the web builder. It is ungated so every player, not just the
+     * operator, has an in-game path to where challenges are built without having to
+     * find the Modrinth listing first.
+     */
+    private int about(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        source.sendSuccess(() -> Component.literal(
+                "ChallengeX: compose your own challenge from rules, goals, and modifiers.")
+                .withStyle(ChatFormatting.GOLD), false);
+        source.sendSuccess(this::builderLink, false);
+        return 1;
+    }
+
     private int listPresets(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         List<String> names = store.listPresetNames();
         if (names.isEmpty()) {
             source.sendSuccess(() -> Component.literal(
-                    "No presets found. Drop a preset JSON into your presets folder, then run /challenge import <file>.")
+                    "No presets found. Drop a preset JSON into your presets folder, then run /challengex import <file>.")
                     .withStyle(ChatFormatting.YELLOW), false);
             source.sendSuccess(this::folderCopyLine, false);
+            source.sendSuccess(this::builderLink, false);
             return 1;
         }
         source.sendSuccess(() -> Component.literal("Presets (click to import):").withStyle(ChatFormatting.GOLD), false);
@@ -117,6 +138,7 @@ public final class ChallengeCommand {
             source.sendSuccess(() -> importLink(name), false);
         }
         source.sendSuccess(this::folderCopyLine, false);
+        source.sendSuccess(this::builderLink, false);
         return 1;
     }
 
@@ -127,7 +149,7 @@ public final class ChallengeCommand {
     private int reload(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         if (activePresetName == null) {
-            source.sendFailure(Component.literal("No preset imported yet. Use /challenge import <file> first."));
+            source.sendFailure(Component.literal("No preset imported yet. Use /challengex import <file> first."));
             return 0;
         }
         return doImport(source, activePresetName);
@@ -154,7 +176,7 @@ public final class ChallengeCommand {
         controller.onChallengeReplaced(source.getServer());
         activePresetName = name;
         source.sendSuccess(() -> Component.literal(
-                "Imported '" + preset.name() + "'. Run /challenge start to begin.")
+                "Imported '" + preset.name() + "'. Run /challengex start to begin.")
                 .withStyle(ChatFormatting.GREEN), true);
         return 1;
     }
@@ -169,16 +191,16 @@ public final class ChallengeCommand {
         CommandSourceStack source = context.getSource();
         ChallengeRun run = ChallengeXFabric.instance().activeRun();
         if (noChallengeLoaded(run)) {
-            source.sendFailure(Component.literal("No challenge loaded. Use /challenge import <file> first."));
+            source.sendFailure(Component.literal("No challenge loaded. Use /challengex import <file> first."));
             return 0;
         }
         switch (run.state()) {
             case RUNNING, PAUSED -> {
-                source.sendFailure(Component.literal("A challenge is already running. Use /challenge reset first."));
+                source.sendFailure(Component.literal("A challenge is already running. Use /challengex reset first."));
                 return 0;
             }
             case FINISHED -> {
-                source.sendFailure(Component.literal("This run has finished. Use /challenge reset to play it again."));
+                source.sendFailure(Component.literal("This run has finished. Use /challengex reset to play it again."));
                 return 0;
             }
             case NOT_STARTED -> {
@@ -193,7 +215,7 @@ public final class ChallengeCommand {
     private int reset(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         controller.reset(source.getServer());
-        source.sendSuccess(() -> Component.literal("Challenge reset. Run /challenge start to begin again.")
+        source.sendSuccess(() -> Component.literal("Challenge reset. Run /challengex start to begin again.")
                 .withStyle(ChatFormatting.GREEN), true);
         return 1;
     }
@@ -247,8 +269,8 @@ public final class ChallengeCommand {
         source.sendSuccess(() -> Component.literal("Your timer hidden: " + preferences.hideTimer(id))
                 .withStyle(ChatFormatting.GOLD), false);
         source.sendSuccess(() -> Component.literal("These are your own settings and affect nobody else."
-                + " Change them with /challenge config timer_color <color>"
-                + " and /challenge config hide_timer <true|false>.")
+                + " Change them with /challengex config timer_color <color>"
+                + " and /challengex config hide_timer <true|false>.")
                 .withStyle(ChatFormatting.GRAY), false);
         return 1;
     }
@@ -319,7 +341,7 @@ public final class ChallengeCommand {
         ServerPlayer player = source.getPlayer();
         if (player == null) {
             source.sendFailure(Component.literal(
-                    "/challenge config sets your own display settings, so a player has to run it."));
+                    "/challengex config sets your own display settings, so a player has to run it."));
         }
         return Optional.ofNullable(player);
     }
@@ -327,7 +349,7 @@ public final class ChallengeCommand {
     private Component colorLink(String color) {
         return Component.literal("  • " + color).withStyle(style -> style
                 .withColor(ChatFormatting.YELLOW)
-                .withClickEvent(new ClickEvent.RunCommand("/challenge config timer_color " + color))
+                .withClickEvent(new ClickEvent.RunCommand("/challengex config timer_color " + color))
                 .withHoverEvent(new HoverEvent.ShowText(Component.literal("Use the " + color + " timer"))));
     }
 
@@ -356,7 +378,7 @@ public final class ChallengeCommand {
     private Component importLink(String name) {
         return Component.literal("  • " + name).withStyle(style -> style
                 .withColor(ChatFormatting.YELLOW)
-                .withClickEvent(new ClickEvent.RunCommand("/challenge import " + name))
+                .withClickEvent(new ClickEvent.RunCommand("/challengex import " + name))
                 .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to import " + name))));
     }
 
@@ -373,5 +395,18 @@ public final class ChallengeCommand {
                 .withColor(ChatFormatting.AQUA)
                 .withClickEvent(new ClickEvent.CopyToClipboard(path))
                 .withHoverEvent(new HoverEvent.ShowText(Component.literal(path))));
+    }
+
+    /**
+     * A clickable link that opens the companion web builder in the player's
+     * browser. Unlike the presets folder, which the client refuses to open from a
+     * server, an https URL is an allowed open_url target, so this is the one thing
+     * the game can point a player straight at to go build a challenge.
+     */
+    private Component builderLink() {
+        return Component.literal("Build a challenge at " + BUILDER_URL).withStyle(style -> style
+                .withColor(ChatFormatting.AQUA)
+                .withClickEvent(new ClickEvent.OpenUrl(URI.create(BUILDER_URL)))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Open the ChallengeX web builder"))));
     }
 }

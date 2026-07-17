@@ -17,7 +17,7 @@ import net.minecraft.sounds.SoundSource;
  * Surfaces a finished run to every player: a big on-screen title (no time
  * beneath it), a chat line stating the outcome and the final time with a
  * clickable control that prints the full challenge composition ({@code
- * /challenge info}), and a win/loss sound.
+ * /challengex info}), and a win/loss sound.
  */
 public final class RunAnnouncer {
 
@@ -34,7 +34,7 @@ public final class RunAnnouncer {
                 .withStyle(won ? ChatFormatting.GREEN : ChatFormatting.RED);
         Component viewConfig = Component.literal("[View challenge configuration]").withStyle(style -> style
                 .withColor(ChatFormatting.AQUA)
-                .withClickEvent(new ClickEvent.RunCommand("/challenge info"))
+                .withClickEvent(new ClickEvent.RunCommand("/challengex info"))
                 .withHoverEvent(new HoverEvent.ShowText(
                         Component.literal("Show every trigger, effect, goal, and modifier in this challenge"))));
 
