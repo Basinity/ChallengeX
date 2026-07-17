@@ -266,7 +266,7 @@
   function rosterPicker(block) {
     if (!challenge.players.length) {
       return el('span.roster__empty', {
-        text: 'Add player names in the bar at the top, then tick them here.'
+        text: 'Add player names in the Players box, then tick them here.'
       });
     }
     var wrap = el('div.roster');
