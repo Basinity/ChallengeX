@@ -6,7 +6,6 @@ import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.model.Scope;
-import com.basinity.challengex.fabric.lifecycle.RunClock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ import net.minecraft.network.chat.Component;
 /**
  * Renders a challenge's full composition as chat lines: every rule's trigger and
  * effect with their parameters and scope, the goal, and every modifier. This is
- * what {@code /challenge info} prints, so a player can see exactly which catalog
+ * what {@code /challengex info} prints, so a player can see exactly which catalog
  * building blocks the active challenge is built from and at which values.
  */
 final class ChallengeSummary {
@@ -60,10 +59,8 @@ final class ChallengeSummary {
         } else {
             lines.add(dim("Modifiers (" + modifiers.size() + "):"));
             for (Modifier modifier : modifiers) {
-                String expiry = modifier.expiryTicks().isPresent()
-                        ? "  (expires " + RunClock.format(modifier.expiryTicks().getAsLong()) + ")" : "";
                 lines.add(Component.literal("  - " + modifier.modifierId() + params(modifier.params())
-                        + scope(modifier.scope()) + expiry)
+                        + scope(modifier.scope()))
                         .withStyle(ChatFormatting.WHITE));
             }
         }

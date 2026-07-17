@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import org.junit.jupiter.api.Test;
 
 class ChallengeRunTest {
@@ -130,7 +129,7 @@ class ChallengeRunTest {
     void aTimeLimitCountsDownAndEndsTheRunAsALoss() {
         Challenge challenge = new Challenge(List.of(), Optional.empty(),
                 List.of(new Modifier("modifier.time_limit", Map.of("minutes", ParamValue.of(1)),
-                        Optional.empty(), OptionalLong.empty())));
+                        Optional.empty())));
         ChallengeRun run = runOf(challenge, command -> { });
         run.start();
 
@@ -181,7 +180,7 @@ class ChallengeRunTest {
     void restoringAFinishedRunKeepsItsOutcome() {
         Challenge challenge = new Challenge(List.of(), Optional.empty(),
                 List.of(new Modifier("modifier.time_limit", Map.of("minutes", ParamValue.of(1)),
-                        Optional.empty(), OptionalLong.empty())));
+                        Optional.empty())));
         ChallengeRun run = runOf(challenge, command -> { });
         run.start();
         run.tick(1200);

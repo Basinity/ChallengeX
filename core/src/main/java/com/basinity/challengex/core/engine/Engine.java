@@ -100,9 +100,9 @@ public final class Engine {
     }
 
     /**
-     * Advances the run's clock; modifier expiry is measured against it. When a
-     * time-limit budget is set and the elapsed time reaches it, an ongoing run
-     * ends as a loss (a run already decided keeps its outcome).
+     * Advances the run's clock. When a time-limit budget is set and the elapsed
+     * time reaches it, an ongoing run ends as a loss (a run already decided keeps
+     * its outcome).
      */
     public void tick(long ticks) {
         if (ticks <= 0) {
@@ -137,15 +137,13 @@ public final class Engine {
     }
 
     /**
-     * The modifiers currently in force for a player: scoped to them and not
-     * expired. A playerless modifier applies to the run as a whole, so it is
-     * in force regardless of the player asked about.
+     * The modifiers currently in force for a player: those scoped to them. A
+     * playerless modifier applies to the run as a whole, so it is in force
+     * regardless of the player asked about.
      */
     public List<Modifier> activeModifiersFor(String playerId) {
         return challenge.modifiers().stream()
                 .filter(modifier -> modifier.scope().map(scope -> scope.includes(playerId)).orElse(true))
-                .filter(modifier -> modifier.expiryTicks().isEmpty()
-                        || elapsedTicks < modifier.expiryTicks().getAsLong())
                 .toList();
     }
 

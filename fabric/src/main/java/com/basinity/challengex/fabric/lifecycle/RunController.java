@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Drives a run's lifecycle once a server tick and carries out the world-facing
- * side of the {@code /challenge} lifecycle commands. Each tick it advances the
+ * side of the {@code /challengex} lifecycle commands. Each tick it advances the
  * clock while running (which can end the run on a time limit), announces a
  * finished run once, holds players still while paused, and refreshes the
  * action-bar clock every player sees.

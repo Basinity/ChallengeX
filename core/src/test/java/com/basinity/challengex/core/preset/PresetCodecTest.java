@@ -17,7 +17,6 @@ import com.basinity.challengex.core.registry.CoreCatalog;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import org.junit.jupiter.api.Test;
 
 class PresetCodecTest {
@@ -40,10 +39,10 @@ class PresetCodecTest {
                 List.of(
                         new Modifier("modifier.disable_jump",
                                 Map.of(),
-                                Optional.of(Scope.players("bob")), OptionalLong.of(6000)),
+                                Optional.of(Scope.players("bob"))),
                         new Modifier("modifier.time_limit",
                                 Map.of("minutes", ParamValue.of(30)),
-                                Optional.empty(), OptionalLong.empty()))));
+                                Optional.empty()))));
 
         assertEquals(original, codec.fromJson(codec.toJson(original)));
     }

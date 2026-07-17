@@ -97,7 +97,7 @@ public final class ChallengeRun {
         syncFinished();
     }
 
-    /** Advances the run's clock while running; modifier expiry is measured against it. */
+    /** Advances the run's clock while running; a time limit ends the run when it runs out. */
     public void tick(long ticks) {
         if (state != RunState.RUNNING) {
             return;

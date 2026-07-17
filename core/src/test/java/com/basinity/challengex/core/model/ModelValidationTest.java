@@ -2,9 +2,6 @@ package com.basinity.challengex.core.model;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalLong;
 import org.junit.jupiter.api.Test;
 
 class ModelValidationTest {
@@ -22,12 +19,5 @@ class ModelValidationTest {
     @Test
     void specificPlayerScopeRequiresAtLeastOnePlayer() {
         assertThrows(IllegalArgumentException.class, Scope::players);
-    }
-
-    @Test
-    void modifierExpiryMustBePositive() {
-        assertThrows(IllegalArgumentException.class, () -> new Modifier(
-                "modifier.keep_inventory", Map.of(), Optional.of(Scope.EVERY_PLAYER),
-                OptionalLong.of(0)));
     }
 }

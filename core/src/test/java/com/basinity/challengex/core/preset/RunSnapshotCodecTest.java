@@ -19,7 +19,6 @@ import com.basinity.challengex.core.registry.CoreCatalog;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +40,7 @@ class RunSnapshotCodecTest {
                         Map.of("mob", ParamValue.of("minecraft:ender_dragon")))),
                 List.of(new Modifier("modifier.time_limit",
                         Map.of("minutes", ParamValue.of(30)),
-                        Optional.empty(), OptionalLong.empty())));
+                        Optional.empty())));
     }
 
     @Test

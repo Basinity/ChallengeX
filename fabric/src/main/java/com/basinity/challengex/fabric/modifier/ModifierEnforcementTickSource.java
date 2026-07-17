@@ -17,11 +17,12 @@ import net.minecraft.server.level.ServerPlayer;
  * every tick in between.
  *
  * <p>Per-player state is kept rather than cleared on disconnect: a modifier
- * whose expiry lapses while its player is offline (an attribute modifier left
- * in place, an infinite-duration effect never removed) still needs its {@code
- * stop} to fire once, which happens the next tick the player is seen, whether
- * that is this tick or one after they reconnect. Only a server stop clears it,
- * since a fresh world starts every enforcer from a clean slate.
+ * that stops applying while its player is offline (the run ends or resets,
+ * leaving an attribute modifier in place or an infinite-duration effect never
+ * removed) still needs its {@code stop} to fire once, which happens the next
+ * tick the player is seen, whether that is this tick or one after they
+ * reconnect. Only a server stop clears it, since a fresh world starts every
+ * enforcer from a clean slate.
  */
 public final class ModifierEnforcementTickSource {
 

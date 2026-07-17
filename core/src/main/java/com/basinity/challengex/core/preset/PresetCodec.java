@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.Set;
 
 /**
@@ -86,7 +85,6 @@ public final class PresetCodec {
             for (Modifier modifier : challenge.modifiers()) {
                 JsonObject modifierJson = blockJson(modifier.modifierId(), modifier.params(),
                         modifier.scope());
-                modifier.expiryTicks().ifPresent(ticks -> modifierJson.addProperty("expiryTicks", ticks));
                 modifiers.add(modifierJson);
             }
             target.add("modifiers", modifiers);
@@ -263,12 +261,11 @@ public final class PresetCodec {
             String id = readId(modifierJson, where, problems);
             Map<String, ParamValue> params = readParams(modifierJson, where, problems);
             Optional<Scope> scope = readScope(modifierJson, false, where, problems);
-            OptionalLong expiry = readExpiry(modifierJson, where, problems);
-            if (id == null || scope == null || expiry == null) {
+            if (id == null || scope == null) {
                 continue;
             }
             modifiers.add(new Modifier(id, params,
-                    scope.map(value -> (Scope.Absolute) value), expiry));
+                    scope.map(value -> (Scope.Absolute) value)));
         }
         return modifiers;
     }
@@ -376,27 +373,6 @@ public final class PresetCodec {
             return valid ? Optional.of(new Scope.SpecificPlayers(playerIds)) : null;
         }
         problems.add(where + ": scope must be \"per_player\", \"every_player\", or an array of player names");
-        return null;
-    }
-
-    /** @return the expiry (possibly empty), or null when a problem was recorded */
-    private OptionalLong readExpiry(JsonObject block, String where, List<String> problems) {
-        JsonElement element = block.get("expiryTicks");
-        if (element == null) {
-            return OptionalLong.empty();
-        }
-        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
-            BigDecimal number = element.getAsBigDecimal();
-            if (number.stripTrailingZeros().scale() <= 0 && number.signum() > 0) {
-                try {
-                    return OptionalLong.of(number.longValueExact());
-                } catch (ArithmeticException e) {
-                    problems.add(where + ": expiryTicks out of range");
-                    return null;
-                }
-            }
-        }
-        problems.add(where + ": expiryTicks must be a positive whole number");
         return null;
     }
 

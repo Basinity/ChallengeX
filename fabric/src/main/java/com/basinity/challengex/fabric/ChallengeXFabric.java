@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * trigger source against it, and executes the effects the engine fires back.
  *
  * <p>The active challenge starts empty; a preset imported through the
- * {@code /challenge} command tree swaps it in without a restart. Until the
+ * {@code /challengex} command tree swaps it in without a restart. Until the
  * run-lifecycle phase adds explicit start/reset, a loaded challenge simply
  * counts as active.
  */

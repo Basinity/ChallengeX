@@ -15,7 +15,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
  * TriggerContext#elapsedTicks()}) rather than server uptime, so the period is
  * anchored to when the run actually started and freezes along with it while
  * paused, instead of carrying forward whatever gap sat between server start
- * and {@code /challenge start} as a permanent offset from the action-bar
+ * and {@code /challengex start} as a permanent offset from the action-bar
  * clock.
  */
 public final class FixedIntervalTriggerSource implements TriggerSource {

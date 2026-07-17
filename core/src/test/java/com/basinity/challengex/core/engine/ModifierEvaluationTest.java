@@ -11,7 +11,6 @@ import com.basinity.challengex.core.registry.Registries;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import org.junit.jupiter.api.Test;
 
 class ModifierEvaluationTest {
@@ -33,7 +32,7 @@ class ModifierEvaluationTest {
     @Test
     void targetedModifierIsInForceOnlyForItsTargets() {
         Engine engine = engineFor(new Modifier("modifier.disable_jump",
-                Map.of(), Optional.of(Scope.players("alice")), OptionalLong.empty()));
+                Map.of(), Optional.of(Scope.players("alice"))));
 
         assertEquals(1, engine.activeModifiersFor("alice").size());
         assertEquals(List.of(), engine.activeModifiersFor("bob"));
@@ -42,20 +41,10 @@ class ModifierEvaluationTest {
     @Test
     void playerlessModifierIsInForceRegardlessOfPlayer() {
         Engine engine = engineFor(new Modifier("modifier.time_limit",
-                Map.of("minutes", ParamValue.of(30)), Optional.empty(), OptionalLong.empty()));
+                Map.of("minutes", ParamValue.of(30)), Optional.empty()));
 
         assertEquals(1, engine.activeModifiersFor("alice").size());
         assertEquals(1, engine.activeModifiersFor("bob").size());
-    }
-
-    @Test
-    void expiredModifierStopsApplying() {
-        Engine engine = engineFor(new Modifier("modifier.no_hunger_drain",
-                Map.of(), Optional.of(Scope.EVERY_PLAYER), OptionalLong.of(100)));
-
-        assertEquals(1, engine.activeModifiersFor("alice").size());
-        engine.tick(100);
-        assertEquals(List.of(), engine.activeModifiersFor("alice"));
     }
 
 }

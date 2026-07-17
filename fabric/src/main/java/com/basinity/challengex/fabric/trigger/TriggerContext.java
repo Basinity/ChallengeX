@@ -22,7 +22,7 @@ public interface TriggerContext {
      * paused or not yet started, and back to zero after a reset or a fresh
      * import. Zero when no run is active. Schedule sources anchor themselves
      * to this rather than server uptime, so a period stays locked to when the
-     * run itself started instead of whatever gap sat before {@code /challenge
+     * run itself started instead of whatever gap sat before {@code /challengex
      * start}.
      */
     long elapsedTicks();

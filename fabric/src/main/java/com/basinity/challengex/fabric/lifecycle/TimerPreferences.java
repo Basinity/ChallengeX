@@ -19,7 +19,7 @@ import org.slf4j.Logger;
  * alongside the presets folder and keyed by player UUID: the color the clock
  * draws in, and whether they see it at all. These are personal display
  * preferences rather than host settings, so every player sets their own through
- * {@code /challenge config} with no permission gate, and one player hiding the
+ * {@code /challengex config} with no permission gate, and one player hiding the
  * clock changes nothing for anyone else.
  *
  * <p>The file is read once at startup and rewritten whenever a player changes
