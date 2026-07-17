@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "name": "Minecraft But No Jumping",
+  "modifiers": [
+    {
+      "id": "modifier.disable_jump",
+      "scope": "every_player"
+    },
+    {
+      "id": "modifier.status_effect",
+      "params": {
+        "effect": "minecraft:blindness",
+        "amplifier": 0
+      },
+      "scope": [
+        "Pix"
+      ]
+    }
+  ]
+}

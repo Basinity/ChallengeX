@@ -8,6 +8,7 @@ Early development. Nothing is released yet.
 
 - `core` — the platform-agnostic challenge engine. No Minecraft dependency.
 - `fabric` — the Fabric adapter: maps server events onto the engine and executes its effects.
+- `web` — the companion builder site, static and client-side only. See `web/README.md`.
 
 ## Building
 
@@ -16,3 +17,9 @@ Early development. Nothing is released yet.
 ```
 
 Requires Java 25 (via Gradle toolchains).
+
+The site renders its forms from a catalog generated out of `core`'s registries, so regenerate it after changing a catalog entry:
+
+```
+./gradlew :core:exportCatalog
+```

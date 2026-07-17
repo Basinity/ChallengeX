@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "name": "Blood Sugar Rush",
+  "rules": [
+    {
+      "trigger": {
+        "id": "trigger.damage_taken",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.random_effect",
+        "params": {
+          "type": "negative",
+          "seconds": 15
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.mob_killed",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.spawn_mob",
+        "params": {
+          "mob": "minecraft:zombie",
+          "count": 2,
+          "baby": true
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.fixed_interval",
+        "params": {
+          "seconds": 300
+        }
+      },
+      "effect": {
+        "id": "effect.lightning",
+        "scope": "every_player"
+      }
+    }
+  ],
+  "goal": {
+    "id": "goal.beat_game"
+  },
+  "modifiers": [
+    {
+      "id": "modifier.no_natural_regen",
+      "scope": "every_player"
+    },
+    {
+      "id": "modifier.keep_inventory",
+      "scope": [
+        "Basinity"
+      ]
+    },
+    {
+      "id": "modifier.time_limit",
+      "params": {
+        "minutes": 90
+      }
+    }
+  ]
+}

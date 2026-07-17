@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChallengeX | Build a challenge</title>
+<meta name="description" content="Compose a Minecraft challenge from triggers, effects, goals and modifiers, then export it as a preset file or a shareable link.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="has-actionbar">
+
+<header class="topbar">
+  <a class="brand brand--lg" href="index.html">
+    <span class="brand__mark" aria-hidden="true"></span>
+    <span class="brand__name">CHALLENGEX</span>
+  </a>
+  <div class="topbar__nav topbar__nav--builder">
+    <a class="btn btn--ghost" href="index.html#import">Import JSON</a>
+    <button class="btn btn--primary" type="button" id="export-top">EXPORT ▸</button>
+  </div>
+</header>
+
+<nav class="tabbar seg" id="tabbar" aria-label="Challenge sections"></nav>
+
+<div class="board">
+  <main class="board__main" id="board-main"></main>
+  <aside class="rail">
+    <div class="panel rail__box rail__box--name">
+      <label class="meta" for="challenge-name">CHALLENGE NAME</label>
+      <input class="input input--name" id="challenge-name" type="text"
+             placeholder="NAME YOUR CHALLENGE" autocomplete="off">
+    </div>
+    <div class="panel rail__box rail__box--roster" id="roster"></div>
+    <div class="panel rail__panel" id="rail-panel"></div>
+    <p class="note">
+      Nothing on this page is stored anywhere. Export before you close the tab.
+    </p>
+  </aside>
+</div>
+
+<div class="actionbar">
+  <button class="btn btn--icon" type="button" id="add-bottom" aria-label="Add to this section"
+          style="border-style:dashed;border-color:var(--trigger-line);color:var(--trigger);font-size:20px">+</button>
+  <button class="btn btn--primary" type="button" id="export-bottom">EXPORT ▸</button>
+</div>
+
+<!-- The catalog picker. One card pattern serves all 96 entries. -->
+<div class="overlay overlay--top" id="picker" role="dialog" aria-modal="true"
+     aria-labelledby="picker-title" hidden>
+  <div class="modal modal--picker">
+    <div class="modal__head">
+      <span class="modal__title" id="picker-title">PICK AN ENTRY</span>
+      <span class="modal__sub" id="picker-sub"></span>
+      <button class="btn modal__close" type="button" id="picker-close"
+              style="padding:6px 12px;min-height:36px;font-size:11px;font-family:var(--mono)">ESC ✕</button>
+    </div>
+    <div class="modal__filters">
+      <label class="sr" for="picker-search">Search the catalog</label>
+      <input class="input" id="picker-search" type="search" autocomplete="off" placeholder="Search…">
+    </div>
+    <div class="modal__body">
+      <div class="pick-grid" id="picker-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="assets/js/catalog.js"></script>
+<script src="assets/js/copy.js"></script>
+<script src="assets/js/entries.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/preset.js"></script>
+<script src="assets/js/phrase.js"></script>
+<script src="assets/js/link.js"></script>
+<script src="assets/js/builder.js"></script>
+</body>
+</html>
