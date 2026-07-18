@@ -586,10 +586,6 @@
   function renderEmpty() {
     ui.clear(dom.main);
     ui.append(dom.main, el('div.empty', null, [
-      el('div.empty__title', null, ['SUSPICIOUSLY PEACEFUL', el('span.caret', { text: '_' })]),
-      el('p.empty__body', {
-        text: 'No rules, no goal, no modifiers. Technically a valid challenge. Morally, do better.'
-      }),
       el('div.empty__choices', null, [
         el('button.btn.btn--add', { type: 'button', 'data-kind': 'trigger', onclick: addRule },
           ['+ ADD A RULE', el('span.btn__hint', { text: 'when X happens, do Y' })]),
@@ -604,7 +600,7 @@
       ]),
       el('p.section__hint', null, [
         'or drop a preset JSON on the ',
-        el('a', { href: 'index.html#import', text: 'front page' }),
+        el('a', { href: link.pageHref('index.html') + '#import', text: 'front page' }),
         ' and edit it.'
       ])
     ]));

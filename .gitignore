@@ -9,3 +9,8 @@ run/
 # PresetContractTest parses them with the real codec. The blanket out/ rule
 # above would otherwise drop them and break the build on a fresh clone.
 !web/test/out/
+
+# Committed on purpose: the builder page lives at web/build/ so its served URL
+# is /build with no filename. The blanket build/ rule above would otherwise
+# silently drop it from the repository.
+!web/build/

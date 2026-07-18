@@ -12,12 +12,18 @@ would refuse to `fetch` over `file://`.
 ## Layout
 
 ```
-index.html      the landing page, and the shared-link view at /#c=<preset>
-build.html      the builder
-assets/css      fonts.css (self-hosted faces) and app.css (the whole system)
-assets/js       see below
-test/run.js     headless checks, and the fixtures :core:test parses
+index.html          the landing page, and the shared-link view at /#c=<preset>
+build/index.html    the builder, so its served URL is /build
+assets/css          fonts.css (self-hosted faces) and app.css (the whole system)
+assets/js           see below
+test/run.js         headless checks, and the fixtures :core:test parses
 ```
+
+Served over http(s), no URL says a filename: both pages are directory indexes,
+so links read `/` and `/build`. Opened off disk the filenames stay, because
+`file://` has no directory index; `link.js` picks per protocol at runtime. The
+root `.gitignore` carries an exception for `web/build/`, which its blanket
+`build/` rule would otherwise drop.
 
 The scripts, in load order and by responsibility:
 

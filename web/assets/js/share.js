@@ -93,7 +93,7 @@ window.CX.share = (function () {
       el('ol', null, [
         el('li', null, [
           'Install the ',
-          el('a', { href: 'index.html#getmod', text: 'ChallengeX mod' }),
+          el('a', { href: link.pageHref('index.html') + '#getmod', text: 'ChallengeX mod' }),
           ' (Fabric, server-side, so vanilla clients can join)'
         ]),
         el('li', null, [
@@ -192,7 +192,7 @@ window.CX.share = (function () {
           + 'was copied. Ask for the link again, or ask for the .json file instead.'
       }),
       el('p.fail__detail', { text: 'error: ' + reason }),
-      el('a.btn.btn--primary', { href: 'build.html', text: 'Build one from scratch instead' })
+      el('a.btn.btn--primary', { href: link.pageHref('build.html'), text: 'Build one from scratch instead' })
     ]));
   }
 

@@ -57,10 +57,57 @@ window.CX.link = (function () {
     return toBase64Url(window.CX.preset.stringify(challenge));
   }
 
+  /* Where a link to a page should point, from wherever this script runs. The
+     pages keep their old logical names ('index.html' the landing page,
+     'build.html' the builder) but both are directory indexes when served over
+     http(s), so links read "challengex.basinity.com/" and
+     "challengex.basinity.com/build/" with no filename in sight; opened off
+     disk there is no directory index, so the filenames stay. The builder
+     lives one level down, which is what the '../' cases undo. */
+  var IN_BUILDER = /\/build(\/(index\.html)?)?$/.test(window.location.pathname || '');
+
+  function pageHref(page) {
+    var served = window.location.protocol !== 'file:';
+    if (page === 'index.html') {
+      if (served) {
+        return IN_BUILDER ? '../' : './';
+      }
+      return IN_BUILDER ? '../index.html' : 'index.html';
+    }
+    if (page === 'build.html') {
+      if (served) {
+        return IN_BUILDER ? './' : 'build/';
+      }
+      return IN_BUILDER ? 'index.html' : 'build/index.html';
+    }
+    return page;
+  }
+
   function urlFor(page, challenge) {
-    var base = new URL(page, window.location.href);
+    var base = new URL(pageHref(page), window.location.href);
     base.hash = KEY + '=' + encode(challenge);
     return base.toString();
+  }
+
+  /* The static anchors in the two pages' own markup carry real filenames so a
+     copy opened off disk still navigates; served, they are rewritten once here
+     (this script loads after them, at the end of the body). Longer prefixes
+     first, so '../index.html' is never half-matched. */
+  if (typeof document !== 'undefined' && document.querySelectorAll) {
+    var STATIC_PREFIXES = [
+      ['build/index.html', 'build.html'],
+      ['../index.html', 'index.html'],
+      ['index.html', 'index.html']
+    ];
+    Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (anchor) {
+      var href = anchor.getAttribute('href');
+      for (var i = 0; i < STATIC_PREFIXES.length; i += 1) {
+        if (href.indexOf(STATIC_PREFIXES[i][0]) === 0) {
+          anchor.setAttribute('href', pageHref(STATIC_PREFIXES[i][1]) + href.slice(STATIC_PREFIXES[i][0].length));
+          break;
+        }
+      }
+    });
   }
 
   return {
@@ -68,6 +115,7 @@ window.CX.link = (function () {
     encode: encode,
     decode: decode,
     readFragment: readFragment,
+    pageHref: pageHref,
     urlFor: urlFor
   };
 })();
