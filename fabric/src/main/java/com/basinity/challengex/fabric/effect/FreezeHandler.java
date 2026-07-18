@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +22,8 @@ public final class FreezeHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int seconds = Math.max(1, EffectParams.integer(command, "seconds", DEFAULT_SECONDS));
+        int seconds = CatalogBounds.clampInt(command.effectId(), "seconds",
+                EffectParams.integer(command, "seconds", DEFAULT_SECONDS));
         for (ServerPlayer target : targets) {
             target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, seconds * TICKS_PER_SECOND, ROOT_AMPLIFIER));
         }

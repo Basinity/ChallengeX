@@ -28,8 +28,4 @@ public final class ModifierParams {
     public static boolean has(Modifier modifier, String name) {
         return modifier.params().get(name) != null;
     }
-
-    public static int clamp(int value, int min, int max) {
-        return Math.max(min, Math.min(max, value));
-    }
 }

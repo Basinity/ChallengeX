@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,7 +38,8 @@ public final class SpawnMobHandler implements EffectHandler {
             LOGGER.warn("Unknown mob {}; skipping.", mobId);
             return;
         }
-        int count = EffectParams.clamp(EffectParams.integer(command, "count", 1), 1, 100);
+        int count = CatalogBounds.clampInt(command.effectId(), "count",
+                EffectParams.integer(command, "count", 1));
         boolean baby = EffectParams.bool(command, "baby", false);
         for (ServerPlayer target : targets) {
             ServerLevel level = target.level();

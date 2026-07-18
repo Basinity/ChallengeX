@@ -2,6 +2,7 @@ package com.basinity.challengex.fabric.trigger;
 
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.Map;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
@@ -22,8 +23,6 @@ public final class FixedIntervalTriggerSource implements TriggerSource {
 
     private static final String TRIGGER_ID = "trigger.fixed_interval";
     private static final int TICKS_PER_SECOND = 20;
-    private static final long MIN_SECONDS = 1;
-    private static final long MAX_SECONDS = 24 * 60 * 60;
 
     @Override
     public void register(TriggerContext context) {
@@ -33,15 +32,11 @@ public final class FixedIntervalTriggerSource implements TriggerSource {
                 return;
             }
             for (ParamValue configured : context.configured(TRIGGER_ID, "seconds")) {
-                long period = clamp(TriggerParams.integer(configured));
+                long period = CatalogBounds.clampLong(TRIGGER_ID, "seconds", TriggerParams.integer(configured));
                 if (ticks % (period * TICKS_PER_SECOND) == 0) {
                     context.emit(GameEvent.playerless(TRIGGER_ID, Map.of("seconds", configured)));
                 }
             }
         });
-    }
-
-    private static long clamp(long seconds) {
-        return Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, seconds));
     }
 }

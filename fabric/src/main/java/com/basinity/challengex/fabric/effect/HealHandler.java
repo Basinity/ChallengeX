@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,7 +18,8 @@ public final class HealHandler implements EffectHandler {
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
         boolean hasHearts = EffectParams.has(command, "hearts");
-        double hearts = Math.max(0.0, EffectParams.decimal(command, "hearts", 0.0));
+        double hearts = CatalogBounds.clampDouble(command.effectId(), "hearts",
+                EffectParams.decimal(command, "hearts", 0.0));
         for (ServerPlayer target : targets) {
             if (hasHearts) {
                 target.heal((float) (hearts * HALF_HEARTS_PER_HEART));

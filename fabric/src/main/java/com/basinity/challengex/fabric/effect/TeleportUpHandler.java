@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +13,8 @@ public final class TeleportUpHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int blocks = Math.max(0, EffectParams.integer(command, "blocks", DEFAULT_BLOCKS));
+        int blocks = CatalogBounds.clampInt(command.effectId(), "blocks",
+                EffectParams.integer(command, "blocks", DEFAULT_BLOCKS));
         for (ServerPlayer target : targets) {
             target.teleportTo(target.getX(), target.getY() + blocks, target.getZ());
         }

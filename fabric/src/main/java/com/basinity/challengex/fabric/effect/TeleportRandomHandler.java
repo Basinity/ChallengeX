@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +16,8 @@ public final class TeleportRandomHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int radius = Math.max(1, EffectParams.integer(command, "radius", DEFAULT_RADIUS));
+        int radius = CatalogBounds.clampInt(command.effectId(), "radius",
+                EffectParams.integer(command, "radius", DEFAULT_RADIUS));
         for (ServerPlayer target : targets) {
             RandomSource random = target.getRandom();
             int x = (int) target.getX() + random.nextInt(radius * 2 + 1) - radius;

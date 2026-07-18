@@ -61,6 +61,12 @@ public final class CatalogJson {
                 param.addProperty("name", spec.name());
                 param.addProperty("type", spec.type().name());
                 param.addProperty("required", spec.required());
+                if (spec.min() != null) {
+                    param.addProperty("min", spec.min());
+                }
+                if (spec.max() != null) {
+                    param.addProperty("max", spec.max());
+                }
                 params.add(param);
             }
             entry.add("params", params);

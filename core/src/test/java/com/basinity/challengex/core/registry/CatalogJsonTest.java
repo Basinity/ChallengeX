@@ -68,8 +68,15 @@ class CatalogJsonTest {
                 assertEquals(spec.name(), param.get("name").getAsString(), where + ": parameter name");
                 assertEquals(spec.type().name(), param.get("type").getAsString(), where + ": parameter type");
                 assertEquals(spec.required(), param.get("required").getAsBoolean(), where + ": parameter required");
+                assertEquals(spec.min(), bound(param, "min"), where + ": parameter min");
+                assertEquals(spec.max(), bound(param, "max"), where + ": parameter max");
             }
         }
+    }
+
+    /** A declared bound as an Integer, or null when the export omits it (an open end). */
+    private static Integer bound(JsonObject param, String key) {
+        return param.has(key) ? param.get(key).getAsInt() : null;
     }
 
     private static List<String> scopeValues(JsonObject scopes, String side) {

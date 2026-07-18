@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.modifier;
 
 import com.basinity.challengex.core.model.Modifier;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -23,8 +24,6 @@ public final class StatusEffectEnforcer implements ModifierEnforcer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusEffectEnforcer.class);
     private static final int DEFAULT_AMPLIFIER = 1;
-    private static final int MIN_AMPLIFIER = 1;
-    private static final int MAX_AMPLIFIER = 256;
 
     @Override
     public void start(ServerPlayer player, Modifier modifier, MinecraftServer server) {
@@ -52,8 +51,8 @@ public final class StatusEffectEnforcer implements ModifierEnforcer {
         if (effect == null) {
             return;
         }
-        int amplifier = ModifierParams.clamp(
-                ModifierParams.integer(modifier, "amplifier", DEFAULT_AMPLIFIER), MIN_AMPLIFIER, MAX_AMPLIFIER);
+        int amplifier = CatalogBounds.clampInt(modifier.modifierId(), "amplifier",
+                ModifierParams.integer(modifier, "amplifier", DEFAULT_AMPLIFIER));
         player.addEffect(new MobEffectInstance(effect, MobEffectInstance.INFINITE_DURATION, amplifier - 1));
     }
 

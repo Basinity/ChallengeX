@@ -2,6 +2,7 @@ package com.basinity.challengex.fabric.trigger;
 
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.Map;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -26,7 +27,7 @@ public final class LevelIntervalTriggerSource extends PlayerPollTriggerSource<In
             return;
         }
         for (ParamValue configured : context.configured(TRIGGER_ID, "level")) {
-            long interval = Math.max(1, TriggerParams.integer(configured));
+            long interval = CatalogBounds.clampLong(TRIGGER_ID, "level", TriggerParams.integer(configured));
             if (Math.floorDiv(current, interval) > Math.floorDiv(previous, interval)) {
                 context.emit(GameEvent.of(TRIGGER_ID, player.getScoreboardName(),
                         Map.of("level", configured)));

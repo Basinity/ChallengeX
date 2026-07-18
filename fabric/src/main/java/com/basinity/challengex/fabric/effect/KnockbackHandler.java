@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,7 +18,8 @@ public final class KnockbackHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        double strength = Math.max(0.0, EffectParams.decimal(command, "strength", DEFAULT_STRENGTH));
+        double strength = CatalogBounds.clampDouble(command.effectId(), "strength",
+                EffectParams.decimal(command, "strength", DEFAULT_STRENGTH));
         for (ServerPlayer target : targets) {
             double angle = target.getRandom().nextDouble() * 2.0 * Math.PI;
             target.setDeltaMovement(Math.cos(angle) * strength, UPWARD, Math.sin(angle) * strength);

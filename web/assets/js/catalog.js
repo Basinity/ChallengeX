@@ -235,7 +235,8 @@ window.CX_CATALOG = {
         {
           "name": "level",
           "type": "INT",
-          "required": true
+          "required": true,
+          "min": 1
         }
       ]
     },
@@ -434,7 +435,9 @@ window.CX_CATALOG = {
         {
           "name": "seconds",
           "type": "INT",
-          "required": true
+          "required": true,
+          "min": 1,
+          "max": 86400
         }
       ]
     },
@@ -473,7 +476,9 @@ window.CX_CATALOG = {
         {
           "name": "amplifier",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1,
+          "max": 256
         }
       ]
     },
@@ -509,7 +514,9 @@ window.CX_CATALOG = {
         {
           "name": "amount",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1,
+          "max": 64
         }
       ]
     },
@@ -520,7 +527,8 @@ window.CX_CATALOG = {
         {
           "name": "radius",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1
         }
       ]
     },
@@ -531,7 +539,8 @@ window.CX_CATALOG = {
         {
           "name": "blocks",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -547,7 +556,9 @@ window.CX_CATALOG = {
         {
           "name": "count",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1,
+          "max": 100
         },
         {
           "name": "baby",
@@ -563,7 +574,8 @@ window.CX_CATALOG = {
         {
           "name": "seconds",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -574,7 +586,8 @@ window.CX_CATALOG = {
         {
           "name": "hearts",
           "type": "DECIMAL",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -585,7 +598,8 @@ window.CX_CATALOG = {
         {
           "name": "hearts",
           "type": "DECIMAL",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -607,7 +621,8 @@ window.CX_CATALOG = {
         {
           "name": "amount",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -664,7 +679,9 @@ window.CX_CATALOG = {
         {
           "name": "height",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1,
+          "max": 128
         }
       ]
     },
@@ -675,7 +692,8 @@ window.CX_CATALOG = {
         {
           "name": "strength",
           "type": "DECIMAL",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -751,7 +769,8 @@ window.CX_CATALOG = {
         {
           "name": "seconds",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1
         }
       ]
     },
@@ -762,7 +781,8 @@ window.CX_CATALOG = {
         {
           "name": "strength",
           "type": "DECIMAL",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -773,7 +793,8 @@ window.CX_CATALOG = {
         {
           "name": "power",
           "type": "DECIMAL",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -789,7 +810,8 @@ window.CX_CATALOG = {
         {
           "name": "amount",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -800,7 +822,8 @@ window.CX_CATALOG = {
         {
           "name": "amount",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 0
         }
       ]
     },
@@ -948,7 +971,9 @@ window.CX_CATALOG = {
         {
           "name": "amplifier",
           "type": "INT",
-          "required": false
+          "required": false,
+          "min": 1,
+          "max": 256
         }
       ]
     },

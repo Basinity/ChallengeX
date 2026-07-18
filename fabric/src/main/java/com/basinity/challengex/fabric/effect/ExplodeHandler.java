@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,7 +18,8 @@ public final class ExplodeHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        float power = (float) Math.max(0.0, EffectParams.decimal(command, "power", DEFAULT_POWER));
+        float power = (float) CatalogBounds.clampDouble(command.effectId(), "power",
+                EffectParams.decimal(command, "power", DEFAULT_POWER));
         for (ServerPlayer target : targets) {
             target.level().explode(target, target.getX(), target.getY(), target.getZ(),
                     power, Level.ExplosionInteraction.TNT);

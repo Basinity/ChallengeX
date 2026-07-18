@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +19,8 @@ public final class FallingAnvilHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int height = EffectParams.clamp(EffectParams.integer(command, "height", DEFAULT_HEIGHT), 1, 128);
+        int height = CatalogBounds.clampInt(command.effectId(), "height",
+                EffectParams.integer(command, "height", DEFAULT_HEIGHT));
         for (ServerPlayer target : targets) {
             BlockPos above = target.blockPosition().above(height);
             FallingBlockEntity anvil = FallingBlockEntity.fall(target.level(), above,

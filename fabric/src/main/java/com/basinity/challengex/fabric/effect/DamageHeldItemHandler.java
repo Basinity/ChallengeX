@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,7 +19,8 @@ public final class DamageHeldItemHandler implements EffectHandler {
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
-        int amount = Math.max(0, EffectParams.integer(command, "amount", DEFAULT_AMOUNT));
+        int amount = CatalogBounds.clampInt(command.effectId(), "amount",
+                EffectParams.integer(command, "amount", DEFAULT_AMOUNT));
         for (ServerPlayer target : targets) {
             ItemStack held = target.getMainHandItem();
             if (held.isDamageableItem()) {

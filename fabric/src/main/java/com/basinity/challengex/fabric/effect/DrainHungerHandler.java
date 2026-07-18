@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +20,8 @@ public final class DrainHungerHandler implements EffectHandler {
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
         boolean hasAmount = EffectParams.has(command, "amount");
-        int points = Math.max(0, EffectParams.integer(command, "amount", 0)) * POINTS_PER_SHANK;
+        int points = CatalogBounds.clampInt(command.effectId(), "amount",
+                EffectParams.integer(command, "amount", 0)) * POINTS_PER_SHANK;
         for (ServerPlayer target : targets) {
             FoodData food = target.getFoodData();
             if (hasAmount) {

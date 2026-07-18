@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -30,7 +31,8 @@ public final class GiveItemHandler implements EffectHandler {
             LOGGER.warn("Unknown item {}; skipping.", itemId);
             return;
         }
-        int amount = EffectParams.clamp(EffectParams.integer(command, "amount", 1), 1, 64);
+        int amount = CatalogBounds.clampInt(command.effectId(), "amount",
+                EffectParams.integer(command, "amount", 1));
         for (ServerPlayer target : targets) {
             target.addItem(new ItemStack(item, amount));
         }

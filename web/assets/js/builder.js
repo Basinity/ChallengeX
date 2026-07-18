@@ -162,6 +162,8 @@
       type: numeric ? 'number' : 'text',
       step: param.type === 'DECIMAL' ? 'any' : (param.type === 'INT' ? '1' : null),
       inputmode: numeric ? 'decimal' : null,
+      min: param.min != null ? String(param.min) : null,
+      max: param.max != null ? String(param.max) : null,
       value: preset.rawValue(block, param),
       placeholder: placeholderFor(entry, param),
       'aria-label': entry.name + ' ' + param.name
@@ -171,8 +173,41 @@
       refreshRail();
       markField(input, block, param);
     });
+    // The mod clamps these same bounds at runtime; clamp on commit so the
+    // preset carries a value the mod will honor rather than one it silently
+    // pulls into range. On 'change' rather than 'input' so a value mid-type
+    // ("2" on the way to "25") is not snapped up while the field still has focus.
+    input.addEventListener('change', function () {
+      var clamped = clampToBounds(param, input.value);
+      if (clamped !== input.value) {
+        input.value = clamped;
+        block.params[param.name] = clamped;
+        refreshRail();
+        markField(input, block, param);
+      }
+    });
     markField(input, block, param);
     return el('label.field', null, [label, input]);
+  }
+
+  /* Holds a numeric input to the param's declared bounds, the ones the catalog
+     carries straight from the mod's own clamps. A blank or non-numeric value is
+     left for validation to speak to. */
+  function clampToBounds(param, raw) {
+    if (raw === '' || raw == null) {
+      return raw;
+    }
+    var value = Number(raw);
+    if (!isFinite(value)) {
+      return raw;
+    }
+    if (param.min != null && value < param.min) {
+      value = param.min;
+    }
+    if (param.max != null && value > param.max) {
+      value = param.max;
+    }
+    return String(value);
   }
 
   function markField(input, block, param) {

@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
+import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,8 +25,6 @@ public final class ApplyStatusEffectHandler implements EffectHandler {
     // Players write the potency they see (1 = level I), which is one above the
     // zero-based amplifier the game uses, so the input is shifted down by one.
     private static final int DEFAULT_AMPLIFIER = 1;
-    private static final int MIN_AMPLIFIER = 1;
-    private static final int MAX_AMPLIFIER = 256;
 
     @Override
     public void execute(EffectCommand command, List<ServerPlayer> targets, MinecraftServer server) {
@@ -42,8 +41,8 @@ public final class ApplyStatusEffectHandler implements EffectHandler {
         }
         int seconds = EffectParams.integer(command, "duration", 0);
         int duration = seconds <= 0 ? MobEffectInstance.INFINITE_DURATION : seconds * TICKS_PER_SECOND;
-        int amplifier = EffectParams.clamp(EffectParams.integer(command, "amplifier", DEFAULT_AMPLIFIER),
-                MIN_AMPLIFIER, MAX_AMPLIFIER);
+        int amplifier = CatalogBounds.clampInt(command.effectId(), "amplifier",
+                EffectParams.integer(command, "amplifier", DEFAULT_AMPLIFIER));
         for (ServerPlayer target : targets) {
             target.addEffect(new MobEffectInstance(effect, duration, amplifier - 1));
         }
