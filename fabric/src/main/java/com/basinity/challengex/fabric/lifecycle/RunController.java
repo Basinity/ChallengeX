@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.lifecycle;
 
 import com.basinity.challengex.core.engine.ChallengeRun;
+import com.basinity.challengex.core.engine.RunOutcome;
 import com.basinity.challengex.core.engine.RunState;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,9 @@ import net.minecraft.server.level.ServerPlayer;
  * Drives a run's lifecycle once a server tick and carries out the world-facing
  * side of the {@code /challengex} lifecycle commands. Each tick it advances the
  * clock while running (which can end the run on a time limit), announces a
- * finished run once, holds players still while paused, and refreshes the
- * action-bar clock every player sees.
+ * finished run once (a loss also sends every player to spectator until reset
+ * or import), holds players still while paused, and refreshes the action-bar
+ * clock every player sees.
  *
  * <p>It holds a supplier rather than the run itself because it registers once
  * at mod init while runs come and go with the server and are swapped on import.
@@ -33,6 +35,7 @@ public final class RunController {
     private final TimerPreferences preferences;
     private final RunStore runStore;
     private final PauseControl pause = new PauseControl();
+    private final LossSpectator lossSpectator = new LossSpectator();
     private RunState previous = RunState.NOT_STARTED;
     private int animTick;
 
@@ -57,6 +60,9 @@ public final class RunController {
         RunState state = run.state();
         if (previous != RunState.FINISHED && state == RunState.FINISHED) {
             RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks());
+            if (run.outcome() == RunOutcome.LOSS) {
+                lossSpectator.apply(server);
+            }
             save(server);
         }
         if (state == RunState.PAUSED) {
@@ -99,6 +105,7 @@ public final class RunController {
     /** Rebuilds the run fresh and lifts any freeze it left behind. */
     public void reset(MinecraftServer server) {
         pause.unfreeze(server);
+        lossSpectator.restore(server);
         ChallengeRun run = activeRun.get();
         if (run != null) {
             run.reset();
@@ -110,6 +117,7 @@ public final class RunController {
     /** A freshly imported challenge starts not-started; lift any freeze from the last run. */
     public void onChallengeReplaced(MinecraftServer server) {
         pause.unfreeze(server);
+        lossSpectator.restore(server);
         previous = RunState.NOT_STARTED;
         save(server);
     }
