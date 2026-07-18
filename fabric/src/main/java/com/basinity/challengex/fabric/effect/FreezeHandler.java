@@ -11,7 +11,8 @@ import net.minecraft.world.effect.MobEffects;
 /**
  * {@code effect.freeze}: roots each target in place for {@code seconds} (default
  * three). It applies overwhelming slowness, which halts walking; a full lock of
- * jumping and looking is the pause system's job (phase 6), not this effect's.
+ * jumping and looking is {@link com.basinity.challengex.fabric.lifecycle.PauseControl}'s
+ * job, not this effect's.
  */
 public final class FreezeHandler implements EffectHandler {
 
