@@ -30,7 +30,7 @@ const sandbox = {
   URLSearchParams,
   console
 };
-sandbox.window.location = { href: 'https://challengex.basinity.com/index.html', hash: '' };
+sandbox.window.location = { href: 'https://challengexmc.com/index.html', hash: '' };
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 

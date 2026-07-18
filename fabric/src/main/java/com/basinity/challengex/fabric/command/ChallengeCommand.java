@@ -55,7 +55,7 @@ public final class ChallengeCommand {
     private String activePresetName;
 
     /** The companion web builder, where challenges are composed outside the game. */
-    private static final String BUILDER_URL = "https://challengex.basinity.com";
+    private static final String BUILDER_URL = "https://challengexmc.com";
 
     public ChallengeCommand(PresetStore store, RunController controller, TimerPreferences preferences) {
         this.store = store;
