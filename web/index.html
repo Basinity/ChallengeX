@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -37,9 +37,9 @@
     <div class="stack stack--loose">
       <h1 class="hero__title">MINECRAFT,<br>BUT<span class="caret">_</span></h1>
       <p class="hero__lede">
-        You finish the sentence. Snap together triggers, effects, goals and modifiers
-        into your own challenge, in the browser. No in-game editor, no datapack wrangling.
-        Export a file or a link, and your server imports it with one command.
+        You finish the sentence: snap together triggers, effects, goals and modifiers
+        into your own challenge, right in the browser. Your server imports it with
+        one command.
       </p>
       <div class="hero__actions">
         <a class="btn btn--primary btn--lift" href="build/index.html">BUILD A CHALLENGE</a>
@@ -50,27 +50,31 @@
     <div class="samples" id="samples"></div>
   </section>
 
-  <section class="band band--alt" id="how">
+  <section class="band band--flow" id="how">
     <div class="shell shell--page">
-      <h2 class="band__title">HOW IT WORKS</h2>
-      <div class="steps">
-        <div class="step">
-          <span class="step__num">01 | COMPOSE</span>
+      <h2 class="band__title">BUILD HERE, PLAY THERE</h2>
+      <!-- One long rule card: a preset flows compose → export → import the same
+           way a rule fires trigger → effect, so the section borrows that shape. -->
+      <div class="pipeline panel">
+        <div class="pipe">
+          <span class="pipe__num">01 COMPOSE</span>
           <p class="step__body">
             Pair triggers with effects, pick a goal, stack modifiers. Doubles,
             contradictions and terrible ideas are all allowed. The builder only checks
             the paperwork.
           </p>
         </div>
-        <div class="step">
-          <span class="step__num">02 | EXPORT</span>
+        <div class="pipe__arrow" aria-hidden="true"><span class="arrow__glyph">→</span></div>
+        <div class="pipe">
+          <span class="pipe__num">02 EXPORT</span>
           <p class="step__body">
-            Download the preset as JSON, or copy a share link. The whole challenge lives
-            in the URL. Post it in a video description, a Discord, anywhere.
+            Download the preset as JSON, or copy a share link. The whole challenge
+            lives in the URL. Post it in a video description, a Discord, anywhere.
           </p>
         </div>
-        <div class="step">
-          <span class="step__num">03 | IMPORT</span>
+        <div class="pipe__arrow" aria-hidden="true"><span class="arrow__glyph">→</span></div>
+        <div class="pipe">
+          <span class="pipe__num">03 IMPORT</span>
           <p class="step__body">
             Drop the file into <code>config/challengex/presets/</code> and run
             <code>/challengex import</code>. Works in singleplayer and on servers.
@@ -126,7 +130,7 @@
 <footer class="footer">
   <div class="shell shell--page footer__row">
     <span>ChallengeX | not affiliated with Mojang</span>
-    <span>preset schema v1</span>
+    <span><a href="privacy/index.html">Privacy</a> | preset schema v1</span>
   </div>
 </footer>
 

@@ -60,27 +60,29 @@ window.CX.link = (function () {
   /* Where a link to a page should point, from wherever this script runs. The
      pages keep their old logical names ('index.html' the landing page,
      'build.html' the builder) but both are directory indexes when served over
-     http(s), so links read "challengex.basinity.com/" and
-     "challengex.basinity.com/build/" with no filename in sight; opened off
+     http(s), so links read "challengexmc.com/" and
+     "challengexmc.com/build/" with no filename in sight; opened off
      disk there is no directory index, so the filenames stay. The builder
      lives one level down, which is what the '../' cases undo. */
   var IN_BUILDER = /\/build(\/(index\.html)?)?$/.test(window.location.pathname || '');
 
+  /* Each logical page as [served path from the site root, on-disk path from the
+     site root]. The builder is the only nested page that loads this script, so
+     "one level down" and "in the builder" are the same test. */
+  var PAGES = {
+    'index.html': ['', 'index.html'],
+    'build.html': ['build/', 'build/index.html'],
+    'privacy.html': ['privacy/', 'privacy/index.html']
+  };
+
   function pageHref(page) {
-    var served = window.location.protocol !== 'file:';
-    if (page === 'index.html') {
-      if (served) {
-        return IN_BUILDER ? '../' : './';
-      }
-      return IN_BUILDER ? '../index.html' : 'index.html';
+    var entry = PAGES[page];
+    if (!entry) {
+      return page;
     }
-    if (page === 'build.html') {
-      if (served) {
-        return IN_BUILDER ? './' : 'build/';
-      }
-      return IN_BUILDER ? 'index.html' : 'build/index.html';
-    }
-    return page;
+    var prefix = IN_BUILDER ? '../' : '';
+    var target = prefix + (window.location.protocol !== 'file:' ? entry[0] : entry[1]);
+    return target === '' ? './' : target;
   }
 
   function urlFor(page, challenge) {
@@ -95,6 +97,7 @@ window.CX.link = (function () {
      first, so '../index.html' is never half-matched. */
   if (typeof document !== 'undefined' && document.querySelectorAll) {
     var STATIC_PREFIXES = [
+      ['privacy/index.html', 'privacy.html'],
       ['build/index.html', 'build.html'],
       ['../index.html', 'index.html'],
       ['index.html', 'index.html']

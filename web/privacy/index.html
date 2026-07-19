@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChallengeX | Privacy</title>
+<meta name="description" content="What the ChallengeX website does and does not do with your data. Short answer: it runs entirely in your browser and uploads nothing.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand brand--lg" href="../index.html">
+    <span class="brand__mark" aria-hidden="true"></span>
+    <span class="brand__name">CHALLENGEX</span>
+  </a>
+  <nav class="topbar__nav">
+    <a class="btn btn--primary" href="../build/index.html">Build a challenge</a>
+  </nav>
+</header>
+
+<main class="prose shell shell--narrow">
+
+  <h1>PRIVACY</h1>
+  <p class="note">Applies to this website. Last updated 22 July 2026.</p>
+
+  <p>
+    This site runs entirely in your browser. It has no accounts and sets no cookies,
+    and nothing you build or open here is ever uploaded.
+  </p>
+
+  <h2>WHAT HAPPENS TO A CHALLENGE</h2>
+  <p>
+    A challenge you compose exists only on your screen while the tab is open.
+    Exporting saves a file straight from your browser to your device. A share link
+    carries the whole challenge after the <code>#</code> in the URL, and browsers do
+    not send that part of a URL to any server, so a shared challenge travels from one
+    browser to another without this site ever seeing it. A preset file you drop on
+    the page is read locally by your browser and never uploaded.
+  </p>
+
+  <h2>WHAT THIS SITE NEVER USES</h2>
+  <ul>
+    <li>No cookies, and nothing stored in your browser between visits.</li>
+    <li>No analytics, tracking, or advertising.</li>
+    <li>No forms, accounts, or newsletters.</li>
+    <li>
+      No third-party requests. Fonts, scripts, and styles are all part of the site
+      itself, so loading a page here contacts exactly one server: the one hosting
+      these files.
+    </li>
+  </ul>
+
+  <h2>SERVER LOGS</h2>
+  <p>
+    Like almost any web server, the one delivering these files may keep standard
+    technical access logs: the IP address a request came from, what was requested,
+    and when. Those logs exist to keep the service running and secure (legitimate
+    interest, Art. 6(1)(f) GDPR). They are not combined with anything else and are
+    not used to identify visitors.
+  </p>
+
+  <h2>THE MOD</h2>
+  <p>
+    The ChallengeX mod is a separate download that runs inside your Minecraft. It
+    makes no network requests at all: it reads preset files from its own config
+    folder and stores runs inside your world save, on your own machine or server.
+    Downloading it from Modrinth or GitHub happens under those platforms' own
+    privacy policies.
+  </p>
+
+  <h2>YOUR RIGHTS</h2>
+  <p>
+    Under the GDPR you can ask what personal data is held about you and have it
+    corrected or deleted. This site is built so that the honest answer is: none,
+    beyond the technical server logs described above.
+  </p>
+
+  <h2>CONTACT</h2>
+  <p>
+    Questions about this policy go to the
+    <a href="https://github.com/Basinity/ChallengeX/issues" rel="noopener">project's GitHub</a>.
+  </p>
+
+  <h2>CHANGES</h2>
+  <p>If this policy changes, the new version appears on this page.</p>
+
+</main>
+
+<footer class="footer">
+  <div class="shell shell--page footer__row">
+    <span>ChallengeX | not affiliated with Mojang</span>
+    <span><a href="../index.html">back to the front page</a></span>
+  </div>
+</footer>
+
+<script>
+/* Served over http(s) the landing page is the directory index, so the back
+   links drop their filename; opened off disk the filename stays. Inline, so
+   this page needs no script from the app. */
+if (window.location.protocol !== 'file:') {
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="../index.html"]'), function (anchor) {
+    anchor.setAttribute('href', '../' + anchor.getAttribute('href').slice('../index.html'.length));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="../build/index.html"]'), function (anchor) {
+    anchor.setAttribute('href', '../build/' + anchor.getAttribute('href').slice('../build/index.html'.length));
+  });
+}
+</script>
+</body>
+</html>

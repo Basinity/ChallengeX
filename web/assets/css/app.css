@@ -3,10 +3,10 @@
    Direction: a dark, hard-edged console. Nothing is rounded, nothing glows,
    every raised surface sits on a hard offset shadow instead of a blur. Colour
    carries meaning and is never decorative: amber is a trigger, green an effect,
-   cyan a goal, magenta a modifier, red a structural problem. Silkscreen is the
-   pixel display face and is only ever used for headings and short labels; body
-   copy is Space Grotesk; anything mechanical (ids, params, paths, commands)
-   is IBM Plex Mono. */
+   cyan a goal, magenta a modifier, red a structural problem. MC Ten Lowercase
+   Alt is the pixel display face and is only ever used for headings and short
+   labels; body copy is Space Grotesk; anything mechanical (ids, params, paths,
+   commands) is IBM Plex Mono. */
 
 /* ---------- tokens ---------- */
 
@@ -52,7 +52,7 @@
   --shadow-lift: 7px 7px 0 rgba(0, 0, 0, .5);
   --shadow-modal: 8px 8px 0 rgba(0, 0, 0, .5);
 
-  --display: 'Silkscreen', 'Courier New', monospace;
+  --display: 'MC Ten Lowercase Alt', 'Courier New', monospace;
   --body: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', 'Consolas', monospace;
 
@@ -291,7 +291,7 @@ code {
 .input[aria-invalid='true'] { border-color: var(--bad); }
 
 .input--name {
-  font: 700 15px var(--display);
+  font: 700 17px var(--display);
   letter-spacing: .02em;
   min-height: var(--tap);
 }
@@ -400,13 +400,14 @@ code {
 .brand__mark {
   width: 22px;
   height: 22px;
-  background: var(--effect);
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, .5);
+  background: url(../icon.svg) center / contain no-repeat;
   flex-shrink: 0;
 }
 
-.brand__name { font: 700 13px var(--display); }
-.brand--lg .brand__mark { width: 26px; height: 26px; box-shadow: 3px 3px 0 rgba(0, 0, 0, .5); }
+/* The wordmark keeps Silkscreen so the logo reads distinctly from the
+   Minecraft-style display face everything else uses. */
+.brand__name { font: 700 13px 'Silkscreen', var(--display); }
+.brand--lg .brand__mark { width: 26px; height: 26px; }
 .brand--lg .brand__name { font-size: 15px; }
 
 .topbar__nav {
@@ -528,27 +529,42 @@ code {
   padding: 64px 0;
 }
 
-.band--alt { background: var(--bg-sunken); }
+/* The flow band sits tighter than the others: its content is one strip, not a
+   column of prose, and the uniform-padding-everywhere look is nobody's friend. */
+.band--flow { padding: 52px 0 72px; }
 
-.band__title { font: 700 24px var(--display); }
+.band__title { font: 700 27px var(--display); }
 
-.steps {
+/* How it works, drawn as one long rule card: three unequal steps either side
+   of the same hard arrow cells a rule uses, because a preset flows
+   compose → export → import the way a rule fires trigger → effect. */
+.pipeline {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
+  grid-template-columns: 1.1fr 34px .8fr 34px 1.05fr;
   margin-top: 30px;
 }
 
-.step {
-  border: 2px solid var(--line);
-  background: var(--bg-raised);
-  padding: 22px;
+.pipe {
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
-.step__num { font: 700 13px var(--display); color: var(--effect); }
+.pipe__num { font: 700 16px var(--display); color: var(--effect); }
+
+.pipe__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 2px solid var(--line);
+  border-right: 2px solid var(--line);
+  background: var(--bg-sunken);
+  color: var(--effect);
+  font: 700 14px var(--display);
+}
+
 .step__body { font-size: 14px; line-height: 1.6; color: var(--text-dim); }
 
 .split {
@@ -670,7 +686,7 @@ code {
   flex-wrap: wrap;
 }
 
-.section__title { font: 700 16px var(--display); }
+.section__title { font: 700 19px var(--display); }
 .section[data-kind='rules'] .section__title { color: var(--trigger); }
 .section[data-kind='goal'] .section__title { color: var(--goal); }
 .section[data-kind='modifiers'] .section__title { color: var(--modifier); }
@@ -710,7 +726,7 @@ code {
   background: var(--bg-strip);
 }
 
-.card__label { font: 700 11px var(--display); color: var(--text-mute); }
+.card__label { font: 700 13px var(--display); color: var(--text-mute); }
 
 .card__tools {
   margin-left: auto;
@@ -856,7 +872,7 @@ code {
   gap: 7px;
 }
 
-.problems__title { font: 700 11px var(--display); color: var(--bad); }
+.problems__title { font: 700 13px var(--display); color: var(--bad); }
 
 .problems__item {
   font: 400 11.5px/1.4 var(--mono);
@@ -893,7 +909,7 @@ code {
   text-align: center;
 }
 
-.empty__title { font: 700 26px var(--display); }
+.empty__title { font: 700 30px var(--display); }
 .empty__body { font-size: 15px; color: var(--text-mute); line-height: 1.6; }
 
 .empty__choices {
@@ -941,7 +957,7 @@ code {
   flex-wrap: wrap;
 }
 
-.modal__title { font: 700 12px var(--display); color: var(--effect); }
+.modal__title { font: 700 14px var(--display); color: var(--effect); }
 .modal__sub { font: 400 10.5px var(--mono); color: var(--text-faint); }
 .modal__close { margin-left: auto; }
 
@@ -1017,7 +1033,7 @@ code {
 .share__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
 .share__actions .btn { font-size: 15px; padding: 13px 20px; }
 
-.share__section-title { font: 700 14px var(--display); }
+.share__section-title { font: 700 16px var(--display); }
 .share__section-title[data-kind='rules'] { color: var(--trigger); }
 .share__section-title[data-kind='goal'] { color: var(--goal); }
 .share__section-title[data-kind='modifiers'] { color: var(--modifier); }
@@ -1076,9 +1092,36 @@ code {
   text-align: center;
 }
 
-.fail__title { font: 700 24px var(--display); color: var(--bad); }
+.fail__title { font: 700 27px var(--display); color: var(--bad); }
 .fail__body { font-size: 14.5px; line-height: 1.6; color: var(--text-mute); }
 .fail__detail { font: 400 11.5px var(--mono); color: var(--text-faint); word-break: break-word; }
+
+/* ---------- prose pages (privacy) ---------- */
+
+.prose {
+  padding: 52px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.prose h1 { font: 700 clamp(28px, 4.5vw, 40px)/1.1 var(--display); }
+.prose h2 { font: 700 14px var(--display); color: var(--effect); margin-top: 10px; }
+
+.prose p,
+.prose ul {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  max-width: 640px;
+}
+
+.prose ul {
+  padding-left: 1.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 /* Transient confirmation after a copy or a download. */
 .toast {
@@ -1174,17 +1217,28 @@ code {
 
   .roster-bar__hint { display: none; }
 
-  /* A rule stacks, with the arrow becoming a divider between the halves. */
+  /* A rule stacks, with the arrow becoming a divider between the halves. The
+     how-it-works pipeline stacks the same way. Only the glyph turns downward;
+     rotating the whole divider would swing its full-width dashed borders into
+     vertical lines through the card. */
   .rule { grid-template-columns: minmax(0, 1fr); }
+  .pipeline { grid-template-columns: minmax(0, 1fr); }
 
-  .rule__arrow {
+  .rule__arrow,
+  .pipe__arrow {
     border: none;
     border-top: 2px dashed var(--line);
     border-bottom: 2px dashed var(--line);
     background: none;
     padding: 4px;
-    transform: rotate(90deg) scale(.9);
     height: 26px;
+  }
+
+  .rule__arrow .arrow__glyph,
+  .pipe__arrow .arrow__glyph {
+    display: inline-block;
+    rotate: 90deg;
+    scale: .9;
   }
 
   /* Collapsed cards show a one-line summary; one expands at a time. */

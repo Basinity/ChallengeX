@@ -436,7 +436,7 @@
       }),
       el('div.rule', null, [
         halfView(rule, 'trigger'),
-        el('div.rule__arrow', { text: '→', 'aria-hidden': 'true' }),
+        el('div.rule__arrow', { 'aria-hidden': 'true' }, [el('span.arrow__glyph', { text: '→' })]),
         halfView(rule, 'effect')
       ])
     ]);

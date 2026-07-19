@@ -1,20 +1,24 @@
 /* Self-hosted, so the page makes no third-party request and works offline.
-   Latin subset only, pulled from Google Fonts and trimmed: Space Grotesk ships
-   as one variable file covering the whole 400-700 range, so it is declared once
+   Latin subset only, trimmed with fontTools: Space Grotesk ships as one
+   variable file covering the whole 400-700 range, so it is declared once
    rather than three times over identical bytes.
 
-   Silkscreen: OFL, Jason Kottke.
+   MC Ten Lowercase Alt: CC BY-SA 3.0, Patred (a Minecraft-style pixel face).
+   Silkscreen: OFL, Jason Kottke (the brand wordmark only).
    Space Grotesk: OFL, Florian Karsten.
    IBM Plex Mono: OFL, IBM. */
 
+/* One static face declared across the whole weight range, so bold requests
+   match it exactly instead of smearing a pixel font with synthetic bold. */
 @font-face {
-  font-family: 'Silkscreen';
+  font-family: 'MC Ten Lowercase Alt';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 700;
   font-display: swap;
-  src: url(../fonts/silkscreen-400.woff2) format('woff2');
+  src: url(../fonts/mc-ten-400.woff2) format('woff2');
 }
 
+/* Silkscreen exists for the CHALLENGEX wordmark in the top bar alone. */
 @font-face {
   font-family: 'Silkscreen';
   font-style: normal;
