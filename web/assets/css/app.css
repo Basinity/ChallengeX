@@ -1,56 +1,73 @@
 /* ChallengeX web builder — the whole visual system.
 
-   Direction: a dark, hard-edged console. Nothing is rounded, nothing glows,
-   every raised surface sits on a hard offset shadow instead of a blur. Colour
+   Direction: a hard-edged console. Nothing is rounded, nothing glows, every
+   raised surface sits on a hard offset shadow instead of a blur. Colour
    carries meaning and is never decorative: amber is a trigger, green an effect,
    cyan a goal, magenta a modifier, red a structural problem. MC Ten Lowercase
    Alt is the pixel display face and is only ever used for headings and short
    labels; body copy is Space Grotesk; anything mechanical (ids, params, paths,
-   commands) is IBM Plex Mono. */
+   commands) is IBM Plex Mono.
+
+   The console comes in two finishes. Dark is the original: greenish blacks
+   with the piece colours bright on top. Light is the same console printed on
+   green-cast paper: the piece colours drop to ink weights that hold AA
+   contrast both as text on the paper and under light text on solid chips, and
+   the offset shadows become ink at lower alpha. Every token is a light-dark()
+   pair, so each colour lives in exactly one place; which side renders is the
+   color-scheme, following the system until the topbar switch forces one. */
 
 /* ---------- tokens ---------- */
 
 :root {
-  --bg: #111310;
-  --bg-raised: #191c17;
-  --bg-sunken: #161913;
-  --bg-strip: #1c1f18;
-  --bg-scrim: rgba(7, 8, 6, .82);
+  color-scheme: light dark;
 
-  --line: #2e332c;
-  --line-soft: #3a4036;
-  --line-dashed: #4a5244;
+  --bg: light-dark(#edefe6, #111310);
+  --bg-raised: light-dark(#f7f8f1, #191c17);
+  --bg-sunken: light-dark(#e6e9dc, #161913);
+  --bg-strip: light-dark(#e2e6d6, #1c1f18);
+  --bg-scrim: light-dark(rgba(24, 27, 21, .45), rgba(7, 8, 6, .82));
 
-  --text: #e8ece4;
-  --text-dim: #b9c0b1;
-  --text-mute: #9aa294;
-  --text-faint: #788070;
+  --line: light-dark(#aab29b, #2e332c);
+  --line-soft: light-dark(#98a189, #3a4036);
+  --line-dashed: light-dark(#848e74, #4a5244);
 
-  --trigger: #e8b84b;
-  --trigger-line: #6b5c33;
-  --trigger-wash: #1c1a12;
+  --text: light-dark(#20251d, #e8ece4);
+  --text-dim: light-dark(#434c3d, #b9c0b1);
+  --text-mute: light-dark(#5c6653, #9aa294);
+  --text-faint: light-dark(#75806a, #788070);
 
-  --effect: #9adf6a;
-  --effect-bright: #c2f09a;
-  --effect-line: #4d6b33;
-  --effect-wash: #151c11;
+  --trigger: light-dark(#955f00, #e8b84b);
+  --trigger-line: light-dark(#c0a052, #6b5c33);
+  --trigger-wash: light-dark(#f2edd8, #1c1a12);
 
-  --goal: #6ac9df;
-  --goal-line: #33565f;
-  --goal-wash: #12191c;
+  --effect: light-dark(#3c7a16, #9adf6a);
+  --effect-bright: light-dark(#2f6410, #c2f09a);
+  --effect-line: light-dark(#79a854, #4d6b33);
+  --effect-wash: light-dark(#e9f1dd, #151c11);
 
-  --modifier: #d98fe0;
-  --modifier-line: #5c3961;
-  --modifier-wash: #1a121c;
+  --goal: light-dark(#0e6b7d, #6ac9df);
+  --goal-bright: light-dark(#0a5866, #93dcec);
+  --goal-line: light-dark(#5da4b3, #33565f);
+  --goal-wash: light-dark(#e2eff2, #12191c);
 
-  --bad: #e06c5a;
-  --bad-soft: #c98a80;
-  --bad-wash: rgba(224, 108, 90, .07);
+  --modifier: light-dark(#92379d, #d98fe0);
+  --modifier-line: light-dark(#b56cbe, #5c3961);
+  --modifier-wash: light-dark(#f2e7f4, #1a121c);
 
-  --shadow: 5px 5px 0 rgba(0, 0, 0, .4);
-  --shadow-btn: 4px 4px 0 rgba(0, 0, 0, .5);
-  --shadow-lift: 7px 7px 0 rgba(0, 0, 0, .5);
-  --shadow-modal: 8px 8px 0 rgba(0, 0, 0, .5);
+  --bad: light-dark(#b03421, #e06c5a);
+  --bad-soft: light-dark(#9c4a3c, #c98a80);
+  --bad-wash: light-dark(rgba(176, 52, 33, .08), rgba(224, 108, 90, .07));
+
+  --off-line: light-dark(#b9b19c, #4a4238);
+  --off-bg: light-dark(#dcd7c5, #2a251d);
+  --off-text: light-dark(#7e765f, #9a8f7d);
+
+  --shadow-ink: light-dark(rgba(24, 28, 20, .18), rgba(0, 0, 0, .4));
+  --shadow-ink-deep: light-dark(rgba(24, 28, 20, .26), rgba(0, 0, 0, .5));
+  --shadow: 5px 5px 0 var(--shadow-ink);
+  --shadow-btn: 4px 4px 0 var(--shadow-ink-deep);
+  --shadow-lift: 7px 7px 0 var(--shadow-ink-deep);
+  --shadow-modal: 8px 8px 0 var(--shadow-ink-deep);
 
   --display: 'MC Ten Lowercase Alt', 'Courier New', monospace;
   --body: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
@@ -59,6 +76,10 @@
   --shell: 1240px;
   --tap: 44px;
 }
+
+/* The topbar switch forces a side; without it the system preference decides. */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
 
 /* ---------- reset ---------- */
 
@@ -188,7 +209,7 @@ code {
   box-shadow: var(--shadow-btn);
 }
 
-.btn--goal:hover { background: #93dcec; border-color: #93dcec; color: var(--bg); }
+.btn--goal:hover { background: var(--goal-bright); border-color: var(--goal-bright); color: var(--bg); }
 
 .btn--lift:hover {
   transform: translate(-2px, -2px);
@@ -208,9 +229,9 @@ code {
 
 .btn:disabled,
 .btn[aria-disabled='true'] {
-  border-color: #4a4238;
-  background: #2a251d;
-  color: #9a8f7d;
+  border-color: var(--off-line);
+  background: var(--off-bg);
+  color: var(--off-text);
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
@@ -397,11 +418,23 @@ code {
   flex-shrink: 0;
 }
 
+/* The light finish swaps the mark for icon-ink.svg, the same X in the light
+   side's effect green. Two files rather than one masked with the --effect
+   token, because Chromium fetches CSS mask images with CORS and file:// pages
+   have an opaque origin, so a masked mark can vanish exactly where this site
+   promises to work: opened straight off disk. A plain background image loads
+   everywhere. */
 .brand__mark {
   width: 22px;
   height: 22px;
   background: url(../icon.svg) center / contain no-repeat;
   flex-shrink: 0;
+}
+
+:root[data-theme='light'] .brand__mark { background-image: url(../icon-ink.svg); }
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .brand__mark { background-image: url(../icon-ink.svg); }
 }
 
 /* The wordmark keeps Silkscreen so the logo reads distinctly from the
@@ -426,6 +459,37 @@ code {
 }
 
 .topbar__link:hover { color: var(--text); }
+
+/* The light/dark switch: a quiet icon control at the end of the topbar. It
+   shows the finish a press switches to, so the sun appears on the dark
+   console and the moon on the light one. */
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.theme-btn:hover { color: var(--text); }
+
+.theme-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.theme-btn__moon { display: none; }
+:root[data-theme='light'] .theme-btn__sun { display: none; }
+:root[data-theme='light'] .theme-btn__moon { display: block; }
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .theme-btn__sun { display: none; }
+  :root:not([data-theme='dark']) .theme-btn__moon { display: block; }
+}
 
 .footer {
   border-top: 2px solid var(--line);
@@ -705,7 +769,7 @@ code {
 
 /* New cards land with a single hard step, matching the shadow language. */
 @keyframes slam {
-  from { transform: translate(-4px, -4px); box-shadow: 9px 9px 0 rgba(0, 0, 0, .4); }
+  from { transform: translate(-4px, -4px); box-shadow: 9px 9px 0 var(--shadow-ink); }
   to { transform: none; box-shadow: var(--shadow); }
 }
 
@@ -1266,7 +1330,7 @@ code {
 
   /* Nothing tappable falls under the 44px floor on a touch screen. */
   .roster__name, .chip { min-height: var(--tap); }
-  .icon-btn, .chip__drop { min-width: var(--tap); min-height: var(--tap); }
+  .icon-btn, .chip__drop, .theme-btn { min-width: var(--tap); min-height: var(--tap); }
 
   /* The picker becomes a bottom sheet. */
   .overlay--top { align-items: flex-end; padding: 0; }

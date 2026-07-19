@@ -32,6 +32,7 @@ The scripts, in load order and by responsibility:
 | `builder.js` | the builder page |
 | `share.js` | the shared-link page |
 | `home.js` | the landing page, and the landing-or-shared decision |
+| `theme.js` | the light/dark switch; a head inline script re-applies the stored choice before first paint |
 
 ## Regenerating the catalog
 

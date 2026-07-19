@@ -459,7 +459,7 @@ check('every entry also renders with only its required parameters', () => {
 check('the technical line states exactly what goes in the file', () => {
   const challenge = starter();
   eq(phrase.technical(challenge.rules[1].effect),
-    'effect.spawn_mob · mob=minecraft:zombie · count=2 · baby=true · scope=per_player',
+    'effect.spawn_mob | mob=minecraft:zombie | count=2 | baby=true | scope=per_player',
     'technical detail');
 });
 

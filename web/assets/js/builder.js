@@ -522,7 +522,7 @@
       ]),
       el('button.card__summary', {
         type: 'button',
-        text: [line.detail, line.scope].filter(Boolean).join(' · ') || 'No settings',
+        text: [line.detail, line.scope].filter(Boolean).join(' | ') || 'No settings',
         onclick: function () { view.expanded = modifier.uid; render(); }
       }),
       form
@@ -673,7 +673,7 @@
 
     ui.append(panel, el('button.btn.btn--primary', {
       type: 'button',
-      text: problems.length ? 'EXPORT · FIX ' + problems.length + ' FIRST' : 'EXPORT ▸',
+      text: problems.length ? 'EXPORT | FIX ' + problems.length + ' FIRST' : 'EXPORT ▸',
       disabled: problems.length > 0,
       onclick: goToShare
     }));
@@ -742,7 +742,7 @@
     if (target.type === 'half') {
       var index = challenge.rules.map(function (r) { return r.uid; }).indexOf(target.ruleUid);
       return 'for RULE ' + String(index + 1).padStart(2, '0')
-        + ' · ' + (target.side === 'trigger' ? 'WHEN' : 'THEN') + ' slot';
+        + ' | ' + (target.side === 'trigger' ? 'WHEN' : 'THEN') + ' slot';
     }
     return target.type === 'goal' ? 'the run ends in a win when this is reached'
       : 'always on, for the whole run';

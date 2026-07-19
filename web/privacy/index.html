@@ -5,7 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChallengeX | Privacy</title>
 <meta name="description" content="What the ChallengeX website does and does not do with your data. Short answer: it runs entirely in your browser and uploads nothing.">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
+<script>
+/* Re-applies a stored light/dark choice before first paint; the script at the
+   end of this page wires the switch that sets it. */
+try {
+  var storedTheme = localStorage.getItem('challengex-theme');
+  if (storedTheme === 'light' || storedTheme === 'dark') document.documentElement.setAttribute('data-theme', storedTheme);
+} catch (ignored) {}
+</script>
 <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/css/fonts.css">
 <link rel="stylesheet" href="../assets/css/app.css">
@@ -19,6 +27,10 @@
   </a>
   <nav class="topbar__nav">
     <a class="btn btn--primary" href="../build/index.html">Build a challenge</a>
+    <button class="theme-btn" type="button" id="theme-toggle" aria-label="Switch between light and dark mode">
+      <svg class="theme-btn__sun" viewBox="0 0 11 11" aria-hidden="true" shape-rendering="crispEdges"><path d="M4 4h3v3H4zM5 1h1v2H5zM5 8h1v2H5zM1 5h2v1H1zM8 5h2v1H8zM2 2h1v1H2zM8 2h1v1H8zM2 8h1v1H2zM8 8h1v1H8z"/></svg>
+      <svg class="theme-btn__moon" viewBox="0 0 11 11" aria-hidden="true" shape-rendering="crispEdges"><path d="M4 1h3v1H4zM3 2h2v1H3zM7 2h1v1H7zM2 3h2v1H2zM8 3h1v1H8zM2 4h2v3H2zM2 7h2v1H2zM8 7h1v1H8zM3 8h2v1H3zM7 8h1v1H7zM4 9h3v1H4z"/></svg>
+    </button>
   </nav>
 </header>
 
@@ -44,7 +56,11 @@
 
   <h2>WHAT THIS SITE NEVER USES</h2>
   <ul>
-    <li>No cookies, and nothing stored in your browser between visits.</li>
+    <li>
+      No cookies. The one thing kept in your browser between visits is your
+      light-or-dark choice if you use the theme switch, and it never leaves
+      your device.
+    </li>
     <li>No analytics, tracking, or advertising.</li>
     <li>No forms, accounts, or newsletters.</li>
     <li>
@@ -109,6 +125,19 @@ if (window.location.protocol !== 'file:') {
     anchor.setAttribute('href', '../build/' + anchor.getAttribute('href').slice('../build/index.html'.length));
   });
 }
+
+/* The theme switch, inline for the same reason. Mirrors assets/js/theme.js. */
+document.getElementById('theme-toggle').addEventListener('click', function () {
+  var forced = document.documentElement.getAttribute('data-theme');
+  var current = (forced === 'light' || forced === 'dark')
+    ? forced
+    : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  var next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  try {
+    window.localStorage.setItem('challengex-theme', next);
+  } catch (ignored) {}
+});
 </script>
 </body>
 </html>

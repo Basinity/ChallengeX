@@ -5,7 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChallengeX | Build a challenge</title>
 <meta name="description" content="Compose a Minecraft challenge from triggers, effects, goals and modifiers, then export it as a preset file or a shareable link.">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
+<script>
+/* Re-applies a stored light/dark choice before first paint; theme.js wires
+   the topbar switch that sets it. */
+try {
+  var storedTheme = localStorage.getItem('challengex-theme');
+  if (storedTheme === 'light' || storedTheme === 'dark') document.documentElement.setAttribute('data-theme', storedTheme);
+} catch (ignored) {}
+</script>
 <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/css/fonts.css">
 <link rel="stylesheet" href="../assets/css/app.css">
@@ -20,6 +28,10 @@
   <div class="topbar__nav topbar__nav--builder">
     <a class="btn btn--ghost" href="../index.html#import">Import JSON</a>
     <button class="btn btn--primary" type="button" id="export-top">EXPORT ▸</button>
+    <button class="theme-btn" type="button" id="theme-toggle" aria-label="Switch between light and dark mode">
+      <svg class="theme-btn__sun" viewBox="0 0 11 11" aria-hidden="true" shape-rendering="crispEdges"><path d="M4 4h3v3H4zM5 1h1v2H5zM5 8h1v2H5zM1 5h2v1H1zM8 5h2v1H8zM2 2h1v1H2zM8 2h1v1H8zM2 8h1v1H2zM8 8h1v1H8z"/></svg>
+      <svg class="theme-btn__moon" viewBox="0 0 11 11" aria-hidden="true" shape-rendering="crispEdges"><path d="M4 1h3v1H4zM3 2h2v1H3zM7 2h1v1H7zM2 3h2v1H2zM8 3h1v1H8zM2 4h2v3H2zM2 7h2v1H2zM8 7h1v1H8zM3 8h2v1H3zM7 8h1v1H7zM4 9h3v1H4z"/></svg>
+    </button>
   </div>
 </header>
 
@@ -77,5 +89,6 @@
 <script src="../assets/js/phrase.js"></script>
 <script src="../assets/js/link.js"></script>
 <script src="../assets/js/builder.js"></script>
+<script src="../assets/js/theme.js"></script>
 </body>
 </html>

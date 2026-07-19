@@ -76,7 +76,7 @@ window.CX.share = (function () {
      scope is, so a specific-player scope reads no louder than "everyone". */
   function modifierBlock(modifier) {
     var line = phrase.modifierLine(modifier);
-    var note = [line.detail, line.scope].filter(Boolean).join(' · ');
+    var note = [line.detail, line.scope].filter(Boolean).join(' | ');
 
     return el('div.line', null, [
       el('div.line__row', null, [
@@ -116,7 +116,7 @@ window.CX.share = (function () {
   }
 
   function renderChallenge(challenge, root) {
-    document.title = challenge.name + ' · ChallengeX';
+    document.title = 'ChallengeX | ' + challenge.name;
 
     var rules = el('div.stack.stack--tight');
     challenge.rules.forEach(function (rule, index) {
@@ -183,7 +183,7 @@ window.CX.share = (function () {
   }
 
   function renderFailure(reason, root) {
-    document.title = 'Broken link · ChallengeX';
+    document.title = 'ChallengeX | Broken link';
     ui.clear(root);
     ui.append(root, el('main.fail', null, [
       el('div.fail__title', { text: 'THIS LINK IS SCRAMBLED' }),

@@ -179,7 +179,7 @@ window.CX.phrase = (function () {
       parts.push('scope=' + (Array.isArray(block.scope) ? '[' + block.scope.join(', ') + ']'
         : (block.scope || 'unset')));
     }
-    return parts.join(' · ');
+    return parts.join(' | ');
   }
 
   return {
