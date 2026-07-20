@@ -67,6 +67,9 @@ public final class CatalogJson {
                 if (spec.max() != null) {
                     param.addProperty("max", spec.max());
                 }
+                if (spec.suggests() != null) {
+                    param.addProperty("suggests", spec.suggests());
+                }
                 params.add(param);
             }
             entry.add("params", params);

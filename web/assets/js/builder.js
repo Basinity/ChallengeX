@@ -18,6 +18,7 @@
   var preset = window.CX.preset;
   var phrase = window.CX.phrase;
   var link = window.CX.link;
+  var suggest = window.CX.suggest;
 
   var challenge = preset.blankChallenge();
 
@@ -157,6 +158,10 @@
       return el('label.field', null, [label, toggle]);
     }
 
+    if (param.type === 'STRING' && param.suggests) {
+      return el('div.field', null, [label, suggestField(block, entry, param)]);
+    }
+
     var numeric = param.type === 'INT' || param.type === 'DECIMAL';
     var input = el('input.input', {
       type: numeric ? 'number' : 'text',
@@ -188,6 +193,136 @@
     });
     markField(input, block, param);
     return el('label.field', null, [label, input]);
+  }
+
+  /* A parameter whose value is a game id renders as a type-ahead: the field
+     shows display names ("Diamond Sword"), the model keeps the id the mod
+     matches on (minecraft:diamond_sword). Nothing is ever forced: text that
+     matches no suggestion is kept exactly as typed, so a modded or future id
+     stays as exportable as it always was. The "player" source draws from the
+     challenge roster instead of the game data. */
+  function suggestField(block, entry, param) {
+    var stored = preset.rawValue(block, param);
+    var shown = param.suggests === 'player' ? null : suggest.displayName(param.suggests, stored);
+    var input = el('input.input', {
+      type: 'text',
+      role: 'combobox',
+      autocomplete: 'off',
+      spellcheck: 'false',
+      'aria-expanded': 'false',
+      'aria-autocomplete': 'list',
+      value: shown === null ? stored : shown,
+      placeholder: placeholderFor(entry, param),
+      'aria-label': entry.name + ' ' + param.name
+    });
+    var list = el('div.suggest__list', { hidden: true });
+    var box = el('div.suggest', null, [input, list]);
+    var options = [];
+    var active = -1;
+
+    function optionsFor(query) {
+      if (param.suggests === 'player') {
+        var needle = (query || '').trim().toLowerCase();
+        return challenge.players.filter(function (name) {
+          return !needle || name.toLowerCase().indexOf(needle) >= 0;
+        }).map(function (name) { return { id: name, name: name }; });
+      }
+      return suggest.search(param.suggests, query, 8);
+    }
+
+    function close() {
+      list.hidden = true;
+      ui.clear(list);
+      options = [];
+      active = -1;
+      input.setAttribute('aria-expanded', 'false');
+    }
+
+    function pick(option) {
+      block.params[param.name] = option.id;
+      input.value = option.name;
+      close();
+      refreshRail();
+      markField(input, block, param);
+    }
+
+    function open(query) {
+      options = optionsFor(query);
+      ui.clear(list);
+      active = -1;
+      if (!options.length) {
+        close();
+        return;
+      }
+      options.forEach(function (option) {
+        var row = el('button.suggest__option', { type: 'button', tabindex: '-1', text: option.name });
+        // mousedown, not click: it runs before the input's blur tears the list down.
+        row.addEventListener('mousedown', function (event) {
+          event.preventDefault();
+          pick(option);
+        });
+        ui.append(list, row);
+      });
+      list.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+    }
+
+    function highlight(step) {
+      if (list.hidden || !options.length) {
+        return;
+      }
+      active = (active + step + options.length) % options.length;
+      for (var i = 0; i < list.children.length; i++) {
+        if (i === active) {
+          list.children[i].setAttribute('data-active', 'true');
+        } else {
+          list.children[i].removeAttribute('data-active');
+        }
+      }
+      list.children[active].scrollIntoView({ block: 'nearest' });
+    }
+
+    input.addEventListener('input', function () {
+      block.params[param.name] = input.value;
+      refreshRail();
+      markField(input, block, param);
+      open(input.value);
+    });
+    input.addEventListener('focus', function () { open(input.value); });
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (list.hidden) {
+          open(input.value);
+        }
+        highlight(1);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        highlight(-1);
+      } else if (event.key === 'Enter') {
+        if (!list.hidden && (active >= 0 || options.length === 1)) {
+          event.preventDefault();
+          pick(options[active >= 0 ? active : 0]);
+        }
+      } else if (event.key === 'Escape') {
+        close();
+      }
+    });
+    // Blur snaps exact text onto the entry it names ("creeper", "Creeper" and
+    // the full id all mean the same one); anything else stays as typed.
+    input.addEventListener('blur', function () {
+      close();
+      var match = param.suggests === 'player' ? null : suggest.resolve(param.suggests, input.value);
+      if (match) {
+        block.params[param.name] = match.id;
+        input.value = match.name;
+        refreshRail();
+      }
+      markField(input, block, param);
+    });
+
+    markField(input, block, param);
+    return box;
   }
 
   /* Holds a numeric input to the param's declared bounds, the ones the catalog

@@ -34,7 +34,7 @@ sandbox.window.location = { href: 'https://challengexmc.com/index.html', hash: '
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 
-for (const file of ['catalog.js', 'copy.js', 'entries.js', 'preset.js', 'phrase.js', 'link.js']) {
+for (const file of ['catalog.js', 'gamedata.js', 'copy.js', 'entries.js', 'suggest.js', 'preset.js', 'phrase.js', 'link.js']) {
   const source = fs.readFileSync(path.join(ROOT, 'assets', 'js', file), 'utf8');
   vm.runInContext(source, sandbox, { filename: file });
 }
@@ -391,8 +391,8 @@ check('rules read as English', () => {
     'When anyone takes damage → whoever triggers it gets a random negative effect for 15s',
     'rule 1');
   eq(phrase.ruleSummary(challenge.rules[1]),
-    'When anyone kills a mob → whoever triggers it has 2 baby minecraft:zombie spawned on them',
-    'rule 2');
+    'When anyone kills a mob → whoever triggers it has 2 baby Zombie spawned on them',
+    'rule 2: the stored id reads by its display name');
   eq(phrase.ruleSummary(challenge.rules[2]),
     'Every 300 seconds → everyone is struck by lightning',
     'a playerless trigger drops the "when" and the subject');
@@ -419,7 +419,7 @@ check('optional parameters appear only when set', () => {
     'anyone takes damage', 'without the optional source');
   block.params.source = 'minecraft:fall';
   eq(phrase.ruleLine({ trigger: block, effect: { id: null, params: {} } }).trigger,
-    'anyone takes damage from minecraft:fall', 'with it');
+    'anyone takes damage from Fall', 'with it, read by display name');
 });
 
 check('every entry renders a phrase with required parameters filled', () => {
@@ -454,6 +454,52 @@ check('every entry also renders with only its required parameters', () => {
     });
   });
   eq(bad, [], 'entries whose phrase left a placeholder behind');
+});
+
+/* ---------- suggestions ---------- */
+
+const suggest = CX.suggest;
+
+check('the game data ships every source the catalog asks for', () => {
+  const wanted = new Set();
+  entries.kinds.forEach((kind) => {
+    entries.all(kind).forEach((entry) => {
+      entry.params.forEach((param) => {
+        if (param.suggests && param.suggests !== 'player') {
+          wanted.add(param.suggests);
+        }
+      });
+    });
+  });
+  ok(wanted.size > 0, 'the catalog declares suggestion sources at all');
+  eq([...wanted].filter((name) => !suggest.has(name)), [], 'sources with no game data');
+});
+
+check('typing a display name resolves to the id the mod matches on', () => {
+  eq(suggest.resolve('item', 'Diamond Sword').id, 'minecraft:diamond_sword', 'by name');
+  eq(suggest.resolve('mob', 'creeper').id, 'minecraft:creeper', 'by bare id');
+  eq(suggest.resolve('item', 'minecraft:tnt').name, 'TNT', 'by full id');
+  eq(suggest.resolve('item', 'no such thing'), null, 'unknown text stays free');
+});
+
+check('stored ids read back as display names', () => {
+  eq(suggest.displayName('advancement', 'minecraft:story/mine_diamond'), 'Diamonds!', 'real title');
+  eq(suggest.displayName('mob', 'minecraft:zombie'), 'Zombie', 'derived name');
+  eq(suggest.displayName('item', 'botania:mana_pearl'), null, 'modded id is unknown, not wrong');
+});
+
+check('search ranks a name prefix first and caps the list', () => {
+  const hits = suggest.search('item', 'diamond', 8);
+  eq(hits.length, 8, 'capped at 8');
+  ok(hits[0].name.toLowerCase().indexOf('diamond') === 0, 'prefix first: ' + hits[0].name);
+  eq(suggest.search('weather', '', 8).map((entry) => entry.name),
+    ['Clear', 'Rain', 'Thunder'], 'keyword sources list whole on an empty query');
+});
+
+check('derived names match what the exporter assumed', () => {
+  eq(suggest.derivedName('the_nether'), 'The Nether', 'underscores');
+  eq(suggest.derivedName('story/mine_diamond'), 'Mine Diamond', 'path tail');
+  eq(suggest.derivedName('ambient.cave'), 'Ambient Cave', 'dots');
 });
 
 check('the technical line states exactly what goes in the file', () => {

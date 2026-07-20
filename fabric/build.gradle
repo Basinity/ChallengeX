@@ -33,3 +33,23 @@ processResources {
         expand 'version': project.version
     }
 }
+
+// The web builder suggests game ids by their display names out of this file, so
+// the game jar stays the single source of truth for what exists and what it is
+// called. Re-run after a game-version bump; the result is committed alongside
+// the site, like the catalog.
+def webGameData = rootProject.file('web/assets/js/gamedata.js')
+
+tasks.register('exportGameData', JavaExec) {
+    group = 'build'
+    description = 'Regenerates the web builder game data (ids and display names) from the game registries.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.basinity.challengex.fabric.export.GameDataExportMain'
+    args webGameData.absolutePath, project.minecraft_version
+    // The game's logging writes a logs/ folder relative to the working
+    // directory; point it into build/ so the module root stays clean.
+    workingDir = layout.buildDirectory.dir('exportGameData').get().asFile
+    doFirst { workingDir.mkdirs() }
+    inputs.files(sourceSets.main.output)
+    outputs.file(webGameData)
+}

@@ -20,7 +20,7 @@ window.CX.phrase = (function () {
   /* A parameter as the template sees it: whether it counts as filled in, and
      what it prints. A true boolean is filled in but prints nothing, so it can
      gate a chunk ("[{baby} baby]") without appearing in the sentence. */
-  function valueOf(block, name) {
+  function rawValueOf(block, name) {
     var value = block.params ? block.params[name] : undefined;
     if (value === true) {
       return { set: true, text: '' };
@@ -30,6 +30,38 @@ window.CX.phrase = (function () {
     }
     var text = String(value).trim();
     return { set: text !== '', text: text };
+  }
+
+  function valueOf(block, name) {
+    var value = rawValueOf(block, name);
+    return value.set ? { set: true, text: display(block, name, value.text) } : value;
+  }
+
+  /* Sources whose values are ordinary words a phrase weaves into prose
+     ("negative", "rain", "noon"): capitalizing those mid-sentence would read
+     wrong, so they print as written. */
+  var PROSE_SOURCES = { player: true, weather: true, time: true, effect_kind: true };
+
+  /* An id-valued parameter reads by its display name ("Zombie", "Diamonds!"),
+     since a sentence is exactly where an id should not appear. Free text,
+     prose keywords, and ids nothing knows print as written; the raw ids stay
+     available behind the technical disclosure. */
+  function display(block, name, text) {
+    var suggest = window.CX.suggest;
+    var entry = suggest && entries.get(block.id);
+    if (!entry) {
+      return text;
+    }
+    for (var i = 0; i < entry.params.length; i++) {
+      var param = entry.params[i];
+      if (param.name === name) {
+        if (!param.suggests || PROSE_SOURCES[param.suggests]) {
+          return text;
+        }
+        return suggest.displayName(param.suggests, text) || text;
+      }
+    }
+    return text;
   }
 
   function render(template, block) {
@@ -170,7 +202,8 @@ window.CX.phrase = (function () {
     }
     var parts = [block.id];
     entry.params.forEach(function (param) {
-      var value = valueOf(block, param.name);
+      // Raw on purpose: this line is the technical truth, ids and all.
+      var value = rawValueOf(block, param.name);
       if (value.set) {
         parts.push(param.name + '=' + (param.type === 'BOOL' ? 'true' : value.text));
       }

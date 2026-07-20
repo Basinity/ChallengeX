@@ -39,7 +39,7 @@ window.CX_COPY = {
   },
   'trigger.mob_killed': {
     name: 'Mob killed',
-    blurb: 'A mob gets killed. Filter to a specific mob id.',
+    blurb: 'A mob gets killed. Any mob, or one in particular.',
     phrase: 'kills {mob?a mob}'
   },
   'trigger.kill_player': {
@@ -368,7 +368,7 @@ window.CX_COPY = {
   },
   'effect.play_sound': {
     name: 'Play sound',
-    blurb: 'Any sound id. Use responsibly, or don\'t.',
+    blurb: 'Any game sound. Use responsibly, or don\'t.',
     phrase: 'hears {sound}'
   },
   'effect.change_time': {

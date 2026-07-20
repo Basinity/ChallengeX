@@ -70,6 +70,8 @@ class CatalogJsonTest {
                 assertEquals(spec.required(), param.get("required").getAsBoolean(), where + ": parameter required");
                 assertEquals(spec.min(), bound(param, "min"), where + ": parameter min");
                 assertEquals(spec.max(), bound(param, "max"), where + ": parameter max");
+                assertEquals(spec.suggests(), param.has("suggests") ? param.get("suggests").getAsString() : null,
+                        where + ": parameter suggests");
             }
         }
     }

@@ -27,7 +27,8 @@ window.CX_CATALOG = {
         {
           "name": "block",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "block"
         }
       ]
     },
@@ -38,7 +39,8 @@ window.CX_CATALOG = {
         {
           "name": "block",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "block"
         }
       ]
     },
@@ -49,7 +51,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "mob"
         }
       ]
     },
@@ -60,7 +63,8 @@ window.CX_CATALOG = {
         {
           "name": "name",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "player"
         }
       ]
     },
@@ -71,7 +75,8 @@ window.CX_CATALOG = {
         {
           "name": "source",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "damage_type"
         }
       ]
     },
@@ -82,7 +87,8 @@ window.CX_CATALOG = {
         {
           "name": "source",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "damage_type"
         }
       ]
     },
@@ -93,12 +99,14 @@ window.CX_CATALOG = {
         {
           "name": "source",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "damage_type"
         },
         {
           "name": "target",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "entity"
         }
       ]
     },
@@ -109,7 +117,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -120,7 +129,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -131,7 +141,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -142,7 +153,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -158,7 +170,8 @@ window.CX_CATALOG = {
         {
           "name": "advancement",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "advancement"
         }
       ]
     },
@@ -169,7 +182,8 @@ window.CX_CATALOG = {
         {
           "name": "dimension",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "dimension"
         }
       ]
     },
@@ -180,7 +194,8 @@ window.CX_CATALOG = {
         {
           "name": "biome",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "biome"
         }
       ]
     },
@@ -272,7 +287,8 @@ window.CX_CATALOG = {
         {
           "name": "enchantment",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "enchantment"
         },
         {
           "name": "level",
@@ -288,7 +304,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -299,7 +316,8 @@ window.CX_CATALOG = {
         {
           "name": "projectile",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "entity"
         }
       ]
     },
@@ -310,7 +328,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "mob"
         }
       ]
     },
@@ -321,7 +340,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "mob"
         }
       ]
     },
@@ -332,7 +352,8 @@ window.CX_CATALOG = {
         {
           "name": "container",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "container"
         }
       ]
     },
@@ -343,7 +364,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -354,7 +376,8 @@ window.CX_CATALOG = {
         {
           "name": "block",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "block"
         }
       ]
     },
@@ -370,7 +393,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "entity"
         }
       ]
     },
@@ -381,7 +405,8 @@ window.CX_CATALOG = {
         {
           "name": "effect",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "effect"
         }
       ]
     },
@@ -392,7 +417,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -413,7 +439,8 @@ window.CX_CATALOG = {
         {
           "name": "weather",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "weather"
         }
       ]
     },
@@ -424,7 +451,8 @@ window.CX_CATALOG = {
         {
           "name": "time",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "time"
         }
       ]
     },
@@ -466,7 +494,8 @@ window.CX_CATALOG = {
         {
           "name": "effect",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "effect"
         },
         {
           "name": "duration",
@@ -509,7 +538,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "item"
         },
         {
           "name": "amount",
@@ -551,7 +581,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "entity"
         },
         {
           "name": "count",
@@ -715,7 +746,8 @@ window.CX_CATALOG = {
         {
           "name": "sound",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "sound"
         }
       ]
     },
@@ -726,7 +758,8 @@ window.CX_CATALOG = {
         {
           "name": "value",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "time"
         }
       ]
     },
@@ -737,7 +770,8 @@ window.CX_CATALOG = {
         {
           "name": "value",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "weather"
         }
       ]
     },
@@ -753,7 +787,8 @@ window.CX_CATALOG = {
         {
           "name": "type",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "effect_kind"
         },
         {
           "name": "seconds",
@@ -846,7 +881,8 @@ window.CX_CATALOG = {
         {
           "name": "mob",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "mob"
         }
       ]
     },
@@ -857,7 +893,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "item"
         }
       ]
     },
@@ -868,7 +905,8 @@ window.CX_CATALOG = {
         {
           "name": "advancement",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "advancement"
         }
       ]
     },
@@ -891,7 +929,8 @@ window.CX_CATALOG = {
         {
           "name": "item",
           "type": "STRING",
-          "required": false
+          "required": false,
+          "suggests": "item"
         }
       ]
     },
@@ -902,7 +941,8 @@ window.CX_CATALOG = {
         {
           "name": "target",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "block"
         }
       ]
     },
@@ -966,7 +1006,8 @@ window.CX_CATALOG = {
         {
           "name": "effect",
           "type": "STRING",
-          "required": true
+          "required": true,
+          "suggests": "effect"
         },
         {
           "name": "amplifier",
