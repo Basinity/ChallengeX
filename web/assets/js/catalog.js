@@ -947,7 +947,7 @@ window.CX_CATALOG = {
       ]
     },
     {
-      "id": "modifier.block_interaction",
+      "id": "modifier.disable_interaction",
       "scoped": true,
       "params": [
         {

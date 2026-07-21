@@ -652,7 +652,7 @@
       "scope": "every_player"
     },
     {
-      "id": "modifier.block_interaction",
+      "id": "modifier.disable_interaction",
       "params": {
         "target": "minecraft:test"
       },

@@ -8,12 +8,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * {@code modifier.block_interaction}: blocks right-click interaction with one
+ * {@code modifier.disable_interaction}: blocks right-click interaction with one
  * specific block (its required {@code target} id, e.g. "no crafting table")
  * for as long as the modifier is active. Rides the same {@link
  * UseBlockCallback} {@code trigger.block_interacted} observes.
  */
-public final class BlockInteractionModifierSource implements ModifierSource {
+public final class DisableInteractionModifierSource implements ModifierSource {
 
     @Override
     public void register(ModifierContext context) {
@@ -21,7 +21,7 @@ public final class BlockInteractionModifierSource implements ModifierSource {
             if (!(player instanceof ServerPlayer serverPlayer)) {
                 return InteractionResult.PASS;
             }
-            Modifier modifier = context.find(serverPlayer.getScoreboardName(), "modifier.block_interaction")
+            Modifier modifier = context.find(serverPlayer.getScoreboardName(), "modifier.disable_interaction")
                     .orElse(null);
             if (modifier == null) {
                 return InteractionResult.PASS;

@@ -14,7 +14,7 @@ public final class ModifierSources {
     public static List<ModifierSource> all() {
         return List.of(
                 new DisableItemUseModifierSource(),
-                new BlockInteractionModifierSource(),
+                new DisableInteractionModifierSource(),
                 new BuffHostileMobsModifierSource(),
                 new RandomizeDropsModifierSource());
     }

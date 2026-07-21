@@ -475,8 +475,8 @@ window.CX_COPY = {
     blurb: 'One item becomes decorative. Or all of them.',
     detail: '{item?all items}'
   },
-  'modifier.block_interaction': {
-    name: 'Block interaction',
+  'modifier.disable_interaction': {
+    name: 'Disable interaction',
     blurb: 'A block or item you simply may not touch.',
     detail: '{target}'
   },
