@@ -396,11 +396,21 @@
     return block.scope;
   }
 
-  function scopeControl(block, entry) {
+  function scopeControl(block, entry, context) {
     if (!entry.scoped) {
       return null;
     }
     var allowed = entries.scopes(entry.kind);
+    // A playerless trigger has nobody who "triggered it": the engine treats a
+    // per-player effect as hitting everyone there, so the choice disappears
+    // and a stored per_player (an import, or a later trigger swap) becomes
+    // the every_player it already meant.
+    if (context && context.playerlessTrigger) {
+      allowed = allowed.filter(function (value) { return value !== 'per_player'; });
+      if (currentScopeChoice(block) === 'per_player') {
+        block.scope = 'every_player';
+      }
+    }
     var labels = SCOPE_LABELS[entry.kind] || {};
     var choice = currentScopeChoice(block);
     var missing = !preset.scopeIsSet(block.scope);
@@ -511,8 +521,16 @@
         })
       ]),
       paramsForm(block, entry),
-      scopeControl(block, entry)
+      scopeControl(block, entry, side === 'effect' ? { playerlessTrigger: playerlessTrigger(rule) } : null)
     ]);
+  }
+
+  /* Whether a rule's chosen trigger is a playerless one (world clock, weather,
+     fixed interval): an unchosen or unknown trigger counts as player-ful, so
+     the effect keeps all its scope choices until a playerless pick says otherwise. */
+  function playerlessTrigger(rule) {
+    var entry = rule.trigger.id ? entries.get(rule.trigger.id) : null;
+    return Boolean(entry && !entry.scoped);
   }
 
   function cardTools(actions) {

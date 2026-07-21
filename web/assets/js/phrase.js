@@ -162,13 +162,19 @@ window.CX.phrase = (function () {
   }
 
   /* A rule as its two halves, so the page can colour them separately. A half
-     with nothing chosen yet says so rather than rendering blank. */
+     with nothing chosen yet says so rather than rendering blank. A playerless
+     trigger has nobody who "triggers it", and the engine sends a per-player
+     effect to everyone there, so the sentence says everyone too. */
   function ruleLine(rule) {
     var triggerEntry = entries.get(rule.trigger.id);
+    var playerless = Boolean(triggerEntry && !triggerEntry.scoped);
+    var subjectFor = playerless
+      ? function (scope) { return effectSubject(scope === 'per_player' ? 'every_player' : scope); }
+      : effectSubject;
     return {
       lead: triggerEntry ? triggerEntry.lead : 'When',
       trigger: rule.trigger.id ? clause(rule.trigger, triggerSubject) : 'nothing yet',
-      effect: rule.effect.id ? clause(rule.effect, effectSubject) : 'nothing happens'
+      effect: rule.effect.id ? clause(rule.effect, subjectFor) : 'nothing happens'
     };
   }
 

@@ -98,6 +98,20 @@ check('phrases never say minecraft:, even for stale or unknown values', () => {
   ok(line.effect.indexOf('minecraft:') < 0, 'unknown id prints bare, got: ' + line.effect);
 });
 
+check('a per-player effect under a playerless trigger reads as everyone', () => {
+  const line = CX.phrase.ruleLine({
+    trigger: { id: 'trigger.time_of_day', params: { time: 'day' } },
+    effect: { id: 'effect.random_effect', params: { type: 'positive' }, scope: 'per_player' }
+  });
+  ok(line.effect.indexOf('whoever') < 0, 'no "whoever triggers it", got: ' + line.effect);
+  ok(line.effect.indexOf('everyone') === 0, 'subject is everyone, got: ' + line.effect);
+  const scoped = CX.phrase.ruleLine({
+    trigger: { id: 'trigger.jumped', scope: 'every_player' },
+    effect: { id: 'effect.random_effect', params: { type: 'positive' }, scope: 'per_player' }
+  });
+  ok(scoped.effect.indexOf('whoever') === 0, 'player-ful trigger keeps whoever, got: ' + scoped.effect);
+});
+
 check('every entry has copy, and every non-modifier has a phrase', () => {
   const missing = [];
   entries.kinds.forEach((kind) => {
