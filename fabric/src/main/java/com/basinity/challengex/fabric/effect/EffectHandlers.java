@@ -27,6 +27,7 @@ public final class EffectHandlers {
         handlers.put("effect.remove_item_slot", new RemoveItemSlotHandler());
         handlers.put("effect.drop_inventory", new DropInventoryHandler());
         handlers.put("effect.drain_hunger", new DrainHungerHandler());
+        handlers.put("effect.restore_hunger", new RestoreHungerHandler());
         handlers.put("effect.change_xp", new ChangeXpHandler());
         handlers.put("effect.teleport_up", new TeleportUpHandler());
         handlers.put("effect.launch", new LaunchHandler());

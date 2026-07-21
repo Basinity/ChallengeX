@@ -74,7 +74,7 @@ function ok(condition, message) {
 
 check('catalog carries the whole frozen catalog', () => {
   eq(entries.count('trigger'), 44, 'triggers');
-  eq(entries.count('effect'), 36, 'effects');
+  eq(entries.count('effect'), 37, 'effects');
   eq(entries.count('goal'), 4, 'goals');
   eq(entries.count('modifier'), 12, 'modifiers');
   eq(entries.schemaVersion, 1, 'schema version');

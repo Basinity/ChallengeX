@@ -102,6 +102,7 @@ public final class CoreCatalog {
         effect(registry, "heal", true, optional("hearts", DECIMAL).atLeast(0));
         effect(registry, "change_max_health", true, required("hearts", DECIMAL));
         effect(registry, "drain_hunger", true, optional("amount", INT).atLeast(0));
+        effect(registry, "restore_hunger", true, optional("amount", INT).atLeast(0));
         effect(registry, "change_xp", true, required("amount", INT), optional("set", BOOL), optional("levels", BOOL));
         effect(registry, "shuffle_hotbar", true);
         effect(registry, "swap_inventory", true);

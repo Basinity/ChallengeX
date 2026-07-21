@@ -321,6 +321,11 @@ window.CX_COPY = {
     blurb: 'The bar goes down.',
     phrase: 'loses {amount?some} hunger'
   },
+  'effect.restore_hunger': {
+    name: 'Restore hunger',
+    blurb: 'The bar comes back.',
+    phrase: 'regains {amount?all their} hunger'
+  },
   'effect.change_xp': {
     name: 'Change XP',
     blurb: 'Add, remove, or set outright, in points or in levels.',

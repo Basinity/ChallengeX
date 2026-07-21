@@ -658,6 +658,18 @@ window.CX_CATALOG = {
       ]
     },
     {
+      "id": "effect.restore_hunger",
+      "scoped": true,
+      "params": [
+        {
+          "name": "amount",
+          "type": "INT",
+          "required": false,
+          "min": 0
+        }
+      ]
+    },
+    {
       "id": "effect.change_xp",
       "scoped": true,
       "params": [

@@ -49,7 +49,7 @@ class CoreCatalogTest {
                 "effect.give_item", "effect.teleport_random", "effect.teleport_up",
                 "effect.spawn_mob", "effect.ignite", "effect.damage", "effect.heal",
                 "effect.change_max_health",
-                "effect.drain_hunger", "effect.change_xp", "effect.shuffle_hotbar",
+                "effect.drain_hunger", "effect.restore_hunger", "effect.change_xp", "effect.shuffle_hotbar",
                 "effect.swap_inventory", "effect.swap_position", "effect.clear_effects", "effect.lightning",
                 "effect.falling_anvil", "effect.launch", "effect.broadcast", "effect.play_sound",
                 "effect.change_time", "effect.change_weather", "effect.replace_held_random",
