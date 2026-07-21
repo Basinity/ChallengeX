@@ -43,9 +43,10 @@ window.CX.phrase = (function () {
   var PROSE_SOURCES = { player: true, weather: true, time: true, effect_kind: true };
 
   /* An id-valued parameter reads by its display name ("Zombie", "Diamonds!"),
-     since a sentence is exactly where an id should not appear. Free text,
-     prose keywords, and ids nothing knows print as written; the raw ids stay
-     available behind the technical disclosure. */
+     since a sentence is exactly where an id should not appear. Free text
+     prints as written; prose keywords and ids nothing knows print as written
+     minus any minecraft: prefix, so a sentence never says "minecraft:"; the
+     raw ids stay available behind the technical disclosure. */
   function display(block, name, text) {
     var suggest = window.CX.suggest;
     var entry = suggest && entries.get(block.id);
@@ -55,10 +56,13 @@ window.CX.phrase = (function () {
     for (var i = 0; i < entry.params.length; i++) {
       var param = entry.params[i];
       if (param.name === name) {
-        if (!param.suggests || PROSE_SOURCES[param.suggests]) {
+        if (!param.suggests) {
           return text;
         }
-        return suggest.displayName(param.suggests, text) || text;
+        if (PROSE_SOURCES[param.suggests]) {
+          return suggest.bareOf(text);
+        }
+        return suggest.displayName(param.suggests, text) || suggest.bareOf(text);
       }
     }
     return text;

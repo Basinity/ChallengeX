@@ -88,6 +88,16 @@ check('keyword sources store bare values, registry sources namespaced ids', () =
   eq(CX.suggest.resolve('item', 'Diamond').id, 'minecraft:diamond', 'registry id keeps its namespace');
 });
 
+check('phrases never say minecraft:, even for stale or unknown values', () => {
+  const line = CX.phrase.ruleLine({
+    trigger: { id: 'trigger.time_of_day', params: { time: 'minecraft:midnight' } },
+    effect: { id: 'effect.give_item', params: { item: 'minecraft:from_a_future_version' }, scope: 'per_player' }
+  });
+  ok(line.trigger.indexOf('minecraft:') < 0, 'keyword prints bare, got: ' + line.trigger);
+  ok(line.trigger.indexOf('midnight') >= 0, 'keyword value survives, got: ' + line.trigger);
+  ok(line.effect.indexOf('minecraft:') < 0, 'unknown id prints bare, got: ' + line.effect);
+});
+
 check('every entry has copy, and every non-modifier has a phrase', () => {
   const missing = [];
   entries.kinds.forEach((kind) => {

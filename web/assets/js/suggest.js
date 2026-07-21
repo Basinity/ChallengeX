@@ -129,6 +129,7 @@ window.CX.suggest = (function () {
     gameVersion: data ? data.gameVersion : null,
     derivedName: derivedName,
     has: has,
+    bareOf: bareOf,
     displayName: displayName,
     resolve: resolve,
     search: search
