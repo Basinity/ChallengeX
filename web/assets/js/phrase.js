@@ -106,8 +106,10 @@ window.CX.phrase = (function () {
     return names.slice(0, -1).join(', ') + ' ' + joiner + ' ' + names[names.length - 1];
   }
 
-  /* Both subjects are deliberately singular ("any of A or B", "each of A and
-     B") so one verb form serves every phrase in the copy table. */
+  /* Subjects are singular ("any of A or B", "each of A and B") so the copy
+     table's third-person-singular phrases serve them all unchanged. The one
+     exception is "they", the per-player effect subject, which takes a plural
+     verb: the clause renderer sheds the leading verb's -s for it below. */
   function triggerSubject(scope) {
     if (scope === 'every_player') {
       return 'anyone';
@@ -120,7 +122,7 @@ window.CX.phrase = (function () {
 
   function effectSubject(scope) {
     if (scope === 'per_player') {
-      return 'whoever triggers it';
+      return 'they';
     }
     if (scope === 'every_player') {
       return 'everyone';
@@ -148,6 +150,30 @@ window.CX.phrase = (function () {
 
   /* ---------- clauses ---------- */
 
+  /* "they" takes a plural verb and every phrase is written third-person
+     singular, so the leading verb sheds its -s: gets → get, is healed → are
+     healed, has their → have their, catches fire → catch fire, dies → die. */
+  var PLURAL_VERBS = { is: 'are', has: 'have', was: 'were', does: 'do', goes: 'go', dies: 'die' };
+
+  function pluralizeLead(body) {
+    var space = body.indexOf(' ');
+    var head = space < 0 ? body : body.slice(0, space);
+    var rest = space < 0 ? '' : body.slice(space);
+    var plural = PLURAL_VERBS[head];
+    if (!plural) {
+      if (/(ch|sh|ss|x|z)es$/.test(head)) {
+        plural = head.slice(0, -2);
+      } else if (/[^aeiou]ies$/.test(head)) {
+        plural = head.slice(0, -3) + 'y';
+      } else if (/[^s]s$/.test(head)) {
+        plural = head.slice(0, -1);
+      } else {
+        plural = head;
+      }
+    }
+    return plural + rest;
+  }
+
   function clause(block, subjectFor) {
     var entry = entries.get(block.id);
     if (!entry) {
@@ -158,6 +184,9 @@ window.CX.phrase = (function () {
       return body;
     }
     var subject = subjectFor(block.scope);
+    if (subject === 'they') {
+      body = pluralizeLead(body);
+    }
     return subject ? subject + ' ' + body : body;
   }
 

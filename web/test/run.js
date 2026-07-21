@@ -109,7 +109,19 @@ check('a per-player effect under a playerless trigger reads as everyone', () => 
     trigger: { id: 'trigger.jumped', scope: 'every_player' },
     effect: { id: 'effect.random_effect', params: { type: 'positive' }, scope: 'per_player' }
   });
-  ok(scoped.effect.indexOf('whoever') === 0, 'player-ful trigger keeps whoever, got: ' + scoped.effect);
+  eq(scoped.effect, 'they get a random positive effect', 'player-ful trigger reads as they');
+});
+
+check('the "they" subject pluralizes the leading verb', () => {
+  const they = (id, params) => CX.phrase.ruleLine({
+    trigger: { id: 'trigger.jumped', scope: 'every_player' },
+    effect: { id: id, params: params || {}, scope: 'per_player' }
+  }).effect;
+  eq(they('effect.heal'), 'they are healed', 'is → are');
+  eq(they('effect.change_xp', { amount: 5 }), 'they have their XP changed by 5', 'has → have');
+  eq(they('effect.ignite'), 'they catch fire', 'catches → catch');
+  eq(they('effect.kill'), 'they die on the spot', 'dies → die');
+  eq(they('effect.drain_hunger'), 'they lose some hunger', 'loses → lose');
 });
 
 check('every entry has copy, and every non-modifier has a phrase', () => {
@@ -420,10 +432,10 @@ check('the export filename is one the mod will accept', () => {
 check('rules read as English', () => {
   const challenge = starter();
   eq(phrase.ruleSummary(challenge.rules[0]),
-    'When anyone takes damage → whoever triggers it gets a random negative effect for 15s',
+    'When anyone takes damage → they get a random negative effect for 15s',
     'rule 1');
   eq(phrase.ruleSummary(challenge.rules[1]),
-    'When anyone kills a mob → whoever triggers it has 2 baby Zombie spawned on them',
+    'When anyone kills a mob → they have 2 baby Zombie spawned on them',
     'rule 2: the stored id reads by its display name');
   eq(phrase.ruleSummary(challenge.rules[2]),
     'Every 300 seconds → everyone is struck by lightning',
