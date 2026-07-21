@@ -80,6 +80,14 @@ check('catalog carries the whole frozen catalog', () => {
   eq(entries.schemaVersion, 1, 'schema version');
 });
 
+check('keyword sources store bare values, registry sources namespaced ids', () => {
+  eq(CX.suggest.resolve('time', 'Noon').id, 'noon', 'time keyword');
+  eq(CX.suggest.resolve('weather', 'rain').id, 'rain', 'weather keyword');
+  eq(CX.suggest.resolve('effect_kind', 'any').id, 'any', 'effect kind keyword');
+  eq(CX.suggest.resolve('time', 'minecraft:noon').id, 'noon', 'stale namespaced value snaps bare');
+  eq(CX.suggest.resolve('item', 'Diamond').id, 'minecraft:diamond', 'registry id keeps its namespace');
+});
+
 check('every entry has copy, and every non-modifier has a phrase', () => {
   const missing = [];
   entries.kinds.forEach((kind) => {

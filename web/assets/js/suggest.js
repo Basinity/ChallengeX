@@ -17,6 +17,14 @@ window.CX = window.CX || {};
 window.CX.suggest = (function () {
   var data = window.CX_GAMEDATA;
 
+  /* Keyword sets (weather, time, effect kind) are bare vocabulary the mod
+     matches literally, not registry ids: their stored value must never gain a
+     minecraft: namespace. gamedata.js names them so this file need not guess. */
+  var keyword = {};
+  ((data && data.keywords) || []).forEach(function (name) {
+    keyword[name] = true;
+  });
+
   /* "story/mine_diamond" -> "Mine Diamond"; "ambient.cave" -> "Ambient Cave". */
   function derivedName(id) {
     var tail = id.slice(id.lastIndexOf('/') + 1);
@@ -35,7 +43,7 @@ window.CX.suggest = (function () {
     var rows = (data && data.sources && data.sources[name]) || [];
     indexed[name] = rows.map(function (row) {
       var bare = row[0];
-      var id = bare.indexOf(':') >= 0 ? bare : 'minecraft:' + bare;
+      var id = keyword[name] || bare.indexOf(':') >= 0 ? bare : 'minecraft:' + bare;
       var display = row.length > 1 ? row[1] : derivedName(bare);
       return {
         id: id,
