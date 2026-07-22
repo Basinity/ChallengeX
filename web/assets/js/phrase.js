@@ -112,7 +112,7 @@ window.CX.phrase = (function () {
      verb: the clause renderer sheds the leading verb's -s for it below. */
   function triggerSubject(scope) {
     if (scope === 'every_player') {
-      return 'anyone';
+      return 'someone';
     }
     if (Array.isArray(scope) && scope.length) {
       return scope.length === 1 ? scope[0] : 'any of ' + joinNames(scope, 'or');

@@ -19,7 +19,7 @@
                       booleans disappear cleanly
 
    A BOOL renders as empty text: it only decides whether its chunk survives.
-   Scoped entries write a bare verb phrase, because a subject ("anyone", "each
+   Scoped entries write a bare verb phrase, because a subject ("someone", "each
    of Pix and Kettu") is put in front of them at render time. Playerless
    entries write a whole clause instead, since no subject exists for them. */
 

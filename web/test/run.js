@@ -432,10 +432,10 @@ check('the export filename is one the mod will accept', () => {
 check('rules read as English', () => {
   const challenge = starter();
   eq(phrase.ruleSummary(challenge.rules[0]),
-    'When anyone takes damage → they get a random negative effect for 15s',
+    'When someone takes damage → they get a random negative effect for 15s',
     'rule 1');
   eq(phrase.ruleSummary(challenge.rules[1]),
-    'When anyone kills a mob → they have 2 baby Zombie spawned on them',
+    'When someone kills a mob → they have 2 baby Zombie spawned on them',
     'rule 2: the stored id reads by its display name');
   eq(phrase.ruleSummary(challenge.rules[2]),
     'Every 300 seconds → everyone is struck by lightning',
@@ -460,10 +460,10 @@ check('specific-player scopes stay grammatical', () => {
 check('optional parameters appear only when set', () => {
   const block = { id: 'trigger.damage_taken', params: {}, scope: 'every_player' };
   eq(phrase.ruleLine({ trigger: block, effect: { id: null, params: {} } }).trigger,
-    'anyone takes damage', 'without the optional source');
+    'someone takes damage', 'without the optional source');
   block.params.source = 'minecraft:fall';
   eq(phrase.ruleLine({ trigger: block, effect: { id: null, params: {} } }).trigger,
-    'anyone takes damage from Fall', 'with it, read by display name');
+    'someone takes damage from Fall', 'with it, read by display name');
 });
 
 check('every entry renders a phrase with required parameters filled', () => {
