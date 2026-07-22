@@ -15,11 +15,11 @@
   var SAMPLES = [
     [['when anyone ', null], ['takes damage', 'trigger'], [', everyone gets a ', null],
       ['random effect', 'effect']],
-    [['only ', null], ['Basinity keeps inventory', 'modifier'], [', and the goal is ', null],
+    [['only Basinity', null], [' keeps inventory', 'modifier'], [', and the goal is ', null],
       ['one diamond', 'goal']],
     [['every ', null], ['five minutes', 'trigger'], [', everyone ', null],
       ['swaps places', 'effect']],
-    [['when anyone ', null], ['sleeps', 'trigger'], [', everyone is ', null],
+    [['when anyone ', null], ['sleeps', 'trigger'], [', milknowo is ', null],
       ['struck by lightning', 'effect']],
     [['you all ', null], ['share one inventory', 'modifier'], [' and ', null],
       ['hearts never regenerate', 'modifier']],
