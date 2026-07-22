@@ -919,13 +919,17 @@ code {
 
 .goal-card {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px;
-  flex-wrap: wrap;
 }
 
-.goal-card .params { flex: 1; min-width: 200px; }
+.goal-card__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
 
 .mod-grid {
   display: grid;

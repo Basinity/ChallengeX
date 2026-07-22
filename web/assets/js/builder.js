@@ -609,27 +609,29 @@
       id: 'card-' + goal.uid,
       'data-bad': bad ? 'true' : null
     }, [
-      el('span.tag.tag--win', { text: 'WIN' }),
-      el('b.half__name', { text: entry ? entry.name : goal.id }),
-      el('span.badge', {
-        hidden: !bad,
-        text: ui.plural(bad ? problems[goal.uid].length : 0, 'PROBLEM', 'PROBLEMS')
-      }),
+      el('div.goal-card__head', null, [
+        el('span.tag.tag--win', { text: 'WIN' }),
+        el('b.half__name', { text: entry ? entry.name : goal.id }),
+        el('span.badge', {
+          hidden: !bad,
+          text: ui.plural(bad ? problems[goal.uid].length : 0, 'PROBLEM', 'PROBLEMS')
+        }),
+        cardTools([
+          {
+            glyph: '⇄', title: 'Choose a different goal', run: function () {
+              openPicker('goal', { type: 'goal' });
+            }
+          },
+          {
+            glyph: '✕', title: 'Remove the goal', danger: true, run: function () {
+              challenge.goal = null;
+              render();
+            }
+          }
+        ])
+      ]),
       entry ? paramsForm(goal, entry) : null,
-      entry ? goalModeControl(goal) : null,
-      cardTools([
-        {
-          glyph: '⇄', title: 'Choose a different goal', run: function () {
-            openPicker('goal', { type: 'goal' });
-          }
-        },
-        {
-          glyph: '✕', title: 'Remove the goal', danger: true, run: function () {
-            challenge.goal = null;
-            render();
-          }
-        }
-      ])
+      entry ? goalModeControl(goal) : null
     ]);
   }
 
