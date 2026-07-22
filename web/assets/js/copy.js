@@ -456,7 +456,7 @@ window.CX_COPY = {
   },
   'goal.beat_game': {
     name: 'Beat the game',
-    blurb: 'Win by beating the ender dragon. The classic.',
+    blurb: 'Win by beating the ender dragon and getting the end credits.',
     phrase: 'Beat the ender dragon'
   },
 

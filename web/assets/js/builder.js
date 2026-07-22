@@ -657,7 +657,7 @@
         el('span.scope__label', { text: 'HOW THE RUN IS WON' }),
         seg(goal.mode, [
           { value: 'together', label: 'Win together' },
-          { value: 'versus', label: 'Versus — first to it wins' }
+          { value: 'versus', label: 'First to the goal wins' }
         ], function (value) { goal.mode = value; })
       ])
     ];
@@ -665,7 +665,7 @@
       body.push(el('div.scope', null, [
         el('span.scope__label', { text: 'WHO NEEDS THE GOAL' }),
         seg(goal.completion, [
-          { value: 'anyone', label: 'Anyone — one finish wins for all' },
+          { value: 'anyone', label: 'One finish wins for all' },
           { value: 'everyone', label: 'Everyone must finish' }
         ], function (value) { goal.completion = value; })
       ]));
