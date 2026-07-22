@@ -861,9 +861,6 @@
           text: 'and ' + (problems.length - 6) + ' more'
         }));
       }
-      ui.append(list, el('span.problems__foot', {
-        text: 'Only structure blocks export. Bad ideas never do.'
-      }));
       ui.append(panel, list);
     }
 
