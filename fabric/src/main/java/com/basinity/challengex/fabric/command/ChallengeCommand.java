@@ -116,7 +116,9 @@ public final class ChallengeCommand {
     private int about(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         source.sendSuccess(() -> Component.literal(
-                "ChallengeX: compose your own challenge from rules, goals, and modifiers.")
+                "ChallengeX: compose your own challenges from rules, goals, and modifiers"
+                        + " to play alone or with your friends."
+                        + " More than 32 million ways to play Minecraft.")
                 .withStyle(ChatFormatting.GOLD), false);
         source.sendSuccess(this::builderLink, false);
         return 1;
