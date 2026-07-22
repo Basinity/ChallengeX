@@ -222,16 +222,17 @@ window.CX.phrase = (function () {
     return render(entry.phrase, goal) || entry.name;
   }
 
-  /* The muted note beside the goal for a non-default decision mode; the
-     win-together-anyone default stays silent, as it always has. */
+  /* The muted note beside the goal naming the decision mode; every mode gets
+     one, the default included, so a reader never has to know what silence
+     would have meant. */
   function goalModeNote(goal) {
     if (goal.mode === 'versus') {
-      return 'versus — first player to finish wins';
+      return 'First player to finish wins';
     }
-    if (goal.mode === 'together' && goal.completion === 'everyone') {
-      return 'everyone must finish';
+    if (goal.completion === 'everyone') {
+      return 'Everyone must finish';
     }
-    return '';
+    return 'One finish wins for all';
   }
 
   function modifierLine(modifier) {

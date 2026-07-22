@@ -587,14 +587,14 @@ check('goal modes export sparsely and round-trip', () => {
   eq(backPlain.goal.completion, 'anyone', 'default completion restored');
 });
 
-check('the goal mode note reads right and stays silent by default', () => {
+check('the goal mode note names every decision mode, the default included', () => {
   const goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
-  eq(phrase.goalModeNote(goal), '', 'default is silent');
+  eq(phrase.goalModeNote(goal), 'One finish wins for all', 'default note');
   goal.mode = 'versus';
-  eq(phrase.goalModeNote(goal), 'versus — first player to finish wins', 'versus note');
+  eq(phrase.goalModeNote(goal), 'First player to finish wins', 'versus note');
   goal.mode = 'together';
   goal.completion = 'everyone';
-  eq(phrase.goalModeNote(goal), 'everyone must finish', 'everyone note');
+  eq(phrase.goalModeNote(goal), 'Everyone must finish', 'everyone note');
 });
 
 /* ---------- hand the result to the mod ---------- */
