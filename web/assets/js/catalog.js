@@ -154,7 +154,7 @@ window.CX_CATALOG = {
           "name": "item",
           "type": "STRING",
           "required": false,
-          "suggests": "item"
+          "suggests": "food"
         }
       ]
     },

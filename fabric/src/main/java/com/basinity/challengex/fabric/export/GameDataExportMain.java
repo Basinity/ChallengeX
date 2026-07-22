@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.minecraft.SharedConstants;
@@ -28,6 +29,8 @@ import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.core.component.DataComponentInitializers;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 
 /**
@@ -55,6 +58,9 @@ public final class GameDataExportMain {
     /** The five real advancement trees; recipe unlocks are deliberately not advancements here. */
     private static final List<String> ADVANCEMENT_TREES = List.of("story", "nether", "end", "adventure", "husbandry");
 
+    /** Living entities the mob list leaves out anyway; see the mob source below. */
+    private static final Set<String> NOT_MOBS = Set.of("armor_stand", "player");
+
     private GameDataExportMain() {
     }
 
@@ -66,14 +72,30 @@ public final class GameDataExportMain {
         Bootstrap.bootStrap();
         Language language = Language.getInstance();
         HolderLookup.Provider vanilla = VanillaRegistries.createLookup();
+        // 26.2 binds item components through the data-component initializer
+        // pipeline at server load, not at bootstrap; the food source reads
+        // components, so run the same binding here.
+        BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(vanilla)
+                .forEach(DataComponentInitializers.PendingComponents::apply);
 
         Map<String, JsonArray> sources = new LinkedHashMap<>();
         sources.put("block", fromRegistry(BuiltInRegistries.BLOCK, language, block -> block.getDescriptionId()));
         sources.put("item", fromRegistry(BuiltInRegistries.ITEM, language, item -> item.getDescriptionId()));
         sources.put("entity", fromRegistry(BuiltInRegistries.ENTITY_TYPE, language, type -> type.getDescriptionId()));
+        // The attribute filter catches every living entity, which technically
+        // includes armor stands and players; neither reads as a mob (players
+        // have their own kill-player trigger), so both stay out of the list.
+        // Giant and illusioner stay in: unobtainable in survival, but the
+        // spawn-mob effect can genuinely spawn them.
         sources.put("mob", entries(BuiltInRegistries.ENTITY_TYPE.stream()
                 .filter(DefaultAttributes::hasSupplier)
+                .filter(type -> !NOT_MOBS.contains(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath()))
                 .map(type -> named(BuiltInRegistries.ENTITY_TYPE.getKey(type), langName(language, type.getDescriptionId())))));
+        // Exactly the set the food-eaten trigger fires for: items carrying the
+        // game's own food component, not a hand-picked list.
+        sources.put("food", entries(BuiltInRegistries.ITEM.stream()
+                .filter(item -> item.components().has(DataComponents.FOOD))
+                .map(item -> named(BuiltInRegistries.ITEM.getKey(item), langName(language, item.getDescriptionId())))));
         sources.put("effect", fromRegistry(BuiltInRegistries.MOB_EFFECT, language, effect -> effect.getDescriptionId()));
         sources.put("sound", fromRegistry(BuiltInRegistries.SOUND_EVENT, language, sound -> null));
         sources.put("container", fromRegistry(BuiltInRegistries.MENU, language, menu -> null));

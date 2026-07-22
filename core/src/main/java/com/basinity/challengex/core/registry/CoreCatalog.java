@@ -51,7 +51,7 @@ public final class CoreCatalog {
         trigger(registry, "item_crafted", true, optional("item", STRING).suggesting("item"));
         trigger(registry, "item_picked_up", true, optional("item", STRING).suggesting("item"));
         trigger(registry, "item_dropped", true, optional("item", STRING).suggesting("item"));
-        trigger(registry, "food_eaten", true, optional("item", STRING).suggesting("item"));
+        trigger(registry, "food_eaten", true, optional("item", STRING).suggesting("food"));
         trigger(registry, "xp_gained", true);
         trigger(registry, "advancement_earned", true, optional("advancement", STRING).suggesting("advancement"));
         trigger(registry, "dimension_changed", true, optional("dimension", STRING).suggesting("dimension"));
