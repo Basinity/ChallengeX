@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.EffectSpec;
 import com.basinity.challengex.core.model.Goal;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -61,6 +63,50 @@ class PresetCodecTest {
 
         assertFalse(json.contains("\"scope\""));
         assertEquals(original, codec.fromJson(json));
+    }
+
+    @Test
+    void goalModesRoundTripAndDefaultsStayOffTheWire() throws PresetFormatException {
+        Goal versus = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.VERSUS, GoalCompletion.ANYONE);
+        Goal everyone = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.TOGETHER, GoalCompletion.EVERYONE);
+        Goal plain = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")));
+
+        Preset versusPreset = new Preset("Race", new Challenge(List.of(), Optional.of(versus), List.of()));
+        Preset everyonePreset = new Preset("All in", new Challenge(List.of(), Optional.of(everyone), List.of()));
+        Preset plainPreset = new Preset("Classic", new Challenge(List.of(), Optional.of(plain), List.of()));
+
+        assertEquals(versusPreset, codec.fromJson(codec.toJson(versusPreset)));
+        assertEquals(everyonePreset, codec.fromJson(codec.toJson(everyonePreset)));
+        String plainJson = codec.toJson(plainPreset);
+        assertFalse(plainJson.contains("\"mode\""));
+        assertFalse(plainJson.contains("\"completion\""));
+        assertEquals(plainPreset, codec.fromJson(plainJson));
+    }
+
+    @Test
+    void completionOnAVersusGoalIsRejected() {
+        String json = """
+                {"schemaVersion": 1, "name": "Confused",
+                 "goal": {"id": "goal.beat_game", "mode": "versus", "completion": "everyone"}}""";
+
+        PresetFormatException rejection =
+                assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
+
+        assertTrue(rejection.getMessage().contains("does not apply to a versus goal"));
+    }
+
+    @Test
+    void unknownGoalModeIsRejected() {
+        String json = """
+                {"schemaVersion": 1, "name": "Confused",
+                 "goal": {"id": "goal.beat_game", "mode": "battle_royale"}}""";
+
+        PresetFormatException rejection =
+                assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
+
+        assertTrue(rejection.getMessage().contains("'mode' must be one of"));
     }
 
     @Test

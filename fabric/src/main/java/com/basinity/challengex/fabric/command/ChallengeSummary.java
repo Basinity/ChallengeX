@@ -2,6 +2,8 @@ package com.basinity.challengex.fabric.command;
 
 import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.model.Challenge;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -49,7 +51,8 @@ final class ChallengeSummary {
         if (goal.isEmpty()) {
             lines.add(dim("Goal: none"));
         } else {
-            lines.add(Component.literal("Goal: " + goal.get().goalId() + params(goal.get().params()))
+            lines.add(Component.literal("Goal: " + goal.get().goalId() + params(goal.get().params())
+                    + modeNote(goal.get()))
                     .withStyle(ChatFormatting.WHITE));
         }
 
@@ -69,6 +72,17 @@ final class ChallengeSummary {
 
     private static Component dim(String text) {
         return Component.literal(text).withStyle(ChatFormatting.GRAY);
+    }
+
+    /** The goal's decision mode, silent for the win-together-anyone default. */
+    private static String modeNote(com.basinity.challengex.core.model.Goal goal) {
+        if (goal.mode() == GoalMode.VERSUS) {
+            return " | versus: first to finish wins";
+        }
+        if (goal.completion() == GoalCompletion.EVERYONE) {
+            return " | everyone must finish";
+        }
+        return "";
     }
 
     private static String label(RunState state) {

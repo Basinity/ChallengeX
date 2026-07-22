@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "First To The Dragon",
+  "goal": {
+    "id": "goal.kill_mob",
+    "params": {
+      "mob": "minecraft:ender_dragon"
+    },
+    "mode": "versus"
+  }
+}

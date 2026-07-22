@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric.lifecycle;
 
 import com.basinity.challengex.core.engine.RunOutcome;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -24,13 +25,19 @@ public final class RunAnnouncer {
     private RunAnnouncer() {
     }
 
-    public static void announce(MinecraftServer server, RunOutcome outcome, long elapsedTicks) {
+    public static void announce(MinecraftServer server, RunOutcome outcome, long elapsedTicks,
+            Optional<String> winner) {
         boolean won = outcome == RunOutcome.WIN;
         String time = RunClock.format(elapsedTicks);
-        Component title = Component.literal(won ? "Challenge Complete" : "Challenge Failed")
+        // A versus win names its winner; a shared win stays the collective line.
+        String titleText = !won ? "Challenge Failed"
+                : winner.map(name -> name + " Wins").orElse("Challenge Complete");
+        String chatText = !won ? "Challenge failed — " + time
+                : winner.map(name -> "Challenge won by " + name + " — " + time)
+                        .orElse("Challenge complete — " + time);
+        Component title = Component.literal(titleText)
                 .withStyle(won ? ChatFormatting.GREEN : ChatFormatting.RED);
-        Component chatLine = Component.literal(
-                (won ? "Challenge complete — " : "Challenge failed — ") + time)
+        Component chatLine = Component.literal(chatText)
                 .withStyle(won ? ChatFormatting.GREEN : ChatFormatting.RED);
         Component viewConfig = Component.literal("[View challenge configuration]").withStyle(style -> style
                 .withColor(ChatFormatting.AQUA)

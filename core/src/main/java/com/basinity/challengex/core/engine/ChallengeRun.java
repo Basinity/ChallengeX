@@ -3,8 +3,10 @@ package com.basinity.challengex.core.engine;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.registry.Registries;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalLong;
 
 /**
@@ -44,7 +46,8 @@ public final class ChallengeRun {
             EffectExecutor executor) {
         ChallengeRun run = new ChallengeRun(snapshot.challenge(), registries, executor);
         run.engine = Engine.restore(snapshot.challenge(), registries,
-                snapshot.elapsedTicks(), snapshot.outcome(), snapshot.goalProgress());
+                snapshot.elapsedTicks(), snapshot.outcome(), snapshot.goalProgress(),
+                snapshot.goalProgressByPlayer(), snapshot.winner());
         run.state = snapshot.state();
         return run;
     }
@@ -52,7 +55,8 @@ public final class ChallengeRun {
     /** Captures the whole run — composition, state, clock, outcome, goal progress. */
     public RunSnapshot snapshot() {
         return new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, challenge, state,
-                engine.elapsedTicks(), engine.outcome(), engine.goalProgress());
+                engine.elapsedTicks(), engine.outcome(), engine.goalProgress(),
+                engine.goalProgressByPlayer(), engine.winner());
     }
 
     public RunState state() {
@@ -146,5 +150,23 @@ public final class ChallengeRun {
 
     public RunOutcome outcome() {
         return engine.outcome();
+    }
+
+    /** The versus winner's name, present only once a versus goal decided the run. */
+    public Optional<String> winner() {
+        return engine.winner();
+    }
+
+    /**
+     * Refreshes who counts as being in the run, for an everyone-completion
+     * goal. Only a running run evaluates it; the platform calls this each tick
+     * with the online players.
+     */
+    public void updateParticipants(Collection<String> playerIds) {
+        if (state != RunState.RUNNING) {
+            return;
+        }
+        engine.updateParticipants(playerIds);
+        syncFinished();
     }
 }

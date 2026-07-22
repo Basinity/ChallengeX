@@ -65,9 +65,15 @@ window.CX.share = (function () {
     return el('div.line', { id: 'rule-' + (index + 1) }, [body]);
   }
 
+  /* The mode note beside the goal stays muted like a modifier's scope note:
+     a versus race reads no louder than the win-together default. */
   function goalBlock(goal) {
+    var note = phrase.goalModeNote(goal);
     return el('div.line', null, [
-      el('p.line__text', null, [el('b', { 'data-kind': 'goal', text: phrase.goalLine(goal) })])
+      el('div.line__row', null, [
+        el('p.line__text', null, [el('b', { 'data-kind': 'goal', text: phrase.goalLine(goal) })]),
+        note ? el('span.line__scope', { text: note }) : null
+      ])
     ]);
   }
 

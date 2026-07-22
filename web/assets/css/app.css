@@ -404,6 +404,7 @@ code {
 
 .seg[data-kind='trigger'] .seg__opt[aria-pressed='true'] { background: var(--trigger); border-color: var(--trigger); }
 .seg[data-kind='modifier'] .seg__opt[aria-pressed='true'] { background: var(--modifier); border-color: var(--modifier); }
+.seg[data-kind='goal'] .seg__opt[aria-pressed='true'] { background: var(--goal); border-color: var(--goal); }
 
 /* An unanswered required scope: every option outlined red, none chosen. */
 .seg[data-missing='true'] .seg__opt {

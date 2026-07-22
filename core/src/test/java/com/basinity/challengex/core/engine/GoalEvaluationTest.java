@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.Goal;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.registry.CoreCatalog;
@@ -54,6 +56,86 @@ class GoalEvaluationTest {
                 Map.of("item", ParamValue.of("minecraft:elytra"))));
 
         assertEquals(RunOutcome.WIN, engine.outcome());
+    }
+
+    @Test
+    void versusGoalNamesTheCompletingPlayerAsWinner() {
+        Goal race = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.VERSUS, GoalCompletion.ANYONE);
+        Engine engine = engineWithGoal(race);
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "bob",
+                Map.of("mob", ParamValue.of("minecraft:pig"))));
+        assertEquals(RunOutcome.ONGOING, engine.outcome());
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+
+        assertEquals(RunOutcome.WIN, engine.outcome());
+        assertEquals(Optional.of("alice"), engine.winner());
+    }
+
+    @Test
+    void everyoneCompletionWaitsForEveryParticipant() {
+        Goal everyone = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.TOGETHER, GoalCompletion.EVERYONE);
+        Engine engine = engineWithGoal(everyone);
+        engine.updateParticipants(List.of("alice", "bob"));
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+        assertEquals(RunOutcome.ONGOING, engine.outcome());
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "bob",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+
+        assertEquals(RunOutcome.WIN, engine.outcome());
+        assertEquals(Optional.empty(), engine.winner());
+    }
+
+    @Test
+    void everyoneCompletionCanBeCompletedByAPlayerLeaving() {
+        Goal everyone = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.TOGETHER, GoalCompletion.EVERYONE);
+        Engine engine = engineWithGoal(everyone);
+        engine.updateParticipants(List.of("alice", "bob"));
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+        assertEquals(RunOutcome.ONGOING, engine.outcome());
+
+        engine.updateParticipants(List.of("alice"));
+
+        assertEquals(RunOutcome.WIN, engine.outcome());
+    }
+
+    @Test
+    void everyoneCompletionWithNoKnownParticipantsNeverWins() {
+        Goal everyone = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.TOGETHER, GoalCompletion.EVERYONE);
+        Engine engine = engineWithGoal(everyone);
+
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+
+        assertEquals(RunOutcome.ONGOING, engine.outcome());
+    }
+
+    @Test
+    void versusStateSurvivesASnapshotRestore() {
+        Goal race = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
+                GoalMode.VERSUS, GoalCompletion.ANYONE);
+        Engine engine = engineWithGoal(race);
+        engine.onEvent(GameEvent.of("trigger.mob_killed", "alice",
+                Map.of("mob", ParamValue.of("minecraft:ender_dragon"))));
+
+        Engine restored = Engine.restore(engine.challenge(), registries, engine.elapsedTicks(),
+                engine.outcome(), engine.goalProgress(), engine.goalProgressByPlayer(),
+                engine.winner());
+
+        assertEquals(RunOutcome.WIN, restored.outcome());
+        assertEquals(Optional.of("alice"), restored.winner());
+        assertEquals(engine.goalProgressByPlayer(), restored.goalProgressByPlayer());
     }
 
     @Test

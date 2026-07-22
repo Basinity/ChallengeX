@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "Nobody Left Behind",
+  "goal": {
+    "id": "goal.obtain_item",
+    "params": {
+      "item": "minecraft:elytra"
+    },
+    "completion": "everyone"
+  }
+}

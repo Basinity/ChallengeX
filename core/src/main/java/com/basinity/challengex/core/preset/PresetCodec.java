@@ -3,6 +3,8 @@ package com.basinity.challengex.core.preset;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.EffectSpec;
 import com.basinity.challengex.core.model.Goal;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -78,8 +80,18 @@ public final class PresetCodec {
             }
             target.add("rules", rules);
         }
-        challenge.goal().ifPresent(goal ->
-                target.add("goal", blockJson(goal.goalId(), goal.params(), Optional.empty())));
+        challenge.goal().ifPresent(goal -> {
+            JsonObject goalJson = blockJson(goal.goalId(), goal.params(), Optional.empty());
+            // Defaults are omitted so a plain win-together goal writes exactly
+            // as it always did: "mode" appears only for versus, "completion"
+            // only for everyone (which implies win-together).
+            if (goal.mode() == GoalMode.VERSUS) {
+                goalJson.addProperty("mode", "versus");
+            } else if (goal.completion() == GoalCompletion.EVERYONE) {
+                goalJson.addProperty("completion", "everyone");
+            }
+            target.add("goal", goalJson);
+        });
         if (!challenge.modifiers().isEmpty()) {
             JsonArray modifiers = new JsonArray();
             for (Modifier modifier : challenge.modifiers()) {
@@ -243,7 +255,37 @@ public final class PresetCodec {
         }
         String id = readId(goalJson, "goal", problems);
         Map<String, ParamValue> params = readParams(goalJson, "goal", problems);
-        return id == null ? Optional.empty() : Optional.of(new Goal(id, params));
+        String mode = readKeyword(goalJson, "mode", Set.of("together", "versus"), problems);
+        String completion = readKeyword(goalJson, "completion", Set.of("anyone", "everyone"), problems);
+        if ("versus".equals(mode) && completion != null) {
+            problems.add("goal: 'completion' does not apply to a versus goal");
+            return Optional.empty();
+        }
+        GoalMode goalMode = "versus".equals(mode) ? GoalMode.VERSUS : GoalMode.TOGETHER;
+        GoalCompletion goalCompletion = "everyone".equals(completion)
+                ? GoalCompletion.EVERYONE : GoalCompletion.ANYONE;
+        return id == null ? Optional.empty()
+                : Optional.of(new Goal(id, params, goalMode, goalCompletion));
+    }
+
+    /**
+     * Reads an optional keyword field against its allowed values.
+     *
+     * @return the keyword, or null when absent or when a problem was recorded
+     */
+    private String readKeyword(JsonObject block, String key, Set<String> allowed,
+            List<String> problems) {
+        JsonElement element = block.get(key);
+        if (element == null) {
+            return null;
+        }
+        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()
+                || !allowed.contains(element.getAsString())) {
+            problems.add("goal: '" + key + "' must be one of "
+                    + allowed.stream().sorted().toList());
+            return null;
+        }
+        return element.getAsString();
     }
 
     private List<Modifier> readModifiers(JsonObject root, List<String> problems) {

@@ -553,6 +553,50 @@ check('the technical line states exactly what goes in the file', () => {
     'technical detail');
 });
 
+check('goal modes export sparsely and round-trip', () => {
+  const versus = preset.blankChallenge();
+  versus.name = 'Race';
+  versus.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+  versus.goal.mode = 'versus';
+  const versusJson = JSON.parse(preset.stringify(versus));
+  eq(versusJson.goal.mode, 'versus', 'versus mode written');
+  eq(versusJson.goal.completion, undefined, 'versus writes no completion');
+
+  const everyone = preset.blankChallenge();
+  everyone.name = 'All in';
+  everyone.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+  everyone.goal.completion = 'everyone';
+  const everyoneJson = JSON.parse(preset.stringify(everyone));
+  eq(everyoneJson.goal.mode, undefined, 'together mode stays off the wire');
+  eq(everyoneJson.goal.completion, 'everyone', 'everyone completion written');
+
+  const plain = preset.blankChallenge();
+  plain.name = 'Classic';
+  plain.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+  const plainJson = JSON.parse(preset.stringify(plain));
+  eq(plainJson.goal.mode, undefined, 'default writes no mode');
+  eq(plainJson.goal.completion, undefined, 'default writes no completion');
+
+  const back = preset.parse(preset.stringify(versus));
+  eq(back.goal.mode, 'versus', 'versus survives the round trip');
+  const backEveryone = preset.parse(preset.stringify(everyone));
+  eq(backEveryone.goal.mode, 'together', 'together restored');
+  eq(backEveryone.goal.completion, 'everyone', 'everyone survives the round trip');
+  const backPlain = preset.parse(preset.stringify(plain));
+  eq(backPlain.goal.mode, 'together', 'default mode restored');
+  eq(backPlain.goal.completion, 'anyone', 'default completion restored');
+});
+
+check('the goal mode note reads right and stays silent by default', () => {
+  const goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+  eq(phrase.goalModeNote(goal), '', 'default is silent');
+  goal.mode = 'versus';
+  eq(phrase.goalModeNote(goal), 'versus — first player to finish wins', 'versus note');
+  goal.mode = 'together';
+  goal.completion = 'everyone';
+  eq(phrase.goalModeNote(goal), 'everyone must finish', 'everyone note');
+});
+
 /* ---------- hand the result to the mod ---------- */
 
 fs.mkdirSync(OUT, { recursive: true });
@@ -617,6 +661,22 @@ const fixtures = {
       return goal;
     })();
 
+    return preset.stringify(challenge);
+  })(),
+  'site-export-versus-goal.json': (() => {
+    const challenge = preset.blankChallenge();
+    challenge.name = 'First To The Dragon';
+    challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.kill_mob');
+    challenge.goal.params = { mob: 'minecraft:ender_dragon' };
+    challenge.goal.mode = 'versus';
+    return preset.stringify(challenge);
+  })(),
+  'site-export-everyone-goal.json': (() => {
+    const challenge = preset.blankChallenge();
+    challenge.name = 'Nobody Left Behind';
+    challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.obtain_item');
+    challenge.goal.params = { item: 'minecraft:elytra' };
+    challenge.goal.completion = 'everyone';
     return preset.stringify(challenge);
   })()
 };

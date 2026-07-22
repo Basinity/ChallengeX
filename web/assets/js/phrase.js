@@ -222,6 +222,18 @@ window.CX.phrase = (function () {
     return render(entry.phrase, goal) || entry.name;
   }
 
+  /* The muted note beside the goal for a non-default decision mode; the
+     win-together-anyone default stays silent, as it always has. */
+  function goalModeNote(goal) {
+    if (goal.mode === 'versus') {
+      return 'versus — first player to finish wins';
+    }
+    if (goal.mode === 'together' && goal.completion === 'everyone') {
+      return 'everyone must finish';
+    }
+    return '';
+  }
+
   function modifierLine(modifier) {
     var entry = entries.get(modifier.id);
     if (!entry) {
@@ -262,6 +274,7 @@ window.CX.phrase = (function () {
     ruleLine: ruleLine,
     ruleSummary: ruleSummary,
     goalLine: goalLine,
+    goalModeNote: goalModeNote,
     modifierLine: modifierLine,
     technical: technical,
     capitalize: capitalize

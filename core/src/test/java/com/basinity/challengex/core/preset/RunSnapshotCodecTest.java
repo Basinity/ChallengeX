@@ -46,7 +46,8 @@ class RunSnapshotCodecTest {
     @Test
     void roundTripPreservesEveryField() throws PresetFormatException {
         RunSnapshot original = new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, sampleChallenge(),
-                RunState.RUNNING, 4321L, RunOutcome.ONGOING, Set.of(0, 2));
+                RunState.RUNNING, 4321L, RunOutcome.ONGOING, Set.of(0, 2),
+                Map.of("Basinity", Set.of(0), "Pix", Set.of(0, 2)), Optional.empty());
 
         assertEquals(original, codec.fromJson(codec.toJson(original)));
     }
@@ -54,12 +55,28 @@ class RunSnapshotCodecTest {
     @Test
     void pausedAndFinishedStatesRoundTrip() throws PresetFormatException {
         RunSnapshot paused = new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, sampleChallenge(),
-                RunState.PAUSED, 100L, RunOutcome.ONGOING, Set.of());
+                RunState.PAUSED, 100L, RunOutcome.ONGOING, Set.of(), Map.of(), Optional.empty());
         RunSnapshot finished = new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, sampleChallenge(),
-                RunState.FINISHED, 6000L, RunOutcome.WIN, Set.of(0));
+                RunState.FINISHED, 6000L, RunOutcome.WIN, Set.of(0),
+                Map.of("Basinity", Set.of(0)), Optional.of("Basinity"));
 
         assertEquals(paused, codec.fromJson(codec.toJson(paused)));
         assertEquals(finished, codec.fromJson(codec.toJson(finished)));
+    }
+
+    @Test
+    void aSnapshotWithoutTheNewGoalFieldsStillReads() throws PresetFormatException {
+        // Written by a build predating per-player goal progress and the winner.
+        String json = """
+                {"snapshotVersion": 1, "state": "RUNNING", "elapsedTicks": 10,
+                 "outcome": "ONGOING", "goalProgress": [0],
+                 "challenge": {"goal": {"id": "goal.kill_mob",
+                                        "params": {"mob": "minecraft:ender_dragon"}}}}""";
+
+        RunSnapshot snapshot = codec.fromJson(json);
+
+        assertEquals(Map.of(), snapshot.goalProgressByPlayer());
+        assertEquals(Optional.empty(), snapshot.winner());
     }
 
     @Test

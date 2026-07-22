@@ -30,7 +30,15 @@ window.CX.preset = (function () {
   /* ---------- construction ---------- */
 
   function blankBlock(kind) {
-    return { uid: localId(kind), id: null, params: {}, scope: null };
+    var block = { uid: localId(kind), id: null, params: {}, scope: null };
+    if (kind === 'goal') {
+      // How the goal decides the run: win together (anyone or everyone
+      // reaching it) or a versus race. The cooperative default matches what
+      // the mod assumes when the fields are absent.
+      block.mode = 'together';
+      block.completion = 'anyone';
+    }
+    return block;
   }
 
   function blankChallenge() {
@@ -218,6 +226,13 @@ window.CX.preset = (function () {
     }
     if (challenge.goal && challenge.goal.id) {
       preset.goal = blockJson(challenge.goal);
+      // Defaults stay off the wire, exactly as the mod's codec writes them:
+      // "mode" only for versus, "completion" only for everyone.
+      if (challenge.goal.mode === 'versus') {
+        preset.goal.mode = 'versus';
+      } else if (challenge.goal.completion === 'everyone') {
+        preset.goal.completion = 'everyone';
+      }
     }
     if (challenge.modifiers.length) {
       preset.modifiers = challenge.modifiers.map(blockJson);
@@ -281,6 +296,9 @@ window.CX.preset = (function () {
     }
     if (raw.goal) {
       challenge.goal = readBlock(raw.goal, 'goal');
+      challenge.goal.mode = raw.goal.mode === 'versus' ? 'versus' : 'together';
+      challenge.goal.completion = challenge.goal.mode === 'together'
+        && raw.goal.completion === 'everyone' ? 'everyone' : 'anyone';
     }
     if (Array.isArray(raw.modifiers)) {
       challenge.modifiers = raw.modifiers.map(function (modifier) {

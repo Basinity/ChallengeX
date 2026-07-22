@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.basinity.challengex.core.model.Challenge;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.model.Scope;
@@ -116,6 +118,20 @@ class PresetContractTest {
         assertTrue(emitted.containsAll(expected),
                 "the site did not emit every trigger, effect and modifier: missing "
                         + minus(expected, emitted));
+    }
+
+    @Test
+    void theSitesGoalModesArriveAsTheModelsModes() {
+        Challenge versus = parse("site-export-versus-goal.json").challenge();
+        assertEquals(GoalMode.VERSUS, versus.goal().orElseThrow().mode());
+
+        Challenge everyone = parse("site-export-everyone-goal.json").challenge();
+        assertEquals(GoalMode.TOGETHER, everyone.goal().orElseThrow().mode());
+        assertEquals(GoalCompletion.EVERYONE, everyone.goal().orElseThrow().completion());
+
+        Challenge plain = parse("site-export.json").challenge();
+        assertEquals(GoalMode.TOGETHER, plain.goal().orElseThrow().mode());
+        assertEquals(GoalCompletion.ANYONE, plain.goal().orElseThrow().completion());
     }
 
     @Test

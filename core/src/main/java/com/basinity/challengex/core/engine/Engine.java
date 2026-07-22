@@ -2,6 +2,8 @@ package com.basinity.challengex.core.engine;
 
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.Goal;
+import com.basinity.challengex.core.model.GoalCompletion;
+import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -13,6 +15,8 @@ import com.basinity.challengex.core.registry.GoalRequirement;
 import com.basinity.challengex.core.registry.ParamBinding;
 import com.basinity.challengex.core.registry.Registries;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +44,12 @@ public final class Engine {
     private final Challenge challenge;
     private final Registries registries;
     private final Set<Integer> metGoalRequirements = new HashSet<>();
+    private final Map<String, Set<Integer>> metByPlayer = new HashMap<>();
+    private final Set<String> participants = new HashSet<>();
     private final OptionalLong timeLimitTicks;
     private long elapsedTicks;
     private RunOutcome outcome = RunOutcome.ONGOING;
+    private String winner;
 
     public Engine(Challenge challenge, Registries registries) {
         List<String> problems = ChallengeValidation.problemsOf(challenge, registries);
@@ -151,9 +158,32 @@ public final class Engine {
         return outcome;
     }
 
-    /** The indices of the goal requirements already met, for a run snapshot. */
+    /** The versus winner's name, present only once a versus goal decided the run. */
+    public Optional<String> winner() {
+        return Optional.ofNullable(winner);
+    }
+
+    /**
+     * The players currently in the run, as an everyone-completion goal counts
+     * them. The adapter refreshes this each tick from who is online; a player
+     * leaving can itself complete the goal, so the update re-evaluates it.
+     */
+    public void updateParticipants(Collection<String> playerIds) {
+        participants.clear();
+        participants.addAll(playerIds);
+        evaluateEveryoneCompletion();
+    }
+
+    /** The indices of the goal requirements already met by anyone, for a run snapshot. */
     public Set<Integer> goalProgress() {
         return Set.copyOf(metGoalRequirements);
+    }
+
+    /** Each player's individually met requirement indices, for a run snapshot. */
+    public Map<String, Set<Integer>> goalProgressByPlayer() {
+        Map<String, Set<Integer>> copy = new HashMap<>();
+        metByPlayer.forEach((player, met) -> copy.put(player, Set.copyOf(met)));
+        return Map.copyOf(copy);
     }
 
     /**
@@ -164,7 +194,8 @@ public final class Engine {
      * recomputed from it rather than stored.
      */
     public static Engine restore(Challenge challenge, Registries registries,
-            long elapsedTicks, RunOutcome outcome, Set<Integer> goalProgress) {
+            long elapsedTicks, RunOutcome outcome, Set<Integer> goalProgress,
+            Map<String, Set<Integer>> goalProgressByPlayer, Optional<String> winner) {
         Objects.requireNonNull(outcome, "outcome");
         if (elapsedTicks < 0) {
             throw new IllegalArgumentException("elapsedTicks must not be negative");
@@ -173,6 +204,9 @@ public final class Engine {
         engine.elapsedTicks = elapsedTicks;
         engine.outcome = outcome;
         engine.metGoalRequirements.addAll(goalProgress);
+        goalProgressByPlayer.forEach((player, met) ->
+                engine.metByPlayer.put(player, new HashSet<>(met)));
+        engine.winner = winner.orElse(null);
         return engine;
     }
 
@@ -221,13 +255,55 @@ public final class Engine {
         GoalDefinition definition = registries.goals().require(goal.goalId());
         List<GoalRequirement> requirements = definition.requirements();
         for (int i = 0; i < requirements.size(); i++) {
-            if (!metGoalRequirements.contains(i) && requirementMet(requirements.get(i), goal, event)) {
+            if (requirementMet(requirements.get(i), goal, event)) {
                 metGoalRequirements.add(i);
+                int index = i;
+                event.playerId().ifPresent(player ->
+                        metByPlayer.computeIfAbsent(player, ignored -> new HashSet<>()).add(index));
             }
         }
-        if (metGoalRequirements.size() == requirements.size()) {
-            outcome = RunOutcome.WIN;
+        int needed = requirements.size();
+        switch (goal.mode()) {
+            // A race: the event's player wins the moment their own set completes.
+            case VERSUS -> event.playerId().ifPresent(player -> {
+                if (metByPlayer.getOrDefault(player, Set.of()).size() == needed) {
+                    outcome = RunOutcome.WIN;
+                    winner = player;
+                }
+            });
+            case TOGETHER -> {
+                if (goal.completion() == GoalCompletion.ANYONE) {
+                    // Progress pools across players: the run's collective set completing wins.
+                    if (metGoalRequirements.size() == needed) {
+                        outcome = RunOutcome.WIN;
+                    }
+                } else {
+                    evaluateEveryoneCompletion();
+                }
+            }
         }
+    }
+
+    /**
+     * Wins an everyone-completion run when every current participant has
+     * completed the goal individually. With no participants known there is
+     * nobody to have finished, so nothing wins.
+     */
+    private void evaluateEveryoneCompletion() {
+        if (outcome != RunOutcome.ONGOING || challenge.goal().isEmpty() || participants.isEmpty()) {
+            return;
+        }
+        Goal goal = challenge.goal().get();
+        if (goal.mode() != GoalMode.TOGETHER || goal.completion() != GoalCompletion.EVERYONE) {
+            return;
+        }
+        int needed = registries.goals().require(goal.goalId()).requirements().size();
+        for (String participant : participants) {
+            if (metByPlayer.getOrDefault(participant, Set.of()).size() < needed) {
+                return;
+            }
+        }
+        outcome = RunOutcome.WIN;
     }
 
     private boolean requirementMet(GoalRequirement requirement, Goal goal, GameEvent event) {

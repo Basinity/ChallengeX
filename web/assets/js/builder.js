@@ -616,6 +616,7 @@
         text: ui.plural(bad ? problems[goal.uid].length : 0, 'PROBLEM', 'PROBLEMS')
       }),
       entry ? paramsForm(goal, entry) : null,
+      entry ? goalModeControl(goal) : null,
       cardTools([
         {
           glyph: '⇄', title: 'Choose a different goal', run: function () {
@@ -630,6 +631,46 @@
         }
       ])
     ]);
+  }
+
+  /* How the goal decides the run: win together or a versus race, and under
+     win-together who has to reach it. Both always hold a real choice (the
+     defaults are choices), so unlike scope there is no missing state. */
+  function goalModeControl(goal) {
+    function seg(current, options, pick) {
+      var control = el('div.seg', { 'data-kind': 'goal' });
+      options.forEach(function (option) {
+        ui.append(control, el('button.seg__opt', {
+          type: 'button',
+          'aria-pressed': String(current === option.value),
+          text: option.label,
+          onclick: function () {
+            pick(option.value);
+            render();
+          }
+        }));
+      });
+      return control;
+    }
+    var body = [
+      el('div.scope', null, [
+        el('span.scope__label', { text: 'HOW THE RUN IS WON' }),
+        seg(goal.mode, [
+          { value: 'together', label: 'Win together' },
+          { value: 'versus', label: 'Versus — first to it wins' }
+        ], function (value) { goal.mode = value; })
+      ])
+    ];
+    if (goal.mode === 'together') {
+      body.push(el('div.scope', null, [
+        el('span.scope__label', { text: 'WHO NEEDS THE GOAL' }),
+        seg(goal.completion, [
+          { value: 'anyone', label: 'Anyone — one finish wins for all' },
+          { value: 'everyone', label: 'Everyone must finish' }
+        ], function (value) { goal.completion = value; })
+      ]));
+    }
+    return el('div.stack.stack--tight', null, body);
   }
 
   function modifierCard(modifier, index, problems) {
