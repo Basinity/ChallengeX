@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel an in-progress run when a newer commit lands on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # Gradle 9.6.1 refuses to launch under an older JVM, and both modules
+      # target the Java 25 toolchain, so one JDK 25 covers launch and compile.
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The web builder lives outside the Gradle build and is checked on its own.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Dependency-free: drives the site's model and rewrites the export fixtures
+      # that core's PresetContractTest then parses with the mod's real codec.
+      - name: Web builder checks
+        run: node web/test/run.js
+
+      # Runs core's unit tests and assembles the remapped fabric jar.
+      - name: Build and test
+        run: ./gradlew build --stacktrace
+
+      - name: Upload mod jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: challengex-jar
+          path: fabric/build/libs/*.jar
+          if-no-files-found: error
