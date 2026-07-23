@@ -2,7 +2,7 @@
 
 Compose your own "Minecraft, but..." challenges from rules, goals, and modifiers to play alone or with your friends. More than 32 million ways to play Minecraft.
 
-<!-- demo GIF goes here -->
+![Composing a challenge in the web builder, then importing and playing it in-game](docs/demo.gif)
 
 ## The concept
 
