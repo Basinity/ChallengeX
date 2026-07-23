@@ -1,10 +1,10 @@
-![ChallengeX](docs/challengex-header.png)
+![ChallengeX](web/assets/og.png)
 
 # ChallengeX
 
 Compose your own "Minecraft, but..." challenges from rules, goals, and modifiers to play alone or with your friends. More than 32 million ways to play Minecraft.
 
-![Composing a challenge in the web builder, then importing and playing it in-game](docs/demo.gif)
+![Composing a challenge in the web builder, then importing and playing it in-game](web/assets/demo.gif)
 
 ## The concept
 
