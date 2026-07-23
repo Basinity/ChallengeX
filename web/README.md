@@ -1,6 +1,6 @@
 # ChallengeX web builder
 
-The companion site. It composes a challenge and exports it as a preset JSON file or as a shareable link; the mod imports either one. Destined for `challengexmc.com`.
+The companion site, live at `https://challengexmc.com`. It composes a challenge and exports it as a preset JSON file or as a shareable link; the mod imports either one.
 
 Static and client-side only: no backend, no database, no network requests, no build step. Opening `index.html` straight off disk works, which is also why the catalog ships as a script assigning a global rather than as a `.json` a browser would refuse to `fetch` over `file://`.
 
@@ -23,8 +23,10 @@ The scripts, in load order and by responsibility:
 | file | what it owns |
 | --- | --- |
 | `catalog.js` | **generated** from the mod's registries; never edit |
+| `gamedata.js` | **generated** id-to-name game data behind the suggestions; never edit |
 | `copy.js` | display names, picker blurbs, and the English phrase per entry |
 | `entries.js` | the two joined and indexed by id |
+| `suggest.js` | the type-ahead comboboxes and the id-to-name derivation |
 | `ui.js` | DOM helpers, toast, download, clipboard |
 | `preset.js` | the challenge model, validation, and the preset JSON format |
 | `phrase.js` | composing entries into readable sentences |
@@ -34,7 +36,7 @@ The scripts, in load order and by responsibility:
 | `home.js` | the landing page, and the landing-or-shared decision |
 | `theme.js` | the light/dark switch; a head inline script re-applies the stored choice before first paint |
 
-## Regenerating the catalog
+## Regenerating the generated files
 
 The builder renders every form from `assets/js/catalog.js`, which is generated out of `core`'s registries so the site cannot drift from the mod. After adding or changing a catalog entry:
 
@@ -43,6 +45,12 @@ The builder renders every form from `assets/js/catalog.js`, which is generated o
 ```
 
 Nothing about an individual entry is hardcoded in a screen. A new trigger appears in the picker, gets a parameter form, and gets a scope control with no change here. It renders without a blurb until one is added to `copy.js`.
+
+The suggestion fields draw from `assets/js/gamedata.js`, generated out of the real game registries and the game's own English names. After a game-version bump:
+
+```
+./gradlew :fabric:exportGameData
+```
 
 ## Tests
 
@@ -60,3 +68,12 @@ Those fixtures are committed, and the root `.gitignore` carries an exception to 
 - The builder never rejects a combination for being unplayable, self-defeating, or repeated. Only structural problems block an export: a missing required parameter, a missing required scope, or a rule with only one half.
 - A shared link is input from a stranger, so every page builds its content as DOM nodes through `ui.el` and never as an HTML string.
 - Fonts are self-hosted rather than linked from Google, so the page makes no third-party request and keeps working offline.
+
+## Fonts
+
+All faces are self-hosted, subset to the glyphs the site uses; full license texts are in `assets/fonts/LICENSES.txt`.
+
+- MC Ten Lowercase Alt by Patred, the pixel display face — CC BY-SA 3.0.
+- Silkscreen by Jason Kottke, the brand wordmark only — OFL 1.1.
+- Space Grotesk by Florian Karsten, the body face — OFL 1.1.
+- IBM Plex Mono by IBM, the mono face — OFL 1.1.

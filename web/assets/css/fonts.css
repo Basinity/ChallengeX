@@ -3,10 +3,12 @@
    variable file covering the whole 400-700 range, so it is declared once
    rather than three times over identical bytes.
 
-   MC Ten Lowercase Alt: CC BY-SA 3.0, Patred (a Minecraft-style pixel face).
+   MC Ten Lowercase Alt: CC BY-SA 3.0, Patred (a Minecraft-style pixel face),
+   https://creativecommons.org/licenses/by-sa/3.0/
    Silkscreen: OFL, Jason Kottke (the brand wordmark only).
    Space Grotesk: OFL, Florian Karsten.
-   IBM Plex Mono: OFL, IBM. */
+   IBM Plex Mono: OFL, IBM.
+   Full license texts: ../fonts/LICENSES.txt */
 
 /* One static face declared across the whole weight range, so bold requests
    match it exactly instead of smearing a pixel font with synthetic bold. */
