@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class ChallengeRunTest {
@@ -194,5 +195,45 @@ class ChallengeRunTest {
         assertEquals(RunState.FINISHED, restored.state());
         assertEquals(RunOutcome.LOSS, restored.outcome());
         assertEquals(1200, restored.elapsedTicks());
+    }
+
+    /**
+     * The point of persisting outcomes: a run interrupted partway through a race
+     * comes back with the same finishing order and the same casualties, rather
+     * than resuming as though nobody had done anything yet.
+     */
+    @Test
+    void restoringARunMidRaceKeepsTheFinishingOrderAndWhoIsOut() {
+        ChallengeRun run = runFor(command -> { },
+                new Rule(TriggerSpec.of("trigger.game_beaten"),
+                        new EffectSpec(CoreCatalog.EFFECT_WIN_CHALLENGE,
+                                Map.of("end", ParamValue.of(CoreCatalog.END_AFTER_ALL_COMPLETE)),
+                                Optional.of(Scope.PER_PLAYER))),
+                new Rule(TriggerSpec.of("trigger.player_died"),
+                        new EffectSpec(CoreCatalog.EFFECT_LOSE_CHALLENGE, Map.of(),
+                                Optional.of(Scope.PER_PLAYER))));
+        run.start();
+        run.updateRoster(List.of("Pix", "Kettu", "Basinity"));
+
+        run.tick(400);
+        run.handle(GameEvent.of("trigger.game_beaten", "Kettu"));
+        run.tick(500);
+        run.handle(GameEvent.of("trigger.game_beaten", "Pix"));
+        run.handle(GameEvent.of("trigger.player_died", "Basinity"));
+
+        ChallengeRun restored = ChallengeRun.restore(run.snapshot(), registries, command -> { });
+
+        assertEquals(RunState.RUNNING, restored.state());
+        assertEquals(RunOutcome.ONGOING, restored.outcome());
+        assertEquals(List.of("Kettu", "Pix"),
+                restored.completions().stream().map(Completion::playerId).toList());
+        assertEquals(List.of(400L, 900L),
+                restored.completions().stream().map(Completion::atTick).toList());
+        assertEquals(Set.of("Basinity"), restored.eliminated());
+
+        // And the restored run still finishes the way the original would have:
+        // the roster empties, and somebody finished, so it is a win.
+        restored.updateRoster(List.of());
+        assertEquals(RunOutcome.WIN, restored.outcome());
     }
 }

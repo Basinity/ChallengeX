@@ -45,19 +45,21 @@ public final class ChallengeRun {
     public static ChallengeRun restore(RunSnapshot snapshot, Registries registries,
             EffectExecutor executor) {
         ChallengeRun run = new ChallengeRun(snapshot.challenge(), registries, executor);
-        // The snapshot does not carry the finishing order or who is out yet;
-        // that lands with the snapshot format bump, before the adapter can
-        // produce either of them in a real game.
         run.engine = Engine.restore(snapshot.challenge(), registries,
-                snapshot.elapsedTicks(), snapshot.outcome(), List.of(), Set.of());
+                snapshot.elapsedTicks(), snapshot.outcome(), snapshot.completions(),
+                snapshot.eliminated());
         run.state = snapshot.state();
         return run;
     }
 
-    /** Captures the whole run: composition, state, clock, and outcome. */
+    /**
+     * Captures the whole run: composition, state, clock, outcome, who finished
+     * and in what order, and who is out.
+     */
     public RunSnapshot snapshot() {
         return new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, challenge, state,
-                engine.elapsedTicks(), engine.outcome());
+                engine.elapsedTicks(), engine.outcome(), engine.completions(),
+                engine.eliminated());
     }
 
     public RunState state() {
