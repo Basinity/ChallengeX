@@ -692,6 +692,9 @@
     ]);
   }
 
+  /* Adds an empty rule and stops there. It used to push straight on into the
+     trigger picker, which took the board away from somebody who had only just
+     arrived at it; the two empty slots say plainly enough what to fill in. */
   function addRule() {
     var rule = preset.blankRule();
     rule.fresh = true;
@@ -699,7 +702,6 @@
     view.expanded = rule.uid;
     view.tab = 'rules';
     render();
-    openPicker('trigger', { type: 'half', ruleUid: rule.uid, side: 'trigger' });
   }
 
   function renderBoard(problems) {

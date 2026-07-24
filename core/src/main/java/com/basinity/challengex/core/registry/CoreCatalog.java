@@ -47,6 +47,9 @@ public final class CoreCatalog {
     private static void registerTriggers(Registry<TriggerDefinition> registry) {
         trigger(registry, "block_broken", true, optional("block", STRING).suggesting("block"));
         trigger(registry, "block_placed", true, optional("block", STRING).suggesting("block"));
+        // Third rather than last: it is the win condition most people
+        // reach for first, so it should not be at the bottom of forty-four.
+        trigger(registry, "game_beaten", true);
         trigger(registry, "mob_killed", true, optional("mob", STRING).suggesting("mob"));
         trigger(registry, "kill_player", true, optional("name", STRING).suggesting("player"));
         trigger(registry, "player_died", true, optional("source", STRING).suggesting("damage_type"));
@@ -88,7 +91,6 @@ public final class CoreCatalog {
         trigger(registry, "time_of_day", false, required("time", STRING).suggesting("time"));
         trigger(registry, "fixed_interval", false, required("seconds", INT).bounded(1, 24 * 60 * 60));
         trigger(registry, "chat_message", true, optional("message", STRING));
-        trigger(registry, "game_beaten", true);
     }
 
     private static void registerEffects(Registry<EffectDefinition> registry) {

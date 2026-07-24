@@ -44,6 +44,11 @@ window.CX_CATALOG = {
       ]
     },
     {
+      "id": "trigger.game_beaten",
+      "scoped": true,
+      "params": []
+    },
+    {
       "id": "trigger.mob_killed",
       "scoped": true,
       "params": [
@@ -478,11 +483,6 @@ window.CX_CATALOG = {
           "required": false
         }
       ]
-    },
-    {
-      "id": "trigger.game_beaten",
-      "scoped": true,
-      "params": []
     }
   ],
   "effects": [
