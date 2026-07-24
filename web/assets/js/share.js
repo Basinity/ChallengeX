@@ -50,9 +50,13 @@ window.CX.share = (function () {
 
   /* A rule as one readable sentence. The page states the challenge in English
      and nothing else; the ids and parameters behind it live in the .json the
-     download button hands over. */
+     download button hands over.
+
+     A rule that wins or loses the run is drawn apart from the rest: it decides
+     how the whole thing ends, so it should not read as one line among many. */
   function ruleLine(rule, index) {
     var line = phrase.ruleLine(rule);
+    var effect = entries.get(rule.effect && rule.effect.id);
     var body = el('p.line__text');
 
     if (line.lead) {
@@ -62,7 +66,29 @@ window.CX.share = (function () {
     ui.append(body, ' → ');
     ui.append(body, el('b', { 'data-kind': 'effect', text: line.effect }));
 
-    return el('div.line', { id: 'rule-' + (index + 1) }, [body]);
+    return el('div.line', {
+      id: 'rule-' + (index + 1),
+      'data-run-control': effect && effect.runControl ? 'true' : null
+    }, [body]);
+  }
+
+  /* Rules that decide how the run ends are read first, then everything that
+     only changes how it plays. Win leads lose, which is the order the catalog
+     itself lists them in, so the ranking is taken from there rather than
+     spelled out again here. The sort is stable, so the rest keep the order
+     they were composed in, and the challenge's own list is left alone. */
+  function outcomeFirst(rules) {
+    var order = {};
+    entries.all('effect').forEach(function (entry, index) {
+      if (entry.runControl) {
+        order[entry.id] = index;
+      }
+    });
+    function rank(rule) {
+      var id = rule.effect && rule.effect.id;
+      return order[id] === undefined ? Number.MAX_SAFE_INTEGER : order[id];
+    }
+    return rules.slice().sort(function (a, b) { return rank(a) - rank(b); });
   }
 
   /* The modifier's name carries the colour, like the trigger and effect
@@ -113,7 +139,7 @@ window.CX.share = (function () {
     document.title = 'ChallengeX | ' + challenge.name;
 
     var rules = el('div.stack.stack--tight');
-    challenge.rules.forEach(function (rule, index) {
+    outcomeFirst(challenge.rules).forEach(function (rule, index) {
       ui.append(rules, ruleLine(rule, index));
     });
 

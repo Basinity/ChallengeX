@@ -1081,7 +1081,29 @@ code {
   gap: 6px;
 }
 
+/* The two effects that decide how a run ends lead the effect list and are
+   drawn apart from it: a solid edge in the effect colour and its wash behind,
+   so they read as a different sort of thing rather than a louder one. */
+.pick[data-run-control='true'] {
+  border-color: var(--effect-line);
+  border-left: 4px solid var(--effect);
+  background: var(--effect-wash);
+}
+
+.pick__tag {
+  margin-left: 8px;
+  padding: 1px 5px;
+  border: 1px solid var(--effect-line);
+  color: var(--effect);
+  font: 600 9px var(--mono);
+  letter-spacing: .08em;
+  vertical-align: middle;
+}
+
 .pick:hover { background: var(--bg-strip); }
+/* The run-control pair keep their wash on hover: the brightening border is
+   feedback enough, and losing the colour would undo the whole point of it. */
+.pick[data-run-control='true']:hover { background: var(--effect-wash); }
 .pick[data-kind='trigger']:hover { border-color: var(--trigger); }
 .pick[data-kind='effect']:hover { border-color: var(--effect); }
 .pick[data-kind='modifier']:hover { border-color: var(--modifier); }
@@ -1127,6 +1149,13 @@ code {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* The rule that ends the run, given the same edge it has in the builder. */
+.line[data-run-control='true'] {
+  border-color: var(--effect-line);
+  border-left: 4px solid var(--effect);
+  background: var(--effect-wash);
 }
 
 .line__text { font-size: 16px; line-height: 1.5; }

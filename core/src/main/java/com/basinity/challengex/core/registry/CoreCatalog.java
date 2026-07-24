@@ -128,9 +128,11 @@ public final class CoreCatalog {
         effect(registry, "repair_held_item", true, optional("amount", INT).atLeast(0));
         effect(registry, "damage_held_item", true, optional("amount", INT).atLeast(0));
         effect(registry, "kill", true);
-        effect(registry, "lose_challenge", true);
+        // Registered win-first: the two run-control effects lead the effect
+        // list wherever it is shown, and winning reads before losing.
         effect(registry, "win_challenge", true,
                 required("end", STRING).oneOf(END_ON_FIRST_COMPLETION, END_AFTER_ALL_COMPLETE));
+        effect(registry, "lose_challenge", true);
     }
 
     private static void registerModifiers(Registry<ModifierDefinition> registry) {

@@ -432,11 +432,13 @@ window.CX_COPY = {
     phrase: 'dies on the spot'
   },
   'effect.lose_challenge': {
+    runControl: true,
     name: 'Lose the challenge',
     blurb: 'Knocks whoever it lands on out of the run. The run itself is lost once nobody is left playing.',
     phrase: 'is out of the run'
   },
   'effect.win_challenge': {
+    runControl: true,
     name: 'Win the challenge',
     blurb: 'Finishes the run. Pair it with any trigger to make that the win condition.',
     phrase: 'finishes the challenge',

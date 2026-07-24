@@ -11,11 +11,9 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.apply_status_effect",
+        "id": "effect.win_challenge",
         "params": {
-          "effect": "minecraft:test",
-          "duration": 3,
-          "amplifier": 3
+          "end": "after_all_complete"
         },
         "scope": "per_player"
       }
@@ -29,7 +27,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.remove_item_slot",
+        "id": "effect.lose_challenge",
         "scope": "per_player"
       }
     },
@@ -42,7 +40,12 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.drop_held_item",
+        "id": "effect.apply_status_effect",
+        "params": {
+          "effect": "minecraft:test",
+          "duration": 3,
+          "amplifier": 3
+        },
         "scope": "per_player"
       }
     },
@@ -55,7 +58,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.drop_inventory",
+        "id": "effect.remove_item_slot",
         "scope": "per_player"
       }
     },
@@ -68,7 +71,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.give_random_item",
+        "id": "effect.drop_held_item",
         "scope": "per_player"
       }
     },
@@ -77,6 +80,33 @@
         "id": "trigger.damage_taken",
         "params": {
           "source": "minecraft:test"
+        },
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.drop_inventory",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.damage_dealt",
+        "params": {
+          "source": "minecraft:test",
+          "target": "minecraft:test"
+        },
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.give_random_item",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.item_crafted",
+        "params": {
+          "item": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -91,10 +121,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.damage_dealt",
+        "id": "trigger.item_picked_up",
         "params": {
-          "source": "minecraft:test",
-          "target": "minecraft:test"
+          "item": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -108,7 +137,7 @@
     },
     {
       "trigger": {
-        "id": "trigger.item_crafted",
+        "id": "trigger.item_dropped",
         "params": {
           "item": "minecraft:test"
         },
@@ -124,7 +153,7 @@
     },
     {
       "trigger": {
-        "id": "trigger.item_picked_up",
+        "id": "trigger.food_eaten",
         "params": {
           "item": "minecraft:test"
         },
@@ -142,45 +171,13 @@
     },
     {
       "trigger": {
-        "id": "trigger.item_dropped",
-        "params": {
-          "item": "minecraft:test"
-        },
+        "id": "trigger.xp_gained",
         "scope": "every_player"
       },
       "effect": {
         "id": "effect.ignite",
         "params": {
           "seconds": 3
-        },
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.food_eaten",
-        "params": {
-          "item": "minecraft:test"
-        },
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.damage",
-        "params": {
-          "hearts": 2.5
-        },
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.xp_gained",
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.heal",
-        "params": {
-          "hearts": 2.5
         },
         "scope": "per_player"
       }
@@ -194,7 +191,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.change_max_health",
+        "id": "effect.damage",
         "params": {
           "hearts": 2.5
         },
@@ -210,9 +207,9 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.drain_hunger",
+        "id": "effect.heal",
         "params": {
-          "amount": 3
+          "hearts": 2.5
         },
         "scope": "per_player"
       }
@@ -226,9 +223,9 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.restore_hunger",
+        "id": "effect.change_max_health",
         "params": {
-          "amount": 3
+          "hearts": 2.5
         },
         "scope": "per_player"
       }
@@ -238,6 +235,38 @@
         "id": "trigger.height_crossed",
         "params": {
           "y": 3
+        },
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.drain_hunger",
+        "params": {
+          "amount": 3
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.health_below",
+        "params": {
+          "hearts": 2.5
+        },
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.restore_hunger",
+        "params": {
+          "amount": 3
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.hunger_below",
+        "params": {
+          "points": 3
         },
         "scope": "every_player"
       },
@@ -253,32 +282,6 @@
     },
     {
       "trigger": {
-        "id": "trigger.health_below",
-        "params": {
-          "hearts": 2.5
-        },
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.shuffle_hotbar",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.hunger_below",
-        "params": {
-          "points": 3
-        },
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.swap_inventory",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
         "id": "trigger.level_reached",
         "params": {
           "level": 3
@@ -286,7 +289,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.swap_position",
+        "id": "effect.shuffle_hotbar",
         "scope": "per_player"
       }
     },
@@ -299,7 +302,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.clear_effects",
+        "id": "effect.swap_inventory",
         "scope": "per_player"
       }
     },
@@ -309,13 +312,33 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.lightning",
+        "id": "effect.swap_position",
         "scope": "per_player"
       }
     },
     {
       "trigger": {
         "id": "trigger.jumped",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.clear_effects",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.sneaked",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.lightning",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.fish_caught",
         "scope": "every_player"
       },
       "effect": {
@@ -328,39 +351,13 @@
     },
     {
       "trigger": {
-        "id": "trigger.sneaked",
+        "id": "trigger.villager_traded",
         "scope": "every_player"
       },
       "effect": {
         "id": "effect.launch",
         "params": {
           "strength": 2.5
-        },
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.fish_caught",
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.broadcast",
-        "params": {
-          "text": "minecraft:test"
-        },
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.villager_traded",
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.play_sound",
-        "params": {
-          "sound": "minecraft:test"
         },
         "scope": "per_player"
       }
@@ -375,6 +372,38 @@
         "scope": "every_player"
       },
       "effect": {
+        "id": "effect.broadcast",
+        "params": {
+          "text": "minecraft:test"
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.item_smelted",
+        "params": {
+          "item": "minecraft:test"
+        },
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.play_sound",
+        "params": {
+          "sound": "minecraft:test"
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.projectile_shot",
+        "params": {
+          "projectile": "minecraft:test"
+        },
+        "scope": "every_player"
+      },
+      "effect": {
         "id": "effect.change_time",
         "params": {
           "value": "minecraft:test"
@@ -383,9 +412,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.item_smelted",
+        "id": "trigger.mob_tamed",
         "params": {
-          "item": "minecraft:test"
+          "mob": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -398,9 +427,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.projectile_shot",
+        "id": "trigger.mob_bred",
         "params": {
-          "projectile": "minecraft:test"
+          "mob": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -411,9 +440,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.mob_tamed",
+        "id": "trigger.container_opened",
         "params": {
-          "mob": "minecraft:test"
+          "container": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -428,9 +457,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.mob_bred",
+        "id": "trigger.item_used",
         "params": {
-          "mob": "minecraft:test"
+          "item": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -444,9 +473,9 @@
     },
     {
       "trigger": {
-        "id": "trigger.container_opened",
+        "id": "trigger.block_interacted",
         "params": {
-          "container": "minecraft:test"
+          "block": "minecraft:test"
         },
         "scope": "every_player"
       },
@@ -460,42 +489,13 @@
     },
     {
       "trigger": {
-        "id": "trigger.item_used",
-        "params": {
-          "item": "minecraft:test"
-        },
+        "id": "trigger.started_gliding",
         "scope": "every_player"
       },
       "effect": {
         "id": "effect.explode",
         "params": {
           "power": 2.5
-        },
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.block_interacted",
-        "params": {
-          "block": "minecraft:test"
-        },
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.clear_inventory",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.started_gliding",
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.repair_held_item",
-        "params": {
-          "amount": 3
         },
         "scope": "per_player"
       }
@@ -509,10 +509,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.damage_held_item",
-        "params": {
-          "amount": 3
-        },
+        "id": "effect.clear_inventory",
         "scope": "per_player"
       }
     },
@@ -525,7 +522,10 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.kill",
+        "id": "effect.repair_held_item",
+        "params": {
+          "amount": 3
+        },
         "scope": "per_player"
       }
     },
@@ -538,13 +538,26 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.lose_challenge",
+        "id": "effect.damage_held_item",
+        "params": {
+          "amount": 3
+        },
         "scope": "per_player"
       }
     },
     {
       "trigger": {
         "id": "trigger.crit_landed",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.kill",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.shield_blocked",
         "scope": "every_player"
       },
       "effect": {
@@ -557,8 +570,22 @@
     },
     {
       "trigger": {
-        "id": "trigger.shield_blocked",
-        "scope": "every_player"
+        "id": "trigger.weather_changed",
+        "params": {
+          "weather": "minecraft:test"
+        }
+      },
+      "effect": {
+        "id": "effect.lose_challenge",
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.time_of_day",
+        "params": {
+          "time": "minecraft:test"
+        }
       },
       "effect": {
         "id": "effect.apply_status_effect",
@@ -572,37 +599,13 @@
     },
     {
       "trigger": {
-        "id": "trigger.weather_changed",
-        "params": {
-          "weather": "minecraft:test"
-        }
-      },
-      "effect": {
-        "id": "effect.remove_item_slot",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
-        "id": "trigger.time_of_day",
-        "params": {
-          "time": "minecraft:test"
-        }
-      },
-      "effect": {
-        "id": "effect.drop_held_item",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
         "id": "trigger.fixed_interval",
         "params": {
           "seconds": 3
         }
       },
       "effect": {
-        "id": "effect.drop_inventory",
+        "id": "effect.remove_item_slot",
         "scope": "per_player"
       }
     },
@@ -615,7 +618,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.give_random_item",
+        "id": "effect.drop_held_item",
         "scope": "per_player"
       }
     },
@@ -625,11 +628,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.give_item",
-        "params": {
-          "item": "minecraft:test",
-          "amount": 3
-        },
+        "id": "effect.drop_inventory",
         "scope": "per_player"
       }
     }

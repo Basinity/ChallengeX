@@ -917,9 +917,13 @@
     return el('button.pick', {
       type: 'button',
       'data-kind': entry.kind,
+      'data-run-control': entry.runControl ? 'true' : null,
       onclick: function () { choose(entry); }
     }, [
-      el('span.pick__name', { text: entry.name }),
+      el('span.pick__name', null, [
+        entry.name,
+        entry.runControl ? el('span.pick__tag', { text: 'OUTCOME' }) : null
+      ]),
       entry.blurb ? el('span.pick__blurb', { text: entry.blurb }) : null,
       chips
     ]);

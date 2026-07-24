@@ -879,11 +879,6 @@ window.CX_CATALOG = {
       "params": []
     },
     {
-      "id": "effect.lose_challenge",
-      "scoped": true,
-      "params": []
-    },
-    {
       "id": "effect.win_challenge",
       "scoped": true,
       "params": [
@@ -897,6 +892,11 @@ window.CX_CATALOG = {
           ]
         }
       ]
+    },
+    {
+      "id": "effect.lose_challenge",
+      "scoped": true,
+      "params": []
     }
   ],
   "modifiers": [

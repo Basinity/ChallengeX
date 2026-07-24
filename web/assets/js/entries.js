@@ -43,11 +43,18 @@ window.CX.entries = (function () {
         // Reader-facing labels for parameters restricted to a closed set,
         // keyed by parameter name then by value.
         values: text.values || {},
+        // Acts on the run itself rather than on the world, so it leads its
+        // kind and is drawn apart from the rest.
+        runControl: text.runControl === true,
         // Most triggers read as "When <subject> <phrase>"; a few supply their own opening.
         lead: text.lead === undefined ? 'When' : text.lead
       };
       byId[entry.id] = entry;
       return entry;
+    });
+    // Stable, so everything else keeps the catalog's own order.
+    byKind[kind].sort(function (a, b) {
+      return (b.runControl ? 1 : 0) - (a.runControl ? 1 : 0);
     });
   });
 
