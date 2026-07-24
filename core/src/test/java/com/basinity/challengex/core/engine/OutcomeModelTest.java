@@ -199,6 +199,41 @@ class OutcomeModelTest {
 
     // ---- rejoining ----
 
+    /**
+     * The adapter cannot take a player out of the roster in the same instant it
+     * eliminates them: it sees the outcome, then moves them to spectator, and
+     * only the next roster report leaves them out. So an elimination has to
+     * survive being told the player is still playing, or every elimination
+     * undoes itself on the very next tick and nobody is ever knocked out.
+     */
+    @Test
+    void anEliminationSurvivesTheRosterReportThatStillListsThePlayer() {
+        Engine engine = engineFor(loseRule("trigger.player_died", Scope.PER_PLAYER));
+        engine.updateRoster(List.of("alice", "bob"));
+
+        engine.onEvent(GameEvent.of("trigger.player_died", "alice"));
+        // The tick the death happened on still reports alice as playing.
+        engine.updateRoster(List.of("alice", "bob"));
+
+        assertEquals(Set.of("alice"), engine.eliminated(),
+                "the elimination must not be cleared before she has actually left");
+    }
+
+    @Test
+    void aSoloRunEndsWhenItsOnlyPlayerIsEliminated() {
+        Engine engine = engineFor(loseRule("trigger.player_died", Scope.PER_PLAYER));
+        engine.updateRoster(List.of("alice"));
+
+        engine.onEvent(GameEvent.of("trigger.player_died", "alice"));
+        engine.updateRoster(List.of("alice"));
+        assertEquals(RunOutcome.ONGOING, engine.outcome(), "she has not left the roster yet");
+
+        // The adapter has now moved her to spectator, so she drops out.
+        engine.updateRoster(List.of());
+
+        assertEquals(RunOutcome.LOSS, engine.outcome());
+    }
+
     @Test
     void rejoiningTheRosterClearsARecordedLoss() {
         Engine engine = engineFor(loseRule("trigger.player_died", Scope.PER_PLAYER));
@@ -207,6 +242,9 @@ class OutcomeModelTest {
         engine.onEvent(GameEvent.of("trigger.player_died", "alice"));
         assertEquals(Set.of("alice"), engine.eliminated());
 
+        // She is moved to spectator and drops out of the roster, then puts
+        // herself back into survival.
+        engine.updateRoster(List.of("bob"));
         engine.updateRoster(List.of("alice", "bob"));
 
         assertTrue(engine.eliminated().isEmpty(), "back in survival is back in play");

@@ -55,6 +55,7 @@ public final class Engine {
     private final List<Completion> completions = new ArrayList<>();
     private final Set<String> completed = new HashSet<>();
     private final Set<String> eliminated = new LinkedHashSet<>();
+    private final Set<String> leftAfterLosing = new HashSet<>();
     private final Set<String> roster = new HashSet<>();
     private boolean rosterReported;
 
@@ -130,6 +131,7 @@ public final class Engine {
             // Finishing puts a player back in good standing: a win outranks a
             // loss they had picked up earlier in the run.
             eliminated.remove(player);
+            leftAfterLosing.remove(player);
         }
         if (!completions.isEmpty() && endsOnFirstCompletion(rule)) {
             outcome = RunOutcome.WIN;
@@ -150,7 +152,12 @@ public final class Engine {
 
     /** Takes the lose rule's scoped players out of the run. */
     private void eliminate(Rule rule, GameEvent event) {
-        eliminated.addAll(playersOf(rule.effect().scope(), event));
+        for (String player : playersOf(rule.effect().scope(), event)) {
+            eliminated.add(player);
+            // A fresh loss starts over: they have not left on the strength of
+            // this one yet, whatever an earlier one recorded.
+            leftAfterLosing.remove(player);
+        }
         resolveEmptyRoster();
     }
 
@@ -246,16 +253,29 @@ public final class Engine {
      * survival leaves the roster, and one who switches back rejoins it.
      *
      * <p>Rejoining clears a recorded loss, since the player is back in play and
-     * can still win or be eliminated again. A recorded win is permanent and
-     * keeps its place and time, so a player who already finished cannot place
-     * twice, though rejoining does hold an after-all-complete run open until
-     * they leave again.
+     * can still win or be eliminated again. Rejoining means having left and come
+     * back, which is not the same as never having left: an adapter cannot take a
+     * player out of the roster in the same instant it eliminates them, so the
+     * report covering the moment of their loss still lists them as playing.
+     * Treating that as a rejoin would undo every elimination on the tick it
+     * happened, so a loss is only cleared once the player has actually been seen
+     * out of the roster and then returns.
+     *
+     * <p>A recorded win is permanent and keeps its place and time, so a player
+     * who already finished cannot place twice, though rejoining does hold an
+     * after-all-complete run open until they leave again.
      */
     public void updateRoster(Collection<String> playerIds) {
         roster.clear();
         roster.addAll(playerIds);
         rosterReported = true;
-        eliminated.removeAll(roster);
+        for (String player : eliminated) {
+            if (!roster.contains(player)) {
+                leftAfterLosing.add(player);
+            }
+        }
+        eliminated.removeIf(player -> leftAfterLosing.contains(player) && roster.contains(player));
+        leftAfterLosing.retainAll(eliminated);
         resolveEmptyRoster();
     }
 

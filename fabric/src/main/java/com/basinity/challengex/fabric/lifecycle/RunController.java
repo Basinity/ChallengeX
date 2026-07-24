@@ -4,6 +4,7 @@ import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunOutcome;
 import com.basinity.challengex.core.engine.RunState;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -18,10 +19,11 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * Drives a run's lifecycle once a server tick and carries out the world-facing
  * side of the {@code /challengex} lifecycle commands. Each tick it advances the
- * clock while running (which can end the run on a time limit), announces a
- * finished run once (a loss also sends every player to spectator until reset
- * or import), holds players still while paused, and refreshes the action-bar
- * clock every player sees.
+ * clock while running (which can end the run on a time limit), refreshes the
+ * roster from who is still in survival or adventure, sends each player who wins
+ * or loses into spectator as it happens, announces a finished run once, holds
+ * players still while paused, and refreshes the action-bar clock every player
+ * sees.
  *
  * <p>It holds a supplier rather than the run itself because it registers once
  * at mod init while runs come and go with the server and are swapped on import.
@@ -35,7 +37,7 @@ public final class RunController {
     private final TimerPreferences preferences;
     private final RunStore runStore;
     private final PauseControl pause = new PauseControl();
-    private final LossSpectator lossSpectator = new LossSpectator();
+    private final OutcomeSpectator outcomeSpectator = new OutcomeSpectator();
     private RunState previous = RunState.NOT_STARTED;
     private int animTick;
 
@@ -55,13 +57,22 @@ public final class RunController {
             return;
         }
         if (run.state() == RunState.RUNNING) {
+            run.updateRoster(roster(server));
             run.tick(1);
+            // Finishing or being knocked out puts a player into spectator,
+            // which is what takes them out of the roster.
+            outcomeSpectator.syncOutcomes(server, run);
+            // That just changed who is playing, so read it again rather than
+            // carrying a stale roster into the next tick: the run has to be
+            // able to end on the tick its last player goes out, not a tick
+            // later while they are still staring at the death screen.
+            run.updateRoster(roster(server));
         }
         RunState state = run.state();
         if (previous != RunState.FINISHED && state == RunState.FINISHED) {
             RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks());
             if (run.outcome() == RunOutcome.LOSS) {
-                lossSpectator.apply(server);
+                outcomeSpectator.applyRunLoss(server);
             }
             save(server);
         }
@@ -71,6 +82,19 @@ public final class RunController {
         animTick = (animTick + 1) % ANIMATION_PERIOD_TICKS;
         renderActionBar(server, run, state);
         previous = state;
+    }
+
+    /**
+     * Who is still playing, read off game mode: survival and adventure are in
+     * the run, creative and spectator are outside it. A player who won, lost, or
+     * simply switched themselves out leaves the roster, and one who switches
+     * back rejoins it.
+     */
+    private static List<String> roster(MinecraftServer server) {
+        return server.getPlayerList().getPlayers().stream()
+                .filter(OutcomeSpectator::isPlaying)
+                .map(ServerPlayer::getScoreboardName)
+                .toList();
     }
 
     /** Begins a not-started run. The caller has already checked it is startable. */
@@ -105,7 +129,7 @@ public final class RunController {
     /** Rebuilds the run fresh and lifts any freeze it left behind. */
     public void reset(MinecraftServer server) {
         pause.unfreeze(server);
-        lossSpectator.restore(server);
+        outcomeSpectator.restore(server);
         ChallengeRun run = activeRun.get();
         if (run != null) {
             run.reset();
@@ -117,7 +141,7 @@ public final class RunController {
     /** A freshly imported challenge starts not-started; lift any freeze from the last run. */
     public void onChallengeReplaced(MinecraftServer server) {
         pause.unfreeze(server);
-        lossSpectator.restore(server);
+        outcomeSpectator.restore(server);
         previous = RunState.NOT_STARTED;
         save(server);
     }
