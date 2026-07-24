@@ -390,7 +390,7 @@ window.CX_CATALOG = {
       "scoped": true,
       "params": [
         {
-          "name": "mob",
+          "name": "vehicle",
           "type": "STRING",
           "required": false,
           "suggests": "entity"
@@ -581,7 +581,7 @@ window.CX_CATALOG = {
           "name": "mob",
           "type": "STRING",
           "required": true,
-          "suggests": "entity"
+          "suggests": "mob"
         },
         {
           "name": "count",

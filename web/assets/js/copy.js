@@ -200,7 +200,7 @@ window.CX_COPY = {
   'trigger.mounted': {
     name: 'Mounted',
     blurb: 'A horse, a boat, a pig with a saddle.',
-    phrase: 'mounts {mob?a mob}'
+    phrase: 'mounts {vehicle?a vehicle}'
   },
   'trigger.effect_gained': {
     name: 'Effect gained',

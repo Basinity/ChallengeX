@@ -504,7 +504,7 @@
       "trigger": {
         "id": "trigger.mounted",
         "params": {
-          "mob": "minecraft:test"
+          "vehicle": "minecraft:test"
         },
         "scope": "every_player"
       },

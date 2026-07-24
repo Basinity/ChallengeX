@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * {@code trigger.mounted}: a player started riding a horse, boat, minecart, or
  * any other vehicle. It rides the shared start-riding call and fires only when
- * mounting actually took. The {@code mob} parameter matches the vehicle's type.
+ * mounting actually took. The {@code vehicle} parameter matches the ridden
+ * entity's type, which is why it is an entity rather than a mob: boats,
+ * minecarts and rafts are all mountable and none of them are mobs.
  */
 @Mixin(Entity.class)
 public class MountedMixin {
@@ -24,9 +26,9 @@ public class MountedMixin {
     private void challengex$onMount(Entity vehicle, boolean force, boolean sendPacket,
             CallbackInfoReturnable<Boolean> info) {
         if (Boolean.TRUE.equals(info.getReturnValue()) && (Object) this instanceof ServerPlayer player) {
-            String mobId = BuiltInRegistries.ENTITY_TYPE.getKey(vehicle.getType()).toString();
+            String vehicleId = BuiltInRegistries.ENTITY_TYPE.getKey(vehicle.getType()).toString();
             MixinTriggerBridge.emit(GameEvent.of("trigger.mounted", player.getScoreboardName(),
-                    Map.of("mob", ParamValue.of(mobId))));
+                    Map.of("vehicle", ParamValue.of(vehicleId))));
         }
     }
 }

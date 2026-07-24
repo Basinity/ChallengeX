@@ -79,7 +79,7 @@ public final class CoreCatalog {
         trigger(registry, "item_used", true, optional("item", STRING).suggesting("item"));
         trigger(registry, "block_interacted", true, optional("block", STRING).suggesting("block"));
         trigger(registry, "started_gliding", true);
-        trigger(registry, "mounted", true, optional("mob", STRING).suggesting("entity"));
+        trigger(registry, "mounted", true, optional("vehicle", STRING).suggesting("entity"));
         trigger(registry, "effect_gained", true, optional("effect", STRING).suggesting("effect"));
         trigger(registry, "tool_broke", true, optional("item", STRING).suggesting("item"));
         trigger(registry, "crit_landed", true);
@@ -100,7 +100,7 @@ public final class CoreCatalog {
         effect(registry, "give_item", true, required("item", STRING).suggesting("item"), optional("amount", INT).bounded(1, 64));
         effect(registry, "teleport_random", true, optional("radius", INT).atLeast(1));
         effect(registry, "teleport_up", true, optional("blocks", INT).atLeast(0));
-        effect(registry, "spawn_mob", true, required("mob", STRING).suggesting("entity"), optional("count", INT).bounded(1, 100), optional("baby", BOOL));
+        effect(registry, "spawn_mob", true, required("mob", STRING).suggesting("mob"), optional("count", INT).bounded(1, 100), optional("baby", BOOL));
         effect(registry, "ignite", true, optional("seconds", INT).atLeast(0));
         effect(registry, "damage", true, optional("hearts", DECIMAL).atLeast(0));
         effect(registry, "heal", true, optional("hearts", DECIMAL).atLeast(0));
