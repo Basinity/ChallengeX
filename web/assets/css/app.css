@@ -2,8 +2,9 @@
 
    Direction: a hard-edged console. Nothing is rounded, nothing glows, every
    raised surface sits on a hard offset shadow instead of a blur. Colour
-   carries meaning and is never decorative: amber is a trigger, green an effect,
-   magenta a modifier, red a structural problem. MC Ten Lowercase
+   carries meaning and is never decorative: amber is a trigger, blue an effect,
+   magenta a modifier, red a structural problem. Green is the site's own accent
+   and belongs to no building block. MC Ten Lowercase
    Alt is the pixel display face and is only ever used for headings and short
    labels; body copy is Space Grotesk; anything mechanical (ids, params, paths,
    commands) is IBM Plex Mono.
@@ -40,10 +41,18 @@
   --trigger-line: light-dark(#c0a052, #6b5c33);
   --trigger-wash: light-dark(#f2edd8, #1c1a12);
 
-  --effect: light-dark(#3c7a16, #9adf6a);
-  --effect-bright: light-dark(#2f6410, #c2f09a);
-  --effect-line: light-dark(#79a854, #4d6b33);
-  --effect-wash: light-dark(#e9f1dd, #151c11);
+  /* The site's own accent: links, focus, primary buttons, headings. Green,
+     and deliberately not any building block's colour, so the four semantic
+     hues stay information rather than decoration. */
+  --accent: light-dark(#3c7a16, #9adf6a);
+  --accent-bright: light-dark(#2f6410, #c2f09a);
+  --accent-line: light-dark(#79a854, #4d6b33);
+  --accent-wash: light-dark(#e9f1dd, #151c11);
+
+  --effect: light-dark(#1d5fa8, #8cc4f2);
+  --effect-bright: light-dark(#17558f, #b8dcfa);
+  --effect-line: light-dark(#7ba7cf, #33536f);
+  --effect-wash: light-dark(#dde9f4, #101820);
 
   --modifier: light-dark(#92379d, #d98fe0);
   --modifier-line: light-dark(#b56cbe, #5c3961);
@@ -94,13 +103,13 @@ body {
 h1, h2, h3, p, ol, ul, figure { margin: 0; }
 ol, ul { padding-left: 1.25em; }
 
-a { color: var(--effect); }
-a:hover { color: var(--effect-bright); }
+a { color: var(--accent); }
+a:hover { color: var(--accent-bright); }
 
-::selection { background: var(--effect); color: var(--bg); }
+::selection { background: var(--accent); color: var(--bg); }
 
 :focus-visible {
-  outline: 2px solid var(--effect);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -151,7 +160,7 @@ code {
 }
 
 /* The caret that ends the wordmark and the empty-state headline. */
-.caret { color: var(--effect); }
+.caret { color: var(--accent); }
 
 .panel {
   border: 2px solid var(--line);
@@ -180,19 +189,19 @@ code {
   transition: transform .08s steps(2), box-shadow .08s steps(2), border-color .1s, background .1s, color .1s;
 }
 
-.btn:hover { border-color: var(--effect); color: var(--text); }
+.btn:hover { border-color: var(--accent); color: var(--text); }
 
 .btn--primary {
-  border-color: var(--effect);
-  background: var(--effect);
+  border-color: var(--accent);
+  background: var(--accent);
   color: var(--bg);
   font-weight: 700;
   box-shadow: var(--shadow-btn);
 }
 
 .btn--primary:hover {
-  background: var(--effect-bright);
-  border-color: var(--effect-bright);
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
   color: var(--bg);
 }
 
@@ -275,8 +284,9 @@ code {
   text-transform: uppercase;
 }
 
-.field__req { color: var(--effect); }
+.field__req { color: var(--accent); }
 .field__label[data-kind='trigger'] .field__req { color: var(--trigger); }
+.field__label[data-kind='effect'] .field__req { color: var(--effect); }
 .field__label[data-kind='modifier'] .field__req { color: var(--modifier); }
 
 .input {
@@ -290,7 +300,7 @@ code {
 }
 
 .input::placeholder { color: var(--text-faint); }
-.input:focus { border-color: var(--effect); outline: none; }
+.input:focus { border-color: var(--accent); outline: none; }
 .input[aria-invalid='true'] { border-color: var(--bad); }
 
 .input--name {
@@ -334,7 +344,7 @@ code {
 .suggest__option:hover,
 .suggest__option[data-active] {
   background: var(--bg-sunken);
-  color: var(--effect-bright);
+  color: var(--accent-bright);
 }
 
 /* A checkbox rendered as a hard toggle chip. */
@@ -353,7 +363,7 @@ code {
 }
 
 .toggle:hover { border-color: var(--line-dashed); }
-.toggle[aria-checked='true'] { color: var(--effect); border-color: var(--effect-line); }
+.toggle[aria-checked='true'] { color: var(--accent); border-color: var(--accent-line); }
 
 /* Segmented control: the scope picker, and the mobile section tabs. */
 .seg {
@@ -377,14 +387,15 @@ code {
 .seg__opt:hover { color: var(--text); }
 
 .seg__opt[aria-pressed='true'] {
-  background: var(--effect);
-  border-color: var(--effect);
+  background: var(--accent);
+  border-color: var(--accent);
   color: var(--bg);
   position: relative;
   z-index: 1;
 }
 
 .seg[data-kind='trigger'] .seg__opt[aria-pressed='true'] { background: var(--trigger); border-color: var(--trigger); }
+.seg[data-kind='effect'] .seg__opt[aria-pressed='true'] { background: var(--effect); border-color: var(--effect); }
 .seg[data-kind='modifier'] .seg__opt[aria-pressed='true'] { background: var(--modifier); border-color: var(--modifier); }
 
 /* An unanswered required scope: every option outlined red, none chosen. */
@@ -636,7 +647,7 @@ code {
   min-width: 0;
 }
 
-.pipe__num { font: 700 16px var(--display); color: var(--effect); }
+.pipe__num { font: 700 16px var(--display); color: var(--accent); }
 
 .pipe__arrow {
   display: flex;
@@ -645,7 +656,7 @@ code {
   border-left: 2px solid var(--line);
   border-right: 2px solid var(--line);
   background: var(--bg-sunken);
-  color: var(--effect);
+  color: var(--accent);
   font: 700 14px var(--display);
 }
 
@@ -682,9 +693,9 @@ code {
 
 .dropzone:hover,
 .dropzone[data-over='true'] {
-  border-color: var(--effect);
-  color: var(--effect);
-  background: var(--effect-wash);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-wash);
 }
 
 .dropzone[data-bad='true'] { border-color: var(--bad); color: var(--bad); }
@@ -838,7 +849,7 @@ code {
   border-left: 2px solid var(--line);
   border-right: 2px solid var(--line);
   background: var(--bg-sunken);
-  color: var(--effect);
+  color: var(--accent);
   font: 700 14px var(--display);
 }
 
@@ -1029,7 +1040,7 @@ code {
   flex-wrap: wrap;
 }
 
-.modal__title { font: 700 14px var(--display); color: var(--effect); }
+.modal__title { font: 700 14px var(--display); color: var(--accent); }
 .modal__sub { font: 400 10.5px var(--mono); color: var(--text-faint); }
 .modal__close { margin-left: auto; }
 
@@ -1175,7 +1186,7 @@ code {
 }
 
 .prose h1 { font: 700 clamp(28px, 4.5vw, 40px)/1.1 var(--display); }
-.prose h2 { font: 700 14px var(--display); color: var(--effect); margin-top: 10px; }
+.prose h2 { font: 700 14px var(--display); color: var(--accent); margin-top: 10px; }
 
 .prose p,
 .prose ul {
@@ -1199,7 +1210,7 @@ code {
   bottom: 24px;
   transform: translateX(-50%);
   z-index: 80;
-  background: var(--effect);
+  background: var(--accent);
   color: var(--bg);
   font: 700 12px var(--mono);
   padding: 12px 18px;
@@ -1344,7 +1355,7 @@ code {
     max-height: 88vh;
     height: 88vh;
     border-width: 2px 0 0;
-    border-top-color: var(--effect);
+    border-top-color: var(--accent);
     box-shadow: none;
   }
 

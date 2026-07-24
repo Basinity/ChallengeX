@@ -34,7 +34,7 @@ window.CX.share = (function () {
       el('a.btn', {
         href: link.urlFor('build.html', challenge),
         text: 'Edit in the builder',
-        style: 'border-color:var(--effect);color:var(--effect)'
+        style: 'border-color:var(--accent);color:var(--accent)'
       }),
       el('button.btn', {
         type: 'button',
@@ -168,7 +168,7 @@ window.CX.share = (function () {
       el('a.btn', {
         href: link.urlFor('build.html', challenge),
         text: 'EDIT →',
-        style: 'border-color:var(--effect);color:var(--effect)'
+        style: 'border-color:var(--accent);color:var(--accent)'
       })
     ]);
   }
