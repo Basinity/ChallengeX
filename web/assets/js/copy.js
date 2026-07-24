@@ -512,6 +512,21 @@ window.CX_COPY = {
     blurb: 'The hunger bar never empties, whatever the player does.',
     detail: ''
   },
+  'modifier.share_health': {
+    name: 'Share health',
+    blurb: 'The scoped players share one health pool. Damage to any of them takes it down, healing any of them brings it up, and when it runs out they all die.',
+    detail: ''
+  },
+  'modifier.share_hunger': {
+    name: 'Share hunger',
+    blurb: 'The scoped players share one hunger bar. Eating fills it for everyone, and it drains faster the more of them there are, since they are all living off the one bar.',
+    detail: ''
+  },
+  'modifier.share_xp': {
+    name: 'Share XP',
+    blurb: 'The scoped players share one experience pool. Every orb picked up is credited to all of them, and every level spent is spent by all of them.',
+    detail: ''
+  },
   'modifier.share_inventory': {
     name: 'Share inventory',
     blurb: 'The scoped players all use one inventory: hotbar, main slots, armor and offhand. Each keeps their own selected slot, and the item on the cursor stays private.',

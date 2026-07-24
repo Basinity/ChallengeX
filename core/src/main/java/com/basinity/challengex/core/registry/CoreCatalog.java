@@ -155,6 +155,9 @@ public final class CoreCatalog {
         modifier(registry, "keep_inventory", true);
         modifier(registry, "no_hunger_drain", true);
         modifier(registry, "share_inventory", true);
+        modifier(registry, "share_health", true);
+        modifier(registry, "share_hunger", true);
+        modifier(registry, "share_xp", true);
     }
 
     private static void trigger(Registry<TriggerDefinition> registry, String name, boolean scoped, ParamSpec... params) {

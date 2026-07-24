@@ -707,6 +707,18 @@
     {
       "id": "modifier.share_inventory",
       "scope": "every_player"
+    },
+    {
+      "id": "modifier.share_health",
+      "scope": "every_player"
+    },
+    {
+      "id": "modifier.share_hunger",
+      "scope": "every_player"
+    },
+    {
+      "id": "modifier.share_xp",
+      "scope": "every_player"
     }
   ]
 }

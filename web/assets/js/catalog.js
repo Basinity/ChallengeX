@@ -1036,6 +1036,21 @@ window.CX_CATALOG = {
       "id": "modifier.share_inventory",
       "scoped": true,
       "params": []
+    },
+    {
+      "id": "modifier.share_health",
+      "scoped": true,
+      "params": []
+    },
+    {
+      "id": "modifier.share_hunger",
+      "scoped": true,
+      "params": []
+    },
+    {
+      "id": "modifier.share_xp",
+      "scoped": true,
+      "params": []
     }
   ]
 };
