@@ -21,9 +21,9 @@ import net.minecraft.server.level.ServerPlayer;
  * side of the {@code /challengex} lifecycle commands. Each tick it advances the
  * clock while running (which can end the run on a time limit), refreshes the
  * roster from who is still in survival or adventure, sends each player who wins
- * or loses into spectator as it happens, announces a finished run once, holds
- * players still while paused, and refreshes the action-bar clock every player
- * sees.
+ * or loses into spectator as it happens, announces a finished run once with its
+ * results, holds players still while paused, and refreshes the action-bar clock
+ * every player sees.
  *
  * <p>It holds a supplier rather than the run itself because it registers once
  * at mod init while runs come and go with the server and are swapped on import.
@@ -70,7 +70,7 @@ public final class RunController {
         }
         RunState state = run.state();
         if (previous != RunState.FINISHED && state == RunState.FINISHED) {
-            RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks());
+            RunAnnouncer.announce(server, run);
             if (run.outcome() == RunOutcome.LOSS) {
                 outcomeSpectator.applyRunLoss(server);
             }
