@@ -75,6 +75,17 @@ window.CX.preset = (function () {
     return value === undefined || value === null ? '' : String(value);
   }
 
+  /* Whether a parameter applies to this block at all. A parameter can hang off
+     a BOOL switch on the same entry, and while that switch is off the parameter
+     is not merely hidden: it is not part of the challenge, so it is neither
+     validated nor written to the preset. */
+  function applies(block, param) {
+    if (!param.shownWhen) {
+      return true;
+    }
+    return block.params[param.shownWhen] === true;
+  }
+
   function isBlank(block, param) {
     var value = rawValue(block, param);
     return param.type === 'BOOL' ? value === false : value.trim() === '';
@@ -146,6 +157,9 @@ window.CX.preset = (function () {
       return;
     }
     entry.params.forEach(function (param) {
+      if (!applies(block, param)) {
+        return;
+      }
       if (param.required && isBlank(block, param)) {
         problems.push(problem(block.uid, where + ': ' + entry.name + ' needs ' + param.name));
         return;
@@ -193,6 +207,9 @@ window.CX.preset = (function () {
     var params = {};
     var any = false;
     entry.params.forEach(function (param) {
+      if (!applies(block, param)) {
+        return;
+      }
       var result = typed(block, param);
       if (result.value !== undefined) {
         params[param.name] = result.value;
@@ -345,6 +362,7 @@ window.CX.preset = (function () {
     assign: assign,
     copyBlock: copyBlock,
     copyRule: copyRule,
+    applies: applies,
     rawValue: rawValue,
     isBlank: isBlank,
     scopeIsSet: scopeIsSet,

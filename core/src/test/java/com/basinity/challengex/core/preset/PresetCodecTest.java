@@ -179,7 +179,7 @@ class PresetCodecTest {
                   "rules": [{"trigger": {"id": "trigger.weather_changed", "scope": "every_player"},
                              "effect": {"id": "effect.change_time",
                                         "params": {"value": "day"}, "scope": "every_player"}}],
-                  "modifiers": [{"id": "modifier.buff_hostile_mobs", "scope": "every_player"}]
+                  "modifiers": [{"id": "modifier.scale_hostile_mobs", "params": {"multiplier": 2.0}, "scope": "every_player"}]
                 }""";
 
         PresetFormatException rejection =
@@ -187,7 +187,7 @@ class PresetCodecTest {
 
         assertTrue(rejection.getMessage().contains("'trigger.weather_changed' has no player dimension"));
         assertTrue(rejection.getMessage().contains("'effect.change_time' has no player dimension"));
-        assertTrue(rejection.getMessage().contains("'modifier.buff_hostile_mobs' has no player dimension"));
+        assertTrue(rejection.getMessage().contains("'modifier.scale_hostile_mobs' has no player dimension"));
     }
 
     @Test

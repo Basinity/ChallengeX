@@ -47,6 +47,15 @@ public final class CatalogJson {
         return scopes;
     }
 
+    /**
+     * A bound as the tidiest number that carries it: a whole bound writes as a
+     * whole number rather than trailing a pointless {@code .0} through every
+     * entry in the file.
+     */
+    private static Number number(double value) {
+        return value == Math.rint(value) ? (Number) (long) value : (Number) value;
+    }
+
     private static JsonArray entries(Registry<? extends Definition> registry) {
         JsonArray array = new JsonArray();
         for (Definition definition : registry.all()) {
@@ -60,13 +69,16 @@ public final class CatalogJson {
                 param.addProperty("type", spec.type().name());
                 param.addProperty("required", spec.required());
                 if (spec.min() != null) {
-                    param.addProperty("min", spec.min());
+                    param.addProperty("min", number(spec.min()));
                 }
                 if (spec.max() != null) {
-                    param.addProperty("max", spec.max());
+                    param.addProperty("max", number(spec.max()));
                 }
                 if (spec.suggests() != null) {
                     param.addProperty("suggests", spec.suggests());
+                }
+                if (spec.shownWhen() != null) {
+                    param.addProperty("shownWhen", spec.shownWhen());
                 }
                 if (spec.allowed() != null) {
                     param.add("allowed", strings(spec.allowed().stream().sorted()

@@ -273,8 +273,8 @@ window.CX_COPY = {
   },
   'effect.give_random_item': {
     name: 'Give random item',
-    blurb: 'Gives one item picked at random from everything in the game.',
-    phrase: 'gets a random item'
+    blurb: 'Gives an item picked at random from everything in the game. How many arrives is random too, up to a full stack of whatever came up, so ender pearls give at most 16 and a boat gives 1. Switch to a fixed amount to set the number yourself.',
+    phrase: 'gets [{amount} of ]a random item'
   },
   'effect.give_item': {
     name: 'Give item',
@@ -492,10 +492,10 @@ window.CX_COPY = {
     blurb: 'Every mob drops some other item instead of its own. The same seed gives the same shuffle twice, and it can be rolled separately for each player.',
     detail: 'seed {seed?random}[, per player{per_player}]'
   },
-  'modifier.buff_hostile_mobs': {
-    name: 'Buff hostile mobs',
-    blurb: 'Hostile mobs hit harder and take more killing, for the whole run.',
-    detail: ''
+  'modifier.scale_hostile_mobs': {
+    name: 'Scale hostile mobs',
+    blurb: 'Multiplies the health and attack damage of every hostile mob. Above 1 makes them harder, below 1 makes them easier, and 1 leaves them as they are.',
+    detail: 'x{multiplier}'
   },
   'modifier.status_effect': {
     name: 'Persistent status effect',

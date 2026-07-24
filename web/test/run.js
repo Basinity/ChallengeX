@@ -149,7 +149,7 @@ check('playerless entries are exactly the ones the mod pins', () => {
   });
   eq(playerless.sort(), [
     'effect.change_time', 'effect.change_weather',
-    'modifier.buff_hostile_mobs', 'modifier.time_limit',
+    'modifier.scale_hostile_mobs', 'modifier.time_limit',
     'trigger.fixed_interval', 'trigger.time_of_day', 'trigger.weather_changed'
   ], 'playerless ids');
 });

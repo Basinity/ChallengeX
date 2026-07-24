@@ -70,13 +70,20 @@ class CatalogJsonTest {
                 assertEquals(spec.max(), bound(param, "max"), where + ": parameter max");
                 assertEquals(spec.suggests(), param.has("suggests") ? param.get("suggests").getAsString() : null,
                         where + ": parameter suggests");
+                assertEquals(spec.shownWhen(),
+                        param.has("shownWhen") ? param.get("shownWhen").getAsString() : null,
+                        where + ": parameter shownWhen");
             }
         }
     }
 
-    /** A declared bound as an Integer, or null when the export omits it (an open end). */
-    private static Integer bound(JsonObject param, String key) {
-        return param.has(key) ? param.get(key).getAsInt() : null;
+    /**
+     * A declared bound, or null when the export omits it (an open end). Bounds
+     * are decimals, and a whole one is written whole, so the comparison has to
+     * read it back as a decimal either way.
+     */
+    private static Double bound(JsonObject param, String key) {
+        return param.has(key) ? param.get(key).getAsDouble() : null;
     }
 
     private static List<String> scopeValues(JsonObject scopes, String side) {

@@ -20,6 +20,18 @@ public final class ModifierParams {
         return modifier.params().get(name) instanceof ParamValue.OfInt value ? (int) value.value() : fallback;
     }
 
+    /** A decimal parameter, accepting a whole number written where one was expected. */
+    public static double decimal(Modifier modifier, String name, double fallback) {
+        ParamValue value = modifier.params().get(name);
+        if (value instanceof ParamValue.OfDecimal decimal) {
+            return decimal.value();
+        }
+        if (value instanceof ParamValue.OfInt integer) {
+            return integer.value();
+        }
+        return fallback;
+    }
+
     public static boolean bool(Modifier modifier, String name, boolean fallback) {
         return modifier.params().get(name) instanceof ParamValue.OfBool value ? value.value() : fallback;
     }

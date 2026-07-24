@@ -98,7 +98,8 @@ public final class CoreCatalog {
         effect(registry, "remove_item_slot", true);
         effect(registry, "drop_held_item", true);
         effect(registry, "drop_inventory", true);
-        effect(registry, "give_random_item", true);
+        effect(registry, "give_random_item", true, optional("fixed_amount", BOOL),
+                optional("amount", INT).bounded(1, 64).shownWhen("fixed_amount"));
         effect(registry, "give_item", true, required("item", STRING).suggesting("item"), optional("amount", INT).bounded(1, 64));
         effect(registry, "teleport_random", true, optional("radius", INT).atLeast(1));
         effect(registry, "teleport_up", true, optional("blocks", INT).atLeast(0));
@@ -145,7 +146,11 @@ public final class CoreCatalog {
         modifier(registry, "time_limit", false, required("minutes", INT));
         modifier(registry, "randomize_block_drops", true, optional("seed", INT), optional("per_player", BOOL));
         modifier(registry, "randomize_mob_drops", true, optional("seed", INT), optional("per_player", BOOL));
-        modifier(registry, "buff_hostile_mobs", false);
+        // A multiplier rather than a fixed buff, so it can weaken as well as
+        // strengthen. Floored just above zero: at zero a mob has no health at
+        // all and cannot exist, and below zero means nothing.
+        modifier(registry, "scale_hostile_mobs", false,
+                required("multiplier", DECIMAL).atLeast(0.05));
         modifier(registry, "status_effect", true, required("effect", STRING).suggesting("effect"), optional("amplifier", INT).bounded(1, 256));
         modifier(registry, "keep_inventory", true);
         modifier(registry, "no_hunger_drain", true);

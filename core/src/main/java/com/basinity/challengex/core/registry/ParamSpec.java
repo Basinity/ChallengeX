@@ -13,8 +13,9 @@ import java.util.regex.Pattern;
  * <p>{@code min} and {@code max} are the value's inclusive bounds, or null for
  * an open end. They are the single source of the clamps the runtime applies and
  * the web builder enforces on its inputs, so the two can never disagree. They
- * are whole numbers even for a {@code DECIMAL} parameter, since every bound the
- * catalog needs is integer-valued.
+ * are decimals, because a {@code DECIMAL} parameter can need a fractional
+ * floor: a multiplier that may be halved but never zeroed is bounded just above
+ * zero, which a whole number cannot express.
  *
  * <p>{@code suggests} names the suggestion source the web builder offers for a
  * STRING parameter whose values are game ids or fixed keywords ("item",
@@ -29,9 +30,15 @@ import java.util.regex.Pattern;
  * names, where falling back to a default on a typo would silently change the
  * outcome instead of reporting a problem. Unlike {@code suggests}, validation
  * enforces it and a preset carrying anything else is rejected.
+ *
+ * <p>{@code shownWhen} names a BOOL parameter of the same entry that this one
+ * depends on, or is null when it always applies. The builder hides the field
+ * while that switch is off and leaves its value out of the export, so a
+ * parameter that does not apply cannot reach a preset. It is the only thing
+ * that lets one parameter turn another on without per-entry code in the view.
  */
-public record ParamSpec(String name, ParamType type, boolean required, Integer min, Integer max,
-        String suggests, Set<String> allowed) {
+public record ParamSpec(String name, ParamType type, boolean required, Double min, Double max,
+        String suggests, Set<String> allowed, String shownWhen) {
 
     private static final Pattern NAME = Pattern.compile("[a-z][a-z0-9_]*");
 
@@ -46,6 +53,9 @@ public record ParamSpec(String name, ParamType type, boolean required, Integer m
         if (suggests != null && !NAME.matcher(suggests).matches()) {
             throw new IllegalArgumentException("Invalid suggestion source '" + suggests + "': expected lower_snake_case");
         }
+        if (shownWhen != null && !NAME.matcher(shownWhen).matches()) {
+            throw new IllegalArgumentException("Invalid shownWhen '" + shownWhen + "': expected a parameter name");
+        }
         if (allowed != null) {
             if (type != ParamType.STRING) {
                 throw new IllegalArgumentException("Parameter '" + name + "' restricts values but is not a STRING");
@@ -58,31 +68,36 @@ public record ParamSpec(String name, ParamType type, boolean required, Integer m
     }
 
     public static ParamSpec required(String name, ParamType type) {
-        return new ParamSpec(name, type, true, null, null, null, null);
+        return new ParamSpec(name, type, true, null, null, null, null, null);
     }
 
     public static ParamSpec optional(String name, ParamType type) {
-        return new ParamSpec(name, type, false, null, null, null, null);
+        return new ParamSpec(name, type, false, null, null, null, null, null);
     }
 
     /** This parameter with both bounds set, as {@code clamp(value, min, max)} does in the code. */
-    public ParamSpec bounded(int min, int max) {
-        return new ParamSpec(name, type, required, min, max, suggests, allowed);
+    public ParamSpec bounded(double min, double max) {
+        return new ParamSpec(name, type, required, min, max, suggests, allowed, shownWhen);
     }
 
     /** This parameter with a lower bound only, as {@code Math.max(min, value)} does in the code. */
-    public ParamSpec atLeast(int min) {
-        return new ParamSpec(name, type, required, min, null, suggests, allowed);
+    public ParamSpec atLeast(double min) {
+        return new ParamSpec(name, type, required, min, null, suggests, allowed, shownWhen);
     }
 
     /** This parameter with a suggestion source the web builder offers values from. */
     public ParamSpec suggesting(String source) {
-        return new ParamSpec(name, type, required, min, max, source, allowed);
+        return new ParamSpec(name, type, required, min, max, source, allowed, shownWhen);
     }
 
     /** This parameter restricted to a closed set of values, enforced by validation. */
     public ParamSpec oneOf(String... values) {
-        return new ParamSpec(name, type, required, min, max, suggests, Set.of(values));
+        return new ParamSpec(name, type, required, min, max, suggests, Set.of(values), shownWhen);
+    }
+
+    /** This parameter shown only while the named BOOL parameter of the same entry is on. */
+    public ParamSpec shownWhen(String boolParam) {
+        return new ParamSpec(name, type, required, min, max, suggests, allowed, boolParam);
     }
 
     /** Copies the list, rejecting duplicate parameter names. */

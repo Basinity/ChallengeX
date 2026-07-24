@@ -393,8 +393,12 @@
     if (!entry.params.length) {
       return null;
     }
-    var form = el('div.params', entry.params.length === 1 ? { class: 'params params--single' } : null);
-    entry.params.forEach(function (param) {
+    var shown = entry.params.filter(function (param) { return preset.applies(block, param); });
+    if (!shown.length) {
+      return null;
+    }
+    var form = el('div.params', shown.length === 1 ? { class: 'params params--single' } : null);
+    shown.forEach(function (param) {
       ui.append(form, paramField(block, entry, param));
     });
     return form;

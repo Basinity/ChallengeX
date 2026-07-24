@@ -95,6 +95,10 @@
       },
       "effect": {
         "id": "effect.give_random_item",
+        "params": {
+          "fixed_amount": true,
+          "amount": 3
+        },
         "scope": "per_player"
       }
     },
@@ -679,7 +683,10 @@
       "scope": "every_player"
     },
     {
-      "id": "modifier.buff_hostile_mobs"
+      "id": "modifier.scale_hostile_mobs",
+      "params": {
+        "multiplier": 2.5
+      }
     },
     {
       "id": "modifier.status_effect",

@@ -528,7 +528,21 @@ window.CX_CATALOG = {
     {
       "id": "effect.give_random_item",
       "scoped": true,
-      "params": []
+      "params": [
+        {
+          "name": "fixed_amount",
+          "type": "BOOL",
+          "required": false
+        },
+        {
+          "name": "amount",
+          "type": "INT",
+          "required": false,
+          "min": 1,
+          "max": 64,
+          "shownWhen": "fixed_amount"
+        }
+      ]
     },
     {
       "id": "effect.give_item",
@@ -978,9 +992,16 @@ window.CX_CATALOG = {
       ]
     },
     {
-      "id": "modifier.buff_hostile_mobs",
+      "id": "modifier.scale_hostile_mobs",
       "scoped": false,
-      "params": []
+      "params": [
+        {
+          "name": "multiplier",
+          "type": "DECIMAL",
+          "required": true,
+          "min": 0.05
+        }
+      ]
     },
     {
       "id": "modifier.status_effect",
