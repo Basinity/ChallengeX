@@ -332,6 +332,24 @@ class OutcomeModelTest {
         assertEquals(1, engine.activeModifiersFor("bob").size(), "bob came back into it");
     }
 
+    /**
+     * A playerless modifier is in force for the run rather than for anybody, so
+     * the adapter asks about it under an empty player id. That id is never in
+     * the roster, so gating it the way a scoped modifier is gated would switch
+     * every world-level modifier off the moment a roster was first reported.
+     */
+    @Test
+    void aPlayerlessModifierIsNotGatedByTheRoster() {
+        Engine engine = new Engine(new Challenge(List.of(),
+                List.of(new Modifier("modifier.scale_hostile_mobs",
+                        Map.of("multiplier", ParamValue.of(2.0)), Optional.empty()))), registries);
+        engine.updateRoster(List.of("alice"));
+
+        assertEquals(1, engine.activeModifiersFor("").size(),
+                "the adapter's global lookup must still find it");
+        assertEquals(1, engine.activeModifiersFor("alice").size());
+    }
+
     @Test
     void anEngineNoAdapterHasReportedARosterToEnforcesModifiersNormally() {
         Engine engine = new Engine(new Challenge(List.of(),

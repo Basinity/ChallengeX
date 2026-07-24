@@ -235,11 +235,15 @@ public final class Engine {
      * until the first roster report arrives.
      */
     public List<Modifier> activeModifiersFor(String playerId) {
-        if (rosterReported && !roster.contains(playerId)) {
-            return List.of();
-        }
+        // A playerless modifier is in force for the run rather than for anybody,
+        // so the roster cannot gate it: the adapter looks those up under an
+        // empty player id that is deliberately nobody, and gating that would
+        // switch every world-level modifier off the moment a roster arrived.
+        boolean playing = !rosterReported || roster.contains(playerId);
         return challenge.modifiers().stream()
-                .filter(modifier -> modifier.scope().map(scope -> scope.includes(playerId)).orElse(true))
+                .filter(modifier -> modifier.scope()
+                        .map(scope -> playing && scope.includes(playerId))
+                        .orElse(true))
                 .toList();
     }
 
