@@ -6,20 +6,14 @@ import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.Registries;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Reads and writes the per-world run snapshot JSON. It reuses {@link
@@ -43,21 +37,6 @@ public final class RunSnapshotCodec {
         root.addProperty("state", snapshot.state().name());
         root.addProperty("elapsedTicks", snapshot.elapsedTicks());
         root.addProperty("outcome", snapshot.outcome().name());
-        JsonArray progress = new JsonArray();
-        snapshot.goalProgress().stream().sorted().forEach(progress::add);
-        root.add("goalProgress", progress);
-        if (!snapshot.goalProgressByPlayer().isEmpty()) {
-            JsonObject byPlayer = new JsonObject();
-            snapshot.goalProgressByPlayer().entrySet().stream()
-                    .sorted(Map.Entry.comparingByKey())
-                    .forEach(entry -> {
-                        JsonArray met = new JsonArray();
-                        entry.getValue().stream().sorted().forEach(met::add);
-                        byPlayer.add(entry.getKey(), met);
-                    });
-            root.add("goalProgressByPlayer", byPlayer);
-        }
-        snapshot.winner().ifPresent(name -> root.addProperty("winner", name));
         JsonObject challenge = new JsonObject();
         presetCodec.writeChallenge(challenge, snapshot.challenge());
         root.add("challenge", challenge);
@@ -86,48 +65,13 @@ public final class RunSnapshotCodec {
         RunState state = readEnum(root, "state", RunState.class, problems);
         RunOutcome outcome = readEnum(root, "outcome", RunOutcome.class, problems);
         long elapsedTicks = readElapsedTicks(root, problems);
-        Set<Integer> goalProgress = readGoalProgress(root, problems);
-        Map<String, Set<Integer>> goalProgressByPlayer = readGoalProgressByPlayer(root, problems);
-        Optional<String> winner = readWinner(root, problems);
         Challenge challenge = readChallengeField(root, problems);
 
         if (problems.isEmpty()) {
             return new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, challenge, state,
-                    elapsedTicks, outcome, goalProgress, goalProgressByPlayer, winner);
+                    elapsedTicks, outcome);
         }
         throw new PresetFormatException(problems);
-    }
-
-    private Map<String, Set<Integer>> readGoalProgressByPlayer(JsonObject root,
-            List<String> problems) {
-        JsonElement element = root.get("goalProgressByPlayer");
-        if (element == null) {
-            return Map.of();
-        }
-        if (!element.isJsonObject()) {
-            problems.add("'goalProgressByPlayer' must be an object");
-            return Map.of();
-        }
-        Map<String, Set<Integer>> byPlayer = new HashMap<>();
-        for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
-            JsonObject holder = new JsonObject();
-            holder.add("goalProgress", entry.getValue());
-            byPlayer.put(entry.getKey(), readGoalProgress(holder, problems));
-        }
-        return byPlayer;
-    }
-
-    private Optional<String> readWinner(JsonObject root, List<String> problems) {
-        JsonElement element = root.get("winner");
-        if (element == null) {
-            return Optional.empty();
-        }
-        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()
-                || element.getAsString().isBlank()) {
-            problems.add("'winner' must be a non-blank string");
-            return Optional.empty();
-        }
-        return Optional.of(element.getAsString());
     }
 
     private long requireSnapshotVersion(JsonObject root) throws PresetFormatException {
@@ -172,35 +116,6 @@ public final class RunSnapshotCodec {
         }
         problems.add("elapsedTicks must be a non-negative whole number");
         return 0L;
-    }
-
-    private Set<Integer> readGoalProgress(JsonObject root, List<String> problems) {
-        JsonElement element = root.get("goalProgress");
-        if (element == null) {
-            return Set.of();
-        }
-        if (!element.isJsonArray()) {
-            problems.add("'goalProgress' must be an array");
-            return Set.of();
-        }
-        Set<Integer> indices = new HashSet<>();
-        for (JsonElement entry : element.getAsJsonArray()) {
-            if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isNumber()) {
-                problems.add("goalProgress entries must be non-negative whole numbers");
-                continue;
-            }
-            BigDecimal number = entry.getAsBigDecimal();
-            if (number.stripTrailingZeros().scale() > 0 || number.signum() < 0) {
-                problems.add("goalProgress entries must be non-negative whole numbers");
-                continue;
-            }
-            try {
-                indices.add(number.intValueExact());
-            } catch (ArithmeticException e) {
-                problems.add("goalProgress entry out of range");
-            }
-        }
-        return indices;
     }
 
     private Challenge readChallengeField(JsonObject root, List<String> problems) {

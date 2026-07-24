@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * {@code trigger.game_beaten}: a player beat the game, reaching the end-credits
  * screen after leaving the End through the exit portal. It rides the credits
- * roll, the vanilla marker for finishing the game, and is what the beat-game
- * goal is built on.
+ * roll, the vanilla marker for finishing the game.
  */
 @Mixin(ServerPlayer.class)
 public class GameBeatMixin {

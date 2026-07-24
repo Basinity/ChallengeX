@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Every Entry In The Catalog",
   "rules": [
     {
@@ -538,12 +538,26 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.lose_challenge"
+        "id": "effect.lose_challenge",
+        "scope": "per_player"
       }
     },
     {
       "trigger": {
         "id": "trigger.crit_landed",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.win_challenge",
+        "params": {
+          "end": "after_all_complete"
+        },
+        "scope": "per_player"
+      }
+    },
+    {
+      "trigger": {
+        "id": "trigger.shield_blocked",
         "scope": "every_player"
       },
       "effect": {
@@ -558,23 +572,13 @@
     },
     {
       "trigger": {
-        "id": "trigger.shield_blocked",
-        "scope": "every_player"
-      },
-      "effect": {
-        "id": "effect.remove_item_slot",
-        "scope": "per_player"
-      }
-    },
-    {
-      "trigger": {
         "id": "trigger.weather_changed",
         "params": {
           "weather": "minecraft:test"
         }
       },
       "effect": {
-        "id": "effect.drop_held_item",
+        "id": "effect.remove_item_slot",
         "scope": "per_player"
       }
     },
@@ -586,7 +590,7 @@
         }
       },
       "effect": {
-        "id": "effect.drop_inventory",
+        "id": "effect.drop_held_item",
         "scope": "per_player"
       }
     },
@@ -598,7 +602,7 @@
         }
       },
       "effect": {
-        "id": "effect.give_random_item",
+        "id": "effect.drop_inventory",
         "scope": "per_player"
       }
     },
@@ -611,11 +615,7 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.give_item",
-        "params": {
-          "item": "minecraft:test",
-          "amount": 3
-        },
+        "id": "effect.give_random_item",
         "scope": "per_player"
       }
     },
@@ -625,20 +625,15 @@
         "scope": "every_player"
       },
       "effect": {
-        "id": "effect.teleport_random",
+        "id": "effect.give_item",
         "params": {
-          "radius": 3
+          "item": "minecraft:test",
+          "amount": 3
         },
         "scope": "per_player"
       }
     }
   ],
-  "goal": {
-    "id": "goal.obtain_item",
-    "params": {
-      "item": "minecraft:diamond"
-    }
-  },
   "modifiers": [
     {
       "id": "modifier.disable_jump",

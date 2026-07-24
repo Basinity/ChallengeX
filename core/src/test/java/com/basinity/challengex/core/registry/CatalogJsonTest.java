@@ -36,18 +36,16 @@ class CatalogJsonTest {
     void everyCategoryExportsFaithfully() {
         assertCategory("triggers", registries.triggers());
         assertCategory("effects", registries.effects());
-        assertCategory("goals", registries.goals());
         assertCategory("modifiers", registries.modifiers());
     }
 
     @Test
-    void onlyEffectsOfferPerPlayerAndGoalsOfferNothing() {
+    void onlyEffectsOfferPerPlayer() {
         JsonObject scopes = exported.getAsJsonObject("scopes");
         assertFalse(scopeValues(scopes, "trigger").contains("per_player"),
                 "no triggering player exists yet when a trigger is evaluated");
         assertTrue(scopeValues(scopes, "effect").contains("per_player"));
         assertFalse(scopeValues(scopes, "modifier").contains("per_player"));
-        assertEquals(List.of(), scopeValues(scopes, "goal"), "goals are scopeless in the MVP");
     }
 
     private void assertCategory(String key, Registry<? extends Definition> registry) {

@@ -30,7 +30,6 @@ public final class CatalogJson {
         root.add("scopes", scopes());
         root.add("triggers", entries(registries.triggers()));
         root.add("effects", entries(registries.effects()));
-        root.add("goals", entries(registries.goals()));
         root.add("modifiers", entries(registries.modifiers()));
         return new GsonBuilder().setPrettyPrinting().create().toJson(root) + "\n";
     }
@@ -38,13 +37,12 @@ public final class CatalogJson {
     /**
      * Which scope values each side accepts, mirroring what {@code Scope} rules
      * out in the type system: only an effect knows a triggering player, so only
-     * an effect accepts {@code per_player}, and a goal carries no scope at all.
+     * an effect accepts {@code per_player}.
      */
     private static JsonObject scopes() {
         JsonObject scopes = new JsonObject();
         scopes.add("trigger", strings("every_player", "specific_players"));
         scopes.add("effect", strings("per_player", "every_player", "specific_players"));
-        scopes.add("goal", strings());
         scopes.add("modifier", strings("every_player", "specific_players"));
         return scopes;
     }
@@ -69,6 +67,10 @@ public final class CatalogJson {
                 }
                 if (spec.suggests() != null) {
                     param.addProperty("suggests", spec.suggests());
+                }
+                if (spec.allowed() != null) {
+                    param.add("allowed", strings(spec.allowed().stream().sorted()
+                            .toArray(String[]::new)));
                 }
                 params.add(param);
             }

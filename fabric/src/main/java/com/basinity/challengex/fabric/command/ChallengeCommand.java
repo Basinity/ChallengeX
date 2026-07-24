@@ -116,7 +116,7 @@ public final class ChallengeCommand {
     private int about(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         source.sendSuccess(() -> Component.literal(
-                "ChallengeX: compose your own challenges from rules, goals, and modifiers"
+                "ChallengeX: compose your own challenges from rules and modifiers"
                         + " to play alone or with your friends."
                         + " More than 32 million ways to play Minecraft.")
                 .withStyle(ChatFormatting.GOLD), false);
@@ -185,8 +185,7 @@ public final class ChallengeCommand {
 
     /** A run wrapping the empty starting challenge: nothing has been imported yet. */
     private static boolean noChallengeLoaded(ChallengeRun run) {
-        return run == null || (run.challenge().rules().isEmpty()
-                && run.challenge().goal().isEmpty() && run.challenge().modifiers().isEmpty());
+        return run == null || run.challenge().isEmpty();
     }
 
     private int start(CommandContext<CommandSourceStack> context) {

@@ -37,7 +37,7 @@
   }
 
   function isEmptyChallenge() {
-    return !challenge.rules.length && !challenge.goal && !challenge.modifiers.length;
+    return !challenge.rules.length && !challenge.modifiers.length;
   }
 
   function problemsByUid() {
@@ -75,9 +75,6 @@
       visit(rule.trigger);
       visit(rule.effect);
     });
-    if (challenge.goal) {
-      visit(challenge.goal);
-    }
     challenge.modifiers.forEach(visit);
   }
 
@@ -156,6 +153,13 @@
         }
       });
       return el('label.field', null, [label, toggle]);
+    }
+
+    // A closed set of values is a choice, not something to type. It renders as
+    // the same segmented control the scope question uses, so the two read
+    // alike, and it never carries a missing state: one option is always on.
+    if (param.type === 'STRING' && param.allowed) {
+      return el('div.field', null, [label, allowedControl(block, entry, param)]);
     }
 
     if (param.type === 'STRING' && param.suggests) {
@@ -362,6 +366,27 @@
       return 'default';
     }
     return 'any';
+  }
+
+  /* The picker for a parameter restricted to a closed set. Labels come from
+     the copy; a value with none falls back to the value itself, so a new
+     allowed value still renders before anyone writes copy for it. */
+  function allowedControl(block, entry, param) {
+    var current = preset.rawValue(block, param);
+    var labels = (entry.values || {})[param.name] || {};
+    var control = el('div.seg', { 'data-kind': entry.kind });
+    param.allowed.forEach(function (value) {
+      ui.append(control, el('button.seg__opt', {
+        type: 'button',
+        'aria-pressed': String(current === value),
+        text: labels[value] || value,
+        onclick: function () {
+          block.params[param.name] = value;
+          render();
+        }
+      }));
+    });
+    return control;
   }
 
   function paramsForm(block, entry) {
@@ -598,82 +623,7 @@
     return card;
   }
 
-  /* ---------- goal and modifier cards ---------- */
-
-  function goalCard(problems) {
-    var goal = challenge.goal;
-    var entry = entries.get(goal.id);
-    var bad = (problems[goal.uid] || []).length > 0;
-
-    return el('article.card.goal-card', {
-      id: 'card-' + goal.uid,
-      'data-bad': bad ? 'true' : null
-    }, [
-      el('div.goal-card__head', null, [
-        el('span.tag.tag--win', { text: 'WIN' }),
-        el('b.half__name', { text: entry ? entry.name : goal.id }),
-        el('span.badge', {
-          hidden: !bad,
-          text: ui.plural(bad ? problems[goal.uid].length : 0, 'PROBLEM', 'PROBLEMS')
-        }),
-        cardTools([
-          {
-            glyph: '⇄', title: 'Choose a different goal', run: function () {
-              openPicker('goal', { type: 'goal' });
-            }
-          },
-          {
-            glyph: '✕', title: 'Remove the goal', danger: true, run: function () {
-              challenge.goal = null;
-              render();
-            }
-          }
-        ])
-      ]),
-      entry ? paramsForm(goal, entry) : null,
-      entry ? goalModeControl(goal) : null
-    ]);
-  }
-
-  /* How the goal decides the run: win together or a versus race, and under
-     win-together who has to reach it. Both always hold a real choice (the
-     defaults are choices), so unlike scope there is no missing state. */
-  function goalModeControl(goal) {
-    function seg(current, options, pick) {
-      var control = el('div.seg', { 'data-kind': 'goal' });
-      options.forEach(function (option) {
-        ui.append(control, el('button.seg__opt', {
-          type: 'button',
-          'aria-pressed': String(current === option.value),
-          text: option.label,
-          onclick: function () {
-            pick(option.value);
-            render();
-          }
-        }));
-      });
-      return control;
-    }
-    var body = [
-      el('div.scope', null, [
-        el('span.scope__label', { text: 'WIN MODE' }),
-        seg(goal.mode, [
-          { value: 'together', label: 'Win together' },
-          { value: 'versus', label: 'First to the goal wins' }
-        ], function (value) { goal.mode = value; })
-      ])
-    ];
-    if (goal.mode === 'together') {
-      body.push(el('div.scope', null, [
-        el('span.scope__label', { text: 'WHO FINISHES' }),
-        seg(goal.completion, [
-          { value: 'anyone', label: 'One finish wins for all' },
-          { value: 'everyone', label: 'Everyone must finish' }
-        ], function (value) { goal.completion = value; })
-      ]));
-    }
-    return el('div.stack.stack--tight', null, body);
-  }
+  /* ---------- modifier cards ---------- */
 
   function modifierCard(modifier, index, problems) {
     var entry = entries.get(modifier.id);
@@ -736,7 +686,7 @@
       cards,
       el('button.btn.btn--add', {
         type: 'button',
-        'data-kind': kind === 'rules' ? 'trigger' : (kind === 'goal' ? 'goal' : 'modifier'),
+        'data-kind': kind === 'rules' ? 'trigger' : 'modifier',
         onclick: onAdd
       }, [addLabel, addHint ? el('span.btn__hint', { text: addHint }) : null])
     ]);
@@ -763,13 +713,6 @@
     ui.append(main, section('rules', 'RULES', 'trigger + effect, both required',
       ruleCards, '+ ADD RULE', null, addRule));
 
-    var goalBody = challenge.goal
-      ? goalCard(problems)
-      : el('p.section__hint', { text: 'No goal. The run has no win condition and simply continues.' });
-    ui.append(main, section('goal', 'GOAL', 'at most one', goalBody,
-      challenge.goal ? '+ REPLACE GOAL' : '+ SET A GOAL', null,
-      function () { openPicker('goal', { type: 'goal' }); }));
-
     var modGrid = el('div.mod-grid');
     challenge.modifiers.forEach(function (modifier, index) {
       ui.append(modGrid, modifierCard(modifier, index, problems));
@@ -785,10 +728,6 @@
       el('div.empty__choices', null, [
         el('button.btn.btn--add', { type: 'button', 'data-kind': 'trigger', onclick: addRule },
           ['+ ADD A RULE', el('span.btn__hint', { text: 'when X happens, do Y' })]),
-        el('button.btn.btn--add', {
-          type: 'button', 'data-kind': 'goal',
-          onclick: function () { openPicker('goal', { type: 'goal' }); }
-        }, ['+ SET A GOAL', el('span.btn__hint', { text: 'optional win condition' })]),
         el('button.btn.btn--add', {
           type: 'button', 'data-kind': 'modifier',
           onclick: function () { openPicker('modifier', { type: 'modifier' }); }
@@ -820,9 +759,6 @@
   function refreshCardStates() {
     var map = problemsByUid();
     var owners = challenge.rules.concat(challenge.modifiers);
-    if (challenge.goal) {
-      owners.push(challenge.goal);
-    }
     owners.forEach(function (owner) {
       var card = document.getElementById('card-' + owner.uid);
       if (!card) {
@@ -881,7 +817,7 @@
     // On a phone the owning section and card may both be out of view.
     var rule = ruleAt(uid);
     var isModifier = challenge.modifiers.some(function (m) { return m.uid === uid; });
-    view.tab = rule ? 'rules' : (isModifier ? 'modifiers' : 'goal');
+    view.tab = rule ? 'rules' : 'modifiers';
     view.expanded = uid;
     render();
     ui.ping(document.getElementById('card-' + uid));
@@ -893,10 +829,9 @@
     var bar = ui.clear(dom.tabs);
     var counts = {
       rules: challenge.rules.length,
-      goal: challenge.goal ? 1 : 0,
       modifiers: challenge.modifiers.length
     };
-    [['rules', 'RULES'], ['goal', 'GOAL'], ['modifiers', 'MODS']].forEach(function (pair) {
+    [['rules', 'RULES'], ['modifiers', 'MODS']].forEach(function (pair) {
       ui.append(bar, el('button.seg__opt', {
         type: 'button',
         'aria-pressed': String(view.tab === pair[0]),
@@ -937,8 +872,7 @@
       return 'for RULE ' + String(index + 1).padStart(2, '0')
         + ' | ' + (target.side === 'trigger' ? 'WHEN' : 'THEN') + ' slot';
     }
-    return target.type === 'goal' ? 'the run ends in a win when this is reached'
-      : 'always on, for the whole run';
+    return 'always on, for the whole run';
   }
 
   function choose(entry) {
@@ -949,8 +883,6 @@
         preset.assign(rule[target.side], entry.id);
         view.expanded = rule.uid;
       }
-    } else if (target.type === 'goal') {
-      challenge.goal = preset.assign(preset.blankBlock('goal'), entry.id);
     } else {
       var modifier = preset.assign(preset.blankBlock('modifier'), entry.id);
       modifier.fresh = true;
@@ -1079,8 +1011,6 @@
     dom.addBottom.addEventListener('click', function () {
       if (view.tab === 'rules') {
         addRule();
-      } else if (view.tab === 'goal') {
-        openPicker('goal', { type: 'goal' });
       } else {
         openPicker('modifier', { type: 'modifier' });
       }

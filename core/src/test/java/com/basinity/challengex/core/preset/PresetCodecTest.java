@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.EffectSpec;
-import com.basinity.challengex.core.model.Goal;
-import com.basinity.challengex.core.model.GoalCompletion;
-import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -36,8 +33,6 @@ class PresetCodecTest {
                                 Map.of("effect", ParamValue.of("minecraft:poison"),
                                         "duration", ParamValue.of(30)),
                                 Optional.of(Scope.EVERY_PLAYER)))),
-                Optional.of(new Goal("goal.kill_mob",
-                        Map.of("mob", ParamValue.of("minecraft:ender_dragon")))),
                 List.of(
                         new Modifier("modifier.disable_jump",
                                 Map.of(),
@@ -56,7 +51,6 @@ class PresetCodecTest {
                         TriggerSpec.playerless("trigger.weather_changed"),
                         new EffectSpec("effect.change_time",
                                 Map.of("value", ParamValue.of("night")), Optional.empty()))),
-                Optional.empty(),
                 List.of()));
 
         String json = codec.toJson(original);
@@ -66,54 +60,10 @@ class PresetCodecTest {
     }
 
     @Test
-    void goalModesRoundTripAndDefaultsStayOffTheWire() throws PresetFormatException {
-        Goal versus = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
-                GoalMode.VERSUS, GoalCompletion.ANYONE);
-        Goal everyone = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")),
-                GoalMode.TOGETHER, GoalCompletion.EVERYONE);
-        Goal plain = new Goal("goal.kill_mob", Map.of("mob", ParamValue.of("minecraft:ender_dragon")));
-
-        Preset versusPreset = new Preset("Race", new Challenge(List.of(), Optional.of(versus), List.of()));
-        Preset everyonePreset = new Preset("All in", new Challenge(List.of(), Optional.of(everyone), List.of()));
-        Preset plainPreset = new Preset("Classic", new Challenge(List.of(), Optional.of(plain), List.of()));
-
-        assertEquals(versusPreset, codec.fromJson(codec.toJson(versusPreset)));
-        assertEquals(everyonePreset, codec.fromJson(codec.toJson(everyonePreset)));
-        String plainJson = codec.toJson(plainPreset);
-        assertFalse(plainJson.contains("\"mode\""));
-        assertFalse(plainJson.contains("\"completion\""));
-        assertEquals(plainPreset, codec.fromJson(plainJson));
-    }
-
-    @Test
-    void completionOnAVersusGoalIsRejected() {
-        String json = """
-                {"schemaVersion": 1, "name": "Confused",
-                 "goal": {"id": "goal.beat_game", "mode": "versus", "completion": "everyone"}}""";
-
-        PresetFormatException rejection =
-                assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
-
-        assertTrue(rejection.getMessage().contains("does not apply to a versus goal"));
-    }
-
-    @Test
-    void unknownGoalModeIsRejected() {
-        String json = """
-                {"schemaVersion": 1, "name": "Confused",
-                 "goal": {"id": "goal.beat_game", "mode": "battle_royale"}}""";
-
-        PresetFormatException rejection =
-                assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
-
-        assertTrue(rejection.getMessage().contains("'mode' must be one of"));
-    }
-
-    @Test
     void unknownIdsAreAllNamedAtOnce() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Broken",
                   "rules": [{"trigger": {"id": "trigger.bogus"}, "effect": {"id": "effect.heal"}}],
                   "modifiers": [{"id": "modifier.fake"}]
@@ -140,10 +90,24 @@ class PresetCodecTest {
     }
 
     @Test
+    void aPresetFromTheGoalEraIsRejectedRatherThanReadWithItsWinConditionDropped() {
+        String json = """
+                {"schemaVersion": 1, "name": "From the goal era",
+                 "goal": {"id": "goal.beat_game"}}""";
+
+        PresetFormatException rejection =
+                assertThrows(PresetFormatException.class, () -> codec.fromJson(json));
+
+        assertTrue(rejection.getMessage().contains("schema version 1"), rejection.getMessage());
+        assertTrue(rejection.getMessage().contains("goals"), rejection.getMessage());
+        assertTrue(rejection.getMessage().contains("challengexmc.com/build"), rejection.getMessage());
+    }
+
+    @Test
     void missingRequiredParameterIsRejected() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "No mob picked",
                   "rules": [{"trigger": {"id": "trigger.jumped"}, "effect": {"id": "effect.spawn_mob"}}]
                 }""";
@@ -158,7 +122,7 @@ class PresetCodecTest {
     void wronglyTypedParameterIsRejected() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Typed wrong",
                   "rules": [{"trigger": {"id": "trigger.jumped"},
                              "effect": {"id": "effect.apply_status_effect",
@@ -176,7 +140,7 @@ class PresetCodecTest {
     void undeclaredParameterIsRejected() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Extra param",
                   "rules": [{"trigger": {"id": "trigger.jumped"},
                              "effect": {"id": "effect.heal", "params": {"strength": 5}}}]
@@ -192,7 +156,7 @@ class PresetCodecTest {
     void missingScopeIsRejectedOnScopedEntries() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Unscoped",
                   "rules": [{"trigger": {"id": "trigger.jumped"}, "effect": {"id": "effect.heal"}}],
                   "modifiers": [{"id": "modifier.keep_inventory"}]
@@ -210,7 +174,7 @@ class PresetCodecTest {
     void scopeOnPlayerlessEntriesIsRejected() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Overscoped",
                   "rules": [{"trigger": {"id": "trigger.weather_changed", "scope": "every_player"},
                              "effect": {"id": "effect.change_time",
@@ -230,7 +194,7 @@ class PresetCodecTest {
     void perPlayerScopeIsInvalidOnATrigger() {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Scoped wrong",
                   "rules": [{"trigger": {"id": "trigger.jumped", "scope": "per_player"},
                              "effect": {"id": "effect.heal"}}]
@@ -246,7 +210,7 @@ class PresetCodecTest {
     void integralNumbersAreAcceptedForDecimalParameters() throws PresetFormatException {
         String json = """
                 {
-                  "schemaVersion": 1,
+                  "schemaVersion": 2,
                   "name": "Whole hearts",
                   "rules": [{"trigger": {"id": "trigger.jumped", "scope": "every_player"},
                              "effect": {"id": "effect.damage", "params": {"hearts": 3},

@@ -22,8 +22,16 @@ import java.util.regex.Pattern;
  * only: suggestions never restrict what a preset may carry, so a modded or
  * unknown id stays as legal as it always was, and the preset codec ignores
  * the field entirely.
+ *
+ * <p>{@code allowed} is the opposite: the closed set of values a STRING
+ * parameter may carry, or null when anything goes. It exists for parameters
+ * whose value changes what the run does rather than which game object it
+ * names, where falling back to a default on a typo would silently change the
+ * outcome instead of reporting a problem. Unlike {@code suggests}, validation
+ * enforces it and a preset carrying anything else is rejected.
  */
-public record ParamSpec(String name, ParamType type, boolean required, Integer min, Integer max, String suggests) {
+public record ParamSpec(String name, ParamType type, boolean required, Integer min, Integer max,
+        String suggests, Set<String> allowed) {
 
     private static final Pattern NAME = Pattern.compile("[a-z][a-z0-9_]*");
 
@@ -38,29 +46,43 @@ public record ParamSpec(String name, ParamType type, boolean required, Integer m
         if (suggests != null && !NAME.matcher(suggests).matches()) {
             throw new IllegalArgumentException("Invalid suggestion source '" + suggests + "': expected lower_snake_case");
         }
+        if (allowed != null) {
+            if (type != ParamType.STRING) {
+                throw new IllegalArgumentException("Parameter '" + name + "' restricts values but is not a STRING");
+            }
+            allowed = Set.copyOf(allowed);
+            if (allowed.isEmpty()) {
+                throw new IllegalArgumentException("Parameter '" + name + "' allows no values at all");
+            }
+        }
     }
 
     public static ParamSpec required(String name, ParamType type) {
-        return new ParamSpec(name, type, true, null, null, null);
+        return new ParamSpec(name, type, true, null, null, null, null);
     }
 
     public static ParamSpec optional(String name, ParamType type) {
-        return new ParamSpec(name, type, false, null, null, null);
+        return new ParamSpec(name, type, false, null, null, null, null);
     }
 
     /** This parameter with both bounds set, as {@code clamp(value, min, max)} does in the code. */
     public ParamSpec bounded(int min, int max) {
-        return new ParamSpec(name, type, required, min, max, suggests);
+        return new ParamSpec(name, type, required, min, max, suggests, allowed);
     }
 
     /** This parameter with a lower bound only, as {@code Math.max(min, value)} does in the code. */
     public ParamSpec atLeast(int min) {
-        return new ParamSpec(name, type, required, min, null, suggests);
+        return new ParamSpec(name, type, required, min, null, suggests, allowed);
     }
 
     /** This parameter with a suggestion source the web builder offers values from. */
     public ParamSpec suggesting(String source) {
-        return new ParamSpec(name, type, required, min, max, source);
+        return new ParamSpec(name, type, required, min, max, source, allowed);
+    }
+
+    /** This parameter restricted to a closed set of values, enforced by validation. */
+    public ParamSpec oneOf(String... values) {
+        return new ParamSpec(name, type, required, min, max, suggests, Set.of(values));
     }
 
     /** Copies the list, rejecting duplicate parameter names. */

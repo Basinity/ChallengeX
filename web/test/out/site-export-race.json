@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "name": "First To The Dragon",
+  "rules": [
+    {
+      "trigger": {
+        "id": "trigger.game_beaten",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.win_challenge",
+        "params": {
+          "end": "after_all_complete"
+        },
+        "scope": "per_player"
+      }
+    }
+  ]
+}

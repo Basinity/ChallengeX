@@ -18,7 +18,7 @@ class ModifierEvaluationTest {
     private final Registries registries = CoreCatalog.createRegistries();
 
     private Engine engineFor(Modifier... modifiers) {
-        return new Engine(new Challenge(List.of(), Optional.empty(), List.of(modifiers)), registries);
+        return new Engine(new Challenge(List.of(), List.of(modifiers)), registries);
     }
 
     @Test

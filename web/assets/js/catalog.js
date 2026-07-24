@@ -2,7 +2,7 @@
 // Do not edit by hand: rerun the task after changing a catalog entry.
 window.CX_CATALOG = {
   "catalogVersion": 1,
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "scopes": {
     "trigger": [
       "every_player",
@@ -13,7 +13,6 @@ window.CX_CATALOG = {
       "every_player",
       "specific_players"
     ],
-    "goal": [],
     "modifier": [
       "every_player",
       "specific_players"
@@ -881,51 +880,23 @@ window.CX_CATALOG = {
     },
     {
       "id": "effect.lose_challenge",
-      "scoped": false,
+      "scoped": true,
       "params": []
-    }
-  ],
-  "goals": [
-    {
-      "id": "goal.kill_mob",
-      "scoped": false,
-      "params": [
-        {
-          "name": "mob",
-          "type": "STRING",
-          "required": true,
-          "suggests": "mob"
-        }
-      ]
     },
     {
-      "id": "goal.obtain_item",
-      "scoped": false,
+      "id": "effect.win_challenge",
+      "scoped": true,
       "params": [
         {
-          "name": "item",
+          "name": "end",
           "type": "STRING",
           "required": true,
-          "suggests": "item"
+          "allowed": [
+            "after_all_complete",
+            "on_first_completion"
+          ]
         }
       ]
-    },
-    {
-      "id": "goal.earn_advancement",
-      "scoped": false,
-      "params": [
-        {
-          "name": "advancement",
-          "type": "STRING",
-          "required": true,
-          "suggests": "advancement"
-        }
-      ]
-    },
-    {
-      "id": "goal.beat_game",
-      "scoped": false,
-      "params": []
     }
   ],
   "modifiers": [

@@ -24,7 +24,7 @@ class ChallengeRunTest {
 
     private ChallengeRun runFor(EffectExecutor executor, Rule... rules) {
         return new ChallengeRun(
-                new Challenge(List.of(rules), Optional.empty(), List.of()), registries, executor);
+                new Challenge(List.of(rules), List.of()), registries, executor);
     }
 
     private ChallengeRun runOf(Challenge challenge, EffectExecutor executor) {
@@ -57,10 +57,13 @@ class ChallengeRunTest {
         List<EffectCommand> executed = new ArrayList<>();
         ChallengeRun run = runFor(executed::add, new Rule(
                 TriggerSpec.of("trigger.player_died"),
-                EffectSpec.playerless("effect.lose_challenge")));
+                new EffectSpec(CoreCatalog.EFFECT_LOSE_CHALLENGE, Map.of(),
+                        Optional.of(Scope.PER_PLAYER))));
         run.start();
+        run.updateRoster(List.of("alice"));
 
         run.handle(GameEvent.of("trigger.player_died", "alice"));
+        run.updateRoster(List.of());
 
         assertTrue(executed.isEmpty());
         assertEquals(RunOutcome.LOSS, run.outcome());
@@ -114,7 +117,7 @@ class ChallengeRunTest {
 
     @Test
     void modifiersAreInForceOnlyWhileTheRunIsLive() {
-        Challenge challenge = new Challenge(List.of(), Optional.empty(),
+        Challenge challenge = new Challenge(List.of(),
                 List.of(Modifier.of("modifier.keep_inventory")));
         ChallengeRun run = runOf(challenge, command -> { });
 
@@ -127,7 +130,7 @@ class ChallengeRunTest {
 
     @Test
     void aTimeLimitCountsDownAndEndsTheRunAsALoss() {
-        Challenge challenge = new Challenge(List.of(), Optional.empty(),
+        Challenge challenge = new Challenge(List.of(),
                 List.of(new Modifier("modifier.time_limit", Map.of("minutes", ParamValue.of(1)),
                         Optional.empty())));
         ChallengeRun run = runOf(challenge, command -> { });
@@ -178,7 +181,7 @@ class ChallengeRunTest {
 
     @Test
     void restoringAFinishedRunKeepsItsOutcome() {
-        Challenge challenge = new Challenge(List.of(), Optional.empty(),
+        Challenge challenge = new Challenge(List.of(),
                 List.of(new Modifier("modifier.time_limit", Map.of("minutes", ParamValue.of(1)),
                         Optional.empty())));
         ChallengeRun run = runOf(challenge, command -> { });

@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * real advancement trees count ({@code story}, {@code nether}, {@code end},
  * {@code adventure}, {@code husbandry}); recipe unlocks and other hidden
  * advancements are skipped. The {@code advancement} parameter matches the
- * completed advancement's id, which the earn-advancement goal matches against.
+ * completed advancement's id.
  */
 @Mixin(PlayerAdvancements.class)
 public class AdvancementEarnedMixin {

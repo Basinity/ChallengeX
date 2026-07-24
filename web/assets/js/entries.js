@@ -16,8 +16,8 @@ window.CX.entries = (function () {
     throw new Error('catalog.js did not load: run ./gradlew :core:exportCatalog');
   }
 
-  var KINDS = ['trigger', 'effect', 'goal', 'modifier'];
-  var LISTS = { trigger: 'triggers', effect: 'effects', goal: 'goals', modifier: 'modifiers' };
+  var KINDS = ['trigger', 'effect', 'modifier'];
+  var LISTS = { trigger: 'triggers', effect: 'effects', modifier: 'modifiers' };
 
   /* "trigger.item_picked_up" with no copy entry becomes "Item picked up". */
   function nameFromId(id) {
@@ -40,6 +40,9 @@ window.CX.entries = (function () {
         blurb: text.blurb || '',
         phrase: text.phrase || '',
         detail: text.detail || '',
+        // Reader-facing labels for parameters restricted to a closed set,
+        // keyed by parameter name then by value.
+        values: text.values || {},
         // Most triggers read as "When <subject> <phrase>"; a few supply their own opening.
         lead: text.lead === undefined ? 'When' : text.lead
       };
@@ -64,7 +67,7 @@ window.CX.entries = (function () {
       return KINDS.reduce(function (sum, kind) { return sum + byKind[kind].length; }, 0);
     },
 
-    /* Which scope values this side accepts. Empty for goals, which take none. */
+    /* Which scope values this side accepts. */
     scopes: function (kind) { return (catalog.scopes && catalog.scopes[kind]) || []; },
 
     requiredParams: requiredParams,

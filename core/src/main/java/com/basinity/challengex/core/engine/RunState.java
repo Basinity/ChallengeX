@@ -6,7 +6,7 @@ package com.basinity.challengex.core.engine;
  * {@link #RUNNING} and {@link #PAUSED} alternate while it plays; {@link
  * #FINISHED} is terminal, reached the moment the engine decides a win or a
  * loss, and the outcome is meaningful only then. A reset returns a run to
- * {@code NOT_STARTED} with a fresh clock and cleared goal progress.
+ * {@code NOT_STARTED} with a fresh clock.
  */
 public enum RunState {
     NOT_STARTED,

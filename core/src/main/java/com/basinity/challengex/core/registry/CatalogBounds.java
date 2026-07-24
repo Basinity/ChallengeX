@@ -51,7 +51,6 @@ public final class CatalogBounds {
         Map<String, Definition> byId = new HashMap<>();
         addAll(byId, registries.triggers());
         addAll(byId, registries.effects());
-        addAll(byId, registries.goals());
         addAll(byId, registries.modifiers());
         return Map.copyOf(byId);
     }

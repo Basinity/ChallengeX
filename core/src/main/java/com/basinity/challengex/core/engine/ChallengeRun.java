@@ -6,8 +6,8 @@ import com.basinity.challengex.core.registry.Registries;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.Set;
 
 /**
  * One active run: the seam the platform feeds, and the owner of the run's
@@ -45,18 +45,19 @@ public final class ChallengeRun {
     public static ChallengeRun restore(RunSnapshot snapshot, Registries registries,
             EffectExecutor executor) {
         ChallengeRun run = new ChallengeRun(snapshot.challenge(), registries, executor);
+        // The snapshot does not carry the finishing order or who is out yet;
+        // that lands with the snapshot format bump, before the adapter can
+        // produce either of them in a real game.
         run.engine = Engine.restore(snapshot.challenge(), registries,
-                snapshot.elapsedTicks(), snapshot.outcome(), snapshot.goalProgress(),
-                snapshot.goalProgressByPlayer(), snapshot.winner());
+                snapshot.elapsedTicks(), snapshot.outcome(), List.of(), Set.of());
         run.state = snapshot.state();
         return run;
     }
 
-    /** Captures the whole run — composition, state, clock, outcome, goal progress. */
+    /** Captures the whole run: composition, state, clock, and outcome. */
     public RunSnapshot snapshot() {
         return new RunSnapshot(RunSnapshot.SNAPSHOT_VERSION, challenge, state,
-                engine.elapsedTicks(), engine.outcome(), engine.goalProgress(),
-                engine.goalProgressByPlayer(), engine.winner());
+                engine.elapsedTicks(), engine.outcome());
     }
 
     public RunState state() {
@@ -152,21 +153,31 @@ public final class ChallengeRun {
         return engine.outcome();
     }
 
-    /** The versus winner's name, present only once a versus goal decided the run. */
-    public Optional<String> winner() {
-        return engine.winner();
-    }
-
     /**
-     * Refreshes who counts as being in the run, for an everyone-completion
-     * goal. Only a running run evaluates it; the platform calls this each tick
-     * with the online players.
+     * Refreshes who is still playing, from the game modes the adapter sees. Only
+     * a running run tracks it; the platform calls this each tick, and the roster
+     * emptying can itself end the run.
      */
-    public void updateParticipants(Collection<String> playerIds) {
+    public void updateRoster(Collection<String> playerIds) {
         if (state != RunState.RUNNING) {
             return;
         }
-        engine.updateParticipants(playerIds);
+        engine.updateRoster(playerIds);
         syncFinished();
+    }
+
+    /** Everyone who finished, in finishing order, with the clock reading at each finish. */
+    public List<Completion> completions() {
+        return engine.completions();
+    }
+
+    /** Everyone currently out of the run through the lose-challenge effect. */
+    public Set<String> eliminated() {
+        return engine.eliminated();
+    }
+
+    /** Whether a win is shared by everyone rather than kept by whoever finished. */
+    public boolean winsTogether() {
+        return engine.winsTogether();
     }
 }

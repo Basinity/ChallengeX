@@ -2,9 +2,6 @@ package com.basinity.challengex.core.preset;
 
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.EffectSpec;
-import com.basinity.challengex.core.model.Goal;
-import com.basinity.challengex.core.model.GoalCompletion;
-import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -46,7 +43,12 @@ import java.util.Set;
  */
 public final class PresetCodec {
 
-    public static final int SCHEMA_VERSION = 1;
+    /**
+     * Version 2 removed goals: winning and losing became rule effects. A
+     * version 1 preset is rejected rather than read, because its win condition
+     * lived in a field this build no longer knows.
+     */
+    public static final int SCHEMA_VERSION = 2;
 
     private final Registries registries;
 
@@ -63,7 +65,7 @@ public final class PresetCodec {
     }
 
     /**
-     * Writes a challenge's rules, goal, and modifiers onto the given object. The
+     * Writes a challenge's rules and modifiers onto the given object. The
      * run-snapshot codec reuses this so a persisted run's composition is written
      * exactly as a preset's is.
      */
@@ -80,18 +82,6 @@ public final class PresetCodec {
             }
             target.add("rules", rules);
         }
-        challenge.goal().ifPresent(goal -> {
-            JsonObject goalJson = blockJson(goal.goalId(), goal.params(), Optional.empty());
-            // Defaults are omitted so a plain win-together goal writes exactly
-            // as it always did: "mode" appears only for versus, "completion"
-            // only for everyone (which implies win-together).
-            if (goal.mode() == GoalMode.VERSUS) {
-                goalJson.addProperty("mode", "versus");
-            } else if (goal.completion() == GoalCompletion.EVERYONE) {
-                goalJson.addProperty("completion", "everyone");
-            }
-            target.add("goal", goalJson);
-        });
         if (!challenge.modifiers().isEmpty()) {
             JsonArray modifiers = new JsonArray();
             for (Modifier modifier : challenge.modifiers()) {
@@ -120,6 +110,15 @@ public final class PresetCodec {
             throw new PresetFormatException(List.of("written for schema version " + version
                     + ", this build supports up to " + SCHEMA_VERSION + " — update ChallengeX"));
         }
+        // The floor is as strict as the ceiling, and for a sharper reason: an
+        // older preset kept its win condition in a goal field this build no
+        // longer reads, so accepting it would silently produce a challenge
+        // that can never be won.
+        if (version < SCHEMA_VERSION) {
+            throw new PresetFormatException(List.of("written for schema version " + version
+                    + ", which used goals instead of win and lose effects — rebuild it at "
+                    + "https://challengexmc.com/build"));
+        }
 
         List<String> problems = new ArrayList<>();
         String name = readName(root, problems);
@@ -132,7 +131,7 @@ public final class PresetCodec {
     }
 
     /**
-     * Reads a challenge's rules, goal, and modifiers from the given object and
+     * Reads a challenge's rules and modifiers from the given object and
      * validates the whole against the registries. Every problem found is added
      * to the list; the return is non-null only when the object read cleanly, so
      * a caller trusts it exactly when it added no problems. The run-snapshot
@@ -142,12 +141,11 @@ public final class PresetCodec {
     Challenge readChallenge(JsonObject source, List<String> problems) {
         int before = problems.size();
         List<Rule> rules = readRules(source, problems);
-        Optional<Goal> goal = readGoal(source, problems);
         List<Modifier> modifiers = readModifiers(source, problems);
         if (problems.size() > before) {
             return null;
         }
-        Challenge challenge = new Challenge(rules, goal, modifiers);
+        Challenge challenge = new Challenge(rules, modifiers);
         problems.addAll(ChallengeValidation.problemsOf(challenge, registries));
         return problems.size() > before ? null : challenge;
     }
@@ -242,50 +240,6 @@ public final class PresetCodec {
                     new EffectSpec(effectId, effectParams, effectScope)));
         }
         return rules;
-    }
-
-    private Optional<Goal> readGoal(JsonObject root, List<String> problems) {
-        JsonElement element = root.get("goal");
-        if (element == null) {
-            return Optional.empty();
-        }
-        JsonObject goalJson = asObject(element, "goal", problems);
-        if (goalJson == null) {
-            return Optional.empty();
-        }
-        String id = readId(goalJson, "goal", problems);
-        Map<String, ParamValue> params = readParams(goalJson, "goal", problems);
-        String mode = readKeyword(goalJson, "mode", Set.of("together", "versus"), problems);
-        String completion = readKeyword(goalJson, "completion", Set.of("anyone", "everyone"), problems);
-        if ("versus".equals(mode) && completion != null) {
-            problems.add("goal: 'completion' does not apply to a versus goal");
-            return Optional.empty();
-        }
-        GoalMode goalMode = "versus".equals(mode) ? GoalMode.VERSUS : GoalMode.TOGETHER;
-        GoalCompletion goalCompletion = "everyone".equals(completion)
-                ? GoalCompletion.EVERYONE : GoalCompletion.ANYONE;
-        return id == null ? Optional.empty()
-                : Optional.of(new Goal(id, params, goalMode, goalCompletion));
-    }
-
-    /**
-     * Reads an optional keyword field against its allowed values.
-     *
-     * @return the keyword, or null when absent or when a problem was recorded
-     */
-    private String readKeyword(JsonObject block, String key, Set<String> allowed,
-            List<String> problems) {
-        JsonElement element = block.get(key);
-        if (element == null) {
-            return null;
-        }
-        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()
-                || !allowed.contains(element.getAsString())) {
-            problems.add("goal: '" + key + "' must be one of "
-                    + allowed.stream().sorted().toList());
-            return null;
-        }
-        return element.getAsString();
     }
 
     private List<Modifier> readModifiers(JsonObject root, List<String> problems) {

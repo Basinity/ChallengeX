@@ -1,7 +1,7 @@
 package com.basinity.challengex.core.model;
 
 /**
- * A typed parameter value carried by triggers, effects, goals, and modifiers.
+ * A typed parameter value carried by triggers, effects, and modifiers.
  * The four shapes mirror the JSON primitives a preset can hold; the registry
  * definitions declare which type each named parameter expects.
  */

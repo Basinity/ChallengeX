@@ -6,9 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.basinity.challengex.core.model.Challenge;
-import com.basinity.challengex.core.model.GoalCompletion;
-import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
+import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
 import com.basinity.challengex.core.model.Scope;
 import com.basinity.challengex.core.registry.CoreCatalog;
@@ -43,16 +42,47 @@ class PresetContractTest {
 
         assertEquals("Blood Sugar Rush", preset.name());
         Challenge challenge = preset.challenge();
-        assertEquals(3, challenge.rules().size(), "rules");
+        assertEquals(4, challenge.rules().size(), "rules");
         assertEquals(3, challenge.modifiers().size(), "modifiers");
-        assertTrue(challenge.goal().isPresent(), "goal");
-        assertEquals("goal.beat_game", challenge.goal().get().goalId());
 
         Rule first = challenge.rules().get(0);
         assertEquals("trigger.damage_taken", first.trigger().id());
         assertEquals("effect.random_effect", first.effect().id());
         assertEquals(Scope.EVERY_PLAYER, first.trigger().scope().orElseThrow());
         assertEquals(Scope.PER_PLAYER, first.effect().scope().orElseThrow());
+    }
+
+    /** The win condition is an ordinary rule now, so it arrives as one. */
+    @Test
+    void theSitesWinConditionArrivesAsARuleWithItsEndParameter() {
+        Challenge challenge = parse("site-export.json").challenge();
+
+        Rule win = challenge.rules().get(3);
+        assertEquals("trigger.game_beaten", win.trigger().id());
+        assertEquals(CoreCatalog.EFFECT_WIN_CHALLENGE, win.effect().id());
+        assertEquals(ParamValue.of(CoreCatalog.END_ON_FIRST_COMPLETION),
+                win.effect().params().get("end"));
+        assertEquals(Scope.EVERY_PLAYER, win.effect().scope().orElseThrow());
+    }
+
+    @Test
+    void aRaceExportedBySiteKeepsItsPerPlayerScopeAndAfterAllEnd() {
+        Challenge challenge = parse("site-export-race.json").challenge();
+
+        Rule win = challenge.rules().getFirst();
+        assertEquals(CoreCatalog.EFFECT_WIN_CHALLENGE, win.effect().id());
+        assertEquals(ParamValue.of(CoreCatalog.END_AFTER_ALL_COMPLETE),
+                win.effect().params().get("end"));
+        assertEquals(Scope.PER_PLAYER, win.effect().scope().orElseThrow());
+    }
+
+    @Test
+    void anEliminationChallengeExportedBySiteScopesItsLossPerPlayer() {
+        Challenge challenge = parse("site-export-elimination.json").challenge();
+
+        Rule out = challenge.rules().getFirst();
+        assertEquals(CoreCatalog.EFFECT_LOSE_CHALLENGE, out.effect().id());
+        assertEquals(Scope.PER_PLAYER, out.effect().scope().orElseThrow());
     }
 
     @Test
@@ -83,11 +113,10 @@ class PresetContractTest {
     }
 
     @Test
-    void aModifierOnlyChallengeIsAcceptedWithNoRulesAndNoGoal() {
+    void aModifierOnlyChallengeIsAcceptedWithNoRules() {
         Challenge challenge = parse("site-export-modifier-only.json").challenge();
 
         assertTrue(challenge.rules().isEmpty(), "rules");
-        assertTrue(challenge.goal().isEmpty(), "goal");
         assertEquals(2, challenge.modifiers().size(), "modifiers");
     }
 
@@ -107,8 +136,6 @@ class PresetContractTest {
         for (Modifier modifier : challenge.modifiers()) {
             emitted.add(modifier.modifierId());
         }
-        challenge.goal().ifPresent(goal -> emitted.add(goal.goalId()));
-
         var registries = CoreCatalog.createRegistries();
         Set<String> expected = new HashSet<>();
         expected.addAll(registries.triggers().ids());
@@ -118,20 +145,6 @@ class PresetContractTest {
         assertTrue(emitted.containsAll(expected),
                 "the site did not emit every trigger, effect and modifier: missing "
                         + minus(expected, emitted));
-    }
-
-    @Test
-    void theSitesGoalModesArriveAsTheModelsModes() {
-        Challenge versus = parse("site-export-versus-goal.json").challenge();
-        assertEquals(GoalMode.VERSUS, versus.goal().orElseThrow().mode());
-
-        Challenge everyone = parse("site-export-everyone-goal.json").challenge();
-        assertEquals(GoalMode.TOGETHER, everyone.goal().orElseThrow().mode());
-        assertEquals(GoalCompletion.EVERYONE, everyone.goal().orElseThrow().completion());
-
-        Challenge plain = parse("site-export.json").challenge();
-        assertEquals(GoalMode.TOGETHER, plain.goal().orElseThrow().mode());
-        assertEquals(GoalCompletion.ANYONE, plain.goal().orElseThrow().completion());
     }
 
     @Test

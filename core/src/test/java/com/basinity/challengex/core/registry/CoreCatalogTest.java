@@ -55,16 +55,8 @@ class CoreCatalogTest {
                 "effect.change_time", "effect.change_weather", "effect.replace_held_random",
                 "effect.random_effect", "effect.freeze", "effect.knockback", "effect.explode",
                 "effect.clear_inventory", "effect.repair_held_item", "effect.damage_held_item",
-                "effect.kill", "effect.lose_challenge"),
+                "effect.kill", "effect.lose_challenge", "effect.win_challenge"),
                 registries.effects().ids());
-    }
-
-    @Test
-    void goalIdsAreFrozen() {
-        assertEquals(Set.of(
-                "goal.kill_mob", "goal.obtain_item", "goal.earn_advancement",
-                "goal.beat_game"),
-                registries.goals().ids());
     }
 
     @Test
@@ -86,7 +78,8 @@ class CoreCatalogTest {
 
     @Test
     void playerlessEffectsAreFrozen() {
-        assertEquals(Set.of("effect.change_time", "effect.change_weather", "effect.lose_challenge"),
+        // The two run-control effects are scoped: an outcome lands on players.
+        assertEquals(Set.of("effect.change_time", "effect.change_weather"),
                 playerlessIds(registries.effects()));
     }
 

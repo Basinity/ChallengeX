@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * An abstract game happening fed in by a platform adapter (or a test). Its id
  * comes from the trigger vocabulary; the context carries what happened (which
- * mob, which block) for trigger-parameter filtering and goal matching. Events
+ * mob, which block) for trigger-parameter filtering. Events
  * without an acting player (weather change, a fixed interval firing) leave
  * {@code playerId} empty.
  */

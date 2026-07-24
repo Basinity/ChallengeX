@@ -1,6 +1,5 @@
 package com.basinity.challengex.core.registry;
 
-import static com.basinity.challengex.core.registry.ParamBinding.fromGoalParam;
 import static com.basinity.challengex.core.registry.ParamSpec.optional;
 import static com.basinity.challengex.core.registry.ParamSpec.required;
 import static com.basinity.challengex.core.registry.ParamType.BOOL;
@@ -9,8 +8,6 @@ import static com.basinity.challengex.core.registry.ParamType.INT;
 import static com.basinity.challengex.core.registry.ParamType.STRING;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The starter catalogs. Every id and parameter name registered here is frozen
@@ -19,8 +16,17 @@ import java.util.Set;
  */
 public final class CoreCatalog {
 
-    /** Ends the run as a loss; handled by the engine itself, never dispatched to an adapter. */
+    /** Takes its scoped players out of the run; handled by the engine itself, never dispatched to an adapter. */
     public static final String EFFECT_LOSE_CHALLENGE = "effect.lose_challenge";
+
+    /** Completes the run for its scoped players; handled by the engine itself, never dispatched to an adapter. */
+    public static final String EFFECT_WIN_CHALLENGE = "effect.win_challenge";
+
+    /** {@code effect.win_challenge}'s end param: the first completion ends the run. */
+    public static final String END_ON_FIRST_COMPLETION = "on_first_completion";
+
+    /** {@code effect.win_challenge}'s end param: the run runs on until nobody is left playing. */
+    public static final String END_AFTER_ALL_COMPLETE = "after_all_complete";
 
     /** Counts the run clock down and ends it as a loss on expiry; read by the engine, never enforced per player. */
     public static final String MODIFIER_TIME_LIMIT = "modifier.time_limit";
@@ -31,13 +37,11 @@ public final class CoreCatalog {
     public static Registries createRegistries() {
         Registry<TriggerDefinition> triggers = new Registry<>("trigger");
         Registry<EffectDefinition> effects = new Registry<>("effect");
-        Registry<GoalDefinition> goals = new Registry<>("goal");
         Registry<ModifierDefinition> modifiers = new Registry<>("modifier");
         registerTriggers(triggers);
         registerEffects(effects);
-        registerGoals(goals);
         registerModifiers(modifiers);
-        return new Registries(triggers, effects, goals, modifiers);
+        return new Registries(triggers, effects, modifiers);
     }
 
     private static void registerTriggers(Registry<TriggerDefinition> registry) {
@@ -124,14 +128,9 @@ public final class CoreCatalog {
         effect(registry, "repair_held_item", true, optional("amount", INT).atLeast(0));
         effect(registry, "damage_held_item", true, optional("amount", INT).atLeast(0));
         effect(registry, "kill", true);
-        effect(registry, "lose_challenge", false);
-    }
-
-    private static void registerGoals(Registry<GoalDefinition> registry) {
-        goal(registry, "kill_mob", List.of(new GoalRequirement(Set.of("trigger.mob_killed"), Map.of("mob", fromGoalParam("mob")))), required("mob", STRING).suggesting("mob"));
-        goal(registry, "obtain_item", List.of(new GoalRequirement(Set.of("trigger.item_picked_up", "trigger.item_crafted"), Map.of("item", fromGoalParam("item")))), required("item", STRING).suggesting("item"));
-        goal(registry, "earn_advancement", List.of(new GoalRequirement(Set.of("trigger.advancement_earned"), Map.of("advancement", fromGoalParam("advancement")))), required("advancement", STRING).suggesting("advancement"));
-        goal(registry, "beat_game", List.of(new GoalRequirement(Set.of("trigger.game_beaten"), Map.of())));
+        effect(registry, "lose_challenge", true);
+        effect(registry, "win_challenge", true,
+                required("end", STRING).oneOf(END_ON_FIRST_COMPLETION, END_AFTER_ALL_COMPLETE));
     }
 
     private static void registerModifiers(Registry<ModifierDefinition> registry) {
@@ -155,10 +154,6 @@ public final class CoreCatalog {
 
     private static void effect(Registry<EffectDefinition> registry, String name, boolean scoped, ParamSpec... params) {
         registry.register(new EffectDefinition("effect." + name, scoped, List.of(params)));
-    }
-
-    private static void goal(Registry<GoalDefinition> registry, String name, List<GoalRequirement> requirements, ParamSpec... params) {
-        registry.register(new GoalDefinition("goal." + name, requirements, List.of(params)));
     }
 
     private static void modifier(Registry<ModifierDefinition> registry, String name, boolean scoped, ParamSpec... params) {

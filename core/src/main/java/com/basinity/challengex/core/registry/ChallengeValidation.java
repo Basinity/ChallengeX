@@ -36,10 +36,6 @@ public final class ChallengeValidation {
                     rule.effect().scope(), where + " effect", problems);
         }
 
-        challenge.goal().ifPresent(goal ->
-                checkBlock(registries.goals(), goal.goalId(), goal.params(), Optional.empty(),
-                        "goal", problems));
-
         List<Modifier> modifiers = challenge.modifiers();
         for (int i = 0; i < modifiers.size(); i++) {
             Modifier modifier = modifiers.get(i);
@@ -82,6 +78,12 @@ public final class ChallengeValidation {
             } else if (!spec.get().type().matches(entry.getValue())) {
                 problems.add(where + ": parameter '" + entry.getKey() + "' of '" + definition.id()
                         + "' expects " + spec.get().type());
+            } else if (spec.get().allowed() != null
+                    && entry.getValue() instanceof ParamValue.OfString value
+                    && !spec.get().allowed().contains(value.value())) {
+                problems.add(where + ": parameter '" + entry.getKey() + "' of '" + definition.id()
+                        + "' must be one of " + spec.get().allowed().stream().sorted().toList()
+                        + ", not '" + value.value() + "'");
             }
         }
         for (ParamSpec spec : definition.params()) {

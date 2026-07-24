@@ -2,31 +2,30 @@ package com.basinity.challengex.core.model;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
- * A challenge aggregates any number of rules, at most one goal, and any number
- * of modifiers. Every piece is independently optional; a modifier-only
- * challenge is a supported shape.
+ * A challenge aggregates any number of rules and any number of modifiers. Both
+ * pieces are independently optional; a modifier-only challenge is a supported
+ * shape. Winning and losing are composed like anything else, as a rule pairing
+ * a trigger with the win-challenge or lose-challenge effect.
  *
  * <p>Rules stack freely: the same trigger or effect may appear in any number
  * of rules.
  */
-public record Challenge(List<Rule> rules, Optional<Goal> goal, List<Modifier> modifiers) {
+public record Challenge(List<Rule> rules, List<Modifier> modifiers) {
 
     public Challenge {
         rules = List.copyOf(rules);
-        Objects.requireNonNull(goal, "goal");
         modifiers = List.copyOf(modifiers);
     }
 
     public static Challenge empty() {
-        return new Challenge(List.of(), Optional.empty(), List.of());
+        return new Challenge(List.of(), List.of());
     }
 
-    /** Whether nothing has been composed: no rules, no goal, and no modifiers. */
+    /** Whether nothing has been composed: no rules and no modifiers. */
     public boolean isEmpty() {
-        return rules.isEmpty() && goal.isEmpty() && modifiers.isEmpty();
+        return rules.isEmpty() && modifiers.isEmpty();
     }
 
     /**

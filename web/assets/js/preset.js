@@ -30,19 +30,11 @@ window.CX.preset = (function () {
   /* ---------- construction ---------- */
 
   function blankBlock(kind) {
-    var block = { uid: localId(kind), id: null, params: {}, scope: null };
-    if (kind === 'goal') {
-      // How the goal decides the run: win together (anyone or everyone
-      // reaching it) or a versus race. The cooperative default matches what
-      // the mod assumes when the fields are absent.
-      block.mode = 'together';
-      block.completion = 'anyone';
-    }
-    return block;
+    return { uid: localId(kind), id: null, params: {}, scope: null };
   }
 
   function blankChallenge() {
-    return { name: '', players: [], rules: [], goal: null, modifiers: [] };
+    return { name: '', players: [], rules: [], modifiers: [] };
   }
 
   function blankRule() {
@@ -99,6 +91,13 @@ window.CX.preset = (function () {
     }
     var text = rawValue(block, param).trim();
     if (param.type === 'STRING') {
+      // A closed set of values is the one place the site restricts what a
+      // parameter may carry, because the value decides what the run does
+      // rather than which game object it names. Everything else stays free
+      // text, so a modded or unknown id exports exactly as typed.
+      if (param.allowed && param.allowed.indexOf(text) < 0) {
+        return { error: 'must be one of ' + param.allowed.join(', ') };
+      }
       return { value: text };
     }
     var number = Number(text);
@@ -179,9 +178,6 @@ window.CX.preset = (function () {
       blockProblems(rule.trigger, where + ' trigger', found);
       blockProblems(rule.effect, where + ' effect', found);
     });
-    if (challenge.goal) {
-      blockProblems(challenge.goal, 'Goal', found);
-    }
     challenge.modifiers.forEach(function (modifier, index) {
       var entry = entries.get(modifier.id);
       blockProblems(modifier, entry ? entry.name : 'Modifier ' + (index + 1), found);
@@ -223,16 +219,6 @@ window.CX.preset = (function () {
       preset.rules = challenge.rules.map(function (rule) {
         return { trigger: blockJson(rule.trigger), effect: blockJson(rule.effect) };
       });
-    }
-    if (challenge.goal && challenge.goal.id) {
-      preset.goal = blockJson(challenge.goal);
-      // Defaults stay off the wire, exactly as the mod's codec writes them:
-      // "mode" only for versus, "completion" only for everyone.
-      if (challenge.goal.mode === 'versus') {
-        preset.goal.mode = 'versus';
-      } else if (challenge.goal.completion === 'everyone') {
-        preset.goal.completion = 'everyone';
-      }
     }
     if (challenge.modifiers.length) {
       preset.modifiers = challenge.modifiers.map(blockJson);
@@ -283,6 +269,13 @@ window.CX.preset = (function () {
       throw new Error('preset written for schema v' + raw.schemaVersion
         + ', this site reads up to v' + entries.schemaVersion);
     }
+    // The floor matters as much as the ceiling. An older preset was built
+    // around goals, which no longer exist, so reading it would quietly drop
+    // its win condition and hand back a challenge nobody can finish.
+    if (raw.schemaVersion < entries.schemaVersion) {
+      throw new Error('preset written for schema v' + raw.schemaVersion
+        + ', which had goals instead of win and lose effects — rebuild it in the builder');
+    }
     var challenge = blankChallenge();
     challenge.name = typeof raw.name === 'string' ? raw.name : '';
     if (Array.isArray(raw.rules)) {
@@ -293,12 +286,6 @@ window.CX.preset = (function () {
           effect: readBlock(rule && rule.effect, 'effect')
         };
       });
-    }
-    if (raw.goal) {
-      challenge.goal = readBlock(raw.goal, 'goal');
-      challenge.goal.mode = raw.goal.mode === 'versus' ? 'versus' : 'together';
-      challenge.goal.completion = challenge.goal.mode === 'together'
-        && raw.goal.completion === 'everyone' ? 'everyone' : 'anyone';
     }
     if (Array.isArray(raw.modifiers)) {
       challenge.modifiers = raw.modifiers.map(function (modifier) {

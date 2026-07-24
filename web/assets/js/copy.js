@@ -433,31 +433,21 @@ window.CX_COPY = {
   },
   'effect.lose_challenge': {
     name: 'Lose the challenge',
-    blurb: 'Ends the run as a loss, instantly.',
-    phrase: 'the run ends as a loss'
+    blurb: 'Knocks whoever it lands on out of the run. The run itself is lost once nobody is left playing.',
+    phrase: 'is out of the run'
   },
-
-  /* ---------- goals ---------- */
-
-  'goal.kill_mob': {
-    name: 'Kill a mob',
-    blurb: 'Win by slaying the named mob.',
-    phrase: 'Kill {mob}'
-  },
-  'goal.obtain_item': {
-    name: 'Obtain an item',
-    blurb: 'Win the moment the item is picked up or crafted.',
-    phrase: 'Obtain {item}'
-  },
-  'goal.earn_advancement': {
-    name: 'Earn an advancement',
-    blurb: 'Win by earning a specific advancement.',
-    phrase: 'Earn the advancement {advancement}'
-  },
-  'goal.beat_game': {
-    name: 'Beat the game',
-    blurb: 'Win by beating the ender dragon and getting the end credits.',
-    phrase: 'Beat the ender dragon'
+  'effect.win_challenge': {
+    name: 'Win the challenge',
+    blurb: 'Finishes the run. Pair it with any trigger to make that the win condition.',
+    phrase: 'finishes the challenge',
+    /* Labels for a parameter restricted to a closed set. The values are the
+       frozen vocabulary; these are what a person reads instead. */
+    values: {
+      end: {
+        on_first_completion: 'End on the first finish',
+        after_all_complete: 'End after everyone finishes'
+      }
+    }
   },
 
   /* ---------- modifiers ---------- */

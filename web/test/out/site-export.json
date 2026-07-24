@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Blood Sugar Rush",
   "rules": [
     {
@@ -42,11 +42,21 @@
         "id": "effect.lightning",
         "scope": "every_player"
       }
+    },
+    {
+      "trigger": {
+        "id": "trigger.game_beaten",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.win_challenge",
+        "params": {
+          "end": "on_first_completion"
+        },
+        "scope": "every_player"
+      }
     }
   ],
-  "goal": {
-    "id": "goal.beat_game"
-  },
   "modifiers": [
     {
       "id": "modifier.no_natural_regen",

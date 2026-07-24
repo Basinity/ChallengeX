@@ -74,10 +74,9 @@ function ok(condition, message) {
 
 check('catalog carries the whole frozen catalog', () => {
   eq(entries.count('trigger'), 44, 'triggers');
-  eq(entries.count('effect'), 37, 'effects');
-  eq(entries.count('goal'), 4, 'goals');
+  eq(entries.count('effect'), 38, 'effects');
   eq(entries.count('modifier'), 12, 'modifiers');
-  eq(entries.schemaVersion, 1, 'schema version');
+  eq(entries.schemaVersion, 2, 'schema version');
 });
 
 check('keyword sources store bare values, registry sources namespaced ids', () => {
@@ -149,17 +148,16 @@ check('playerless entries are exactly the ones the mod pins', () => {
     });
   });
   eq(playerless.sort(), [
-    'effect.change_time', 'effect.change_weather', 'effect.lose_challenge',
+    'effect.change_time', 'effect.change_weather',
     'modifier.buff_hostile_mobs', 'modifier.time_limit',
     'trigger.fixed_interval', 'trigger.time_of_day', 'trigger.weather_changed'
   ], 'playerless ids');
 });
 
-check('only effects offer per_player, goals offer no scope', () => {
+check('only effects offer per_player', () => {
   ok(entries.scopes('effect').includes('per_player'), 'effects take per_player');
   ok(!entries.scopes('trigger').includes('per_player'), 'triggers do not');
   ok(!entries.scopes('modifier').includes('per_player'), 'modifiers do not');
-  eq(entries.scopes('goal'), [], 'goals');
 });
 
 check('search finds entries by name, id and blurb', () => {
@@ -196,8 +194,14 @@ function starter() {
   preset.assign(three.effect, 'effect.lightning');
   three.effect.scope = 'every_player';
 
-  challenge.rules.push(one, two, three);
-  challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+  const win = preset.blankRule();
+  preset.assign(win.trigger, 'trigger.game_beaten');
+  win.trigger.scope = 'every_player';
+  preset.assign(win.effect, 'effect.win_challenge');
+  win.effect.params = { end: 'on_first_completion' };
+  win.effect.scope = 'every_player';
+
+  challenge.rules.push(one, two, three, win);
 
   const regen = preset.assign(preset.blankBlock('modifier'), 'modifier.no_natural_regen');
   regen.scope = 'every_player';
@@ -213,7 +217,7 @@ function starter() {
 check('a composed challenge exports exactly the preset shape the codec reads', () => {
   const json = preset.toPreset(starter());
   eq(json, {
-    schemaVersion: 1,
+    schemaVersion: 2,
     name: 'Blood Sugar Rush',
     rules: [
       {
@@ -236,9 +240,16 @@ check('a composed challenge exports exactly the preset shape the codec reads', (
         // Playerless on both sides: no scope key on either, which the codec requires.
         trigger: { id: 'trigger.fixed_interval', params: { seconds: 300 } },
         effect: { id: 'effect.lightning', scope: 'every_player' }
+      },
+      {
+        trigger: { id: 'trigger.game_beaten', scope: 'every_player' },
+        effect: {
+          id: 'effect.win_challenge',
+          params: { end: 'on_first_completion' },
+          scope: 'every_player'
+        }
       }
     ],
-    goal: { id: 'goal.beat_game' },
     modifiers: [
       { id: 'modifier.no_natural_regen', scope: 'every_player' },
       { id: 'modifier.keep_inventory', scope: ['Basinity'] },
@@ -254,10 +265,10 @@ check('numbers are written as numbers, not as the strings the inputs hold', () =
   eq(typeof json.modifiers[2].params.minutes, 'number', 'INT');
 });
 
-check('an empty challenge exports with no rules, goal or modifiers keys', () => {
+check('an empty challenge exports with no rules or modifiers keys', () => {
   const challenge = preset.blankChallenge();
   challenge.name = 'Nothing At All';
-  eq(preset.toPreset(challenge), { schemaVersion: 1, name: 'Nothing At All' }, 'empty preset');
+  eq(preset.toPreset(challenge), { schemaVersion: 2, name: 'Nothing At All' }, 'empty preset');
 });
 
 check('a modifier-only challenge is a valid shape', () => {
@@ -468,7 +479,7 @@ check('optional parameters appear only when set', () => {
 
 check('every entry renders a phrase with required parameters filled', () => {
   const bad = [];
-  ['trigger', 'effect', 'goal'].forEach((kind) => {
+  ['trigger', 'effect'].forEach((kind) => {
     entries.all(kind).forEach((entry) => {
       const block = { id: entry.id, params: {}, scope: 'every_player' };
       entry.params.forEach((param) => {
@@ -485,7 +496,7 @@ check('every entry renders a phrase with required parameters filled', () => {
 
 check('every entry also renders with only its required parameters', () => {
   const bad = [];
-  ['trigger', 'effect', 'goal'].forEach((kind) => {
+  ['trigger', 'effect'].forEach((kind) => {
     entries.all(kind).forEach((entry) => {
       const block = { id: entry.id, params: {}, scope: 'every_player' };
       entry.params.filter((p) => p.required).forEach((param) => {
@@ -553,48 +564,39 @@ check('the technical line states exactly what goes in the file', () => {
     'technical detail');
 });
 
-check('goal modes export sparsely and round-trip', () => {
-  const versus = preset.blankChallenge();
-  versus.name = 'Race';
-  versus.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
-  versus.goal.mode = 'versus';
-  const versusJson = JSON.parse(preset.stringify(versus));
-  eq(versusJson.goal.mode, 'versus', 'versus mode written');
-  eq(versusJson.goal.completion, undefined, 'versus writes no completion');
+check('the end parameter is restricted to its allowed values', () => {
+  const challenge = preset.blankChallenge();
+  challenge.name = 'Race';
+  const rule = preset.blankRule();
+  preset.assign(rule.trigger, 'trigger.game_beaten');
+  rule.trigger.scope = 'every_player';
+  preset.assign(rule.effect, 'effect.win_challenge');
+  rule.effect.scope = 'per_player';
+  challenge.rules.push(rule);
 
-  const everyone = preset.blankChallenge();
-  everyone.name = 'All in';
-  everyone.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
-  everyone.goal.completion = 'everyone';
-  const everyoneJson = JSON.parse(preset.stringify(everyone));
-  eq(everyoneJson.goal.mode, undefined, 'together mode stays off the wire');
-  eq(everyoneJson.goal.completion, 'everyone', 'everyone completion written');
+  rule.effect.params = { end: 'whenever_really' };
+  const texts = preset.problems(challenge).map((p) => p.text);
+  ok(texts.some((t) => t.includes('must be one of')), 'a value outside the set: ' + texts);
 
-  const plain = preset.blankChallenge();
-  plain.name = 'Classic';
-  plain.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
-  const plainJson = JSON.parse(preset.stringify(plain));
-  eq(plainJson.goal.mode, undefined, 'default writes no mode');
-  eq(plainJson.goal.completion, undefined, 'default writes no completion');
-
-  const back = preset.parse(preset.stringify(versus));
-  eq(back.goal.mode, 'versus', 'versus survives the round trip');
-  const backEveryone = preset.parse(preset.stringify(everyone));
-  eq(backEveryone.goal.mode, 'together', 'together restored');
-  eq(backEveryone.goal.completion, 'everyone', 'everyone survives the round trip');
-  const backPlain = preset.parse(preset.stringify(plain));
-  eq(backPlain.goal.mode, 'together', 'default mode restored');
-  eq(backPlain.goal.completion, 'anyone', 'default completion restored');
+  rule.effect.params = { end: 'after_all_complete' };
+  eq(preset.problems(challenge), [], 'an allowed value passes');
+  eq(JSON.parse(preset.stringify(challenge)).rules[0].effect.params.end,
+    'after_all_complete', 'the value reaches the file');
 });
 
-check('the goal mode note names every decision mode, the default included', () => {
-  const goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
-  eq(phrase.goalModeNote(goal), 'One finish wins for all', 'default note');
-  goal.mode = 'versus';
-  eq(phrase.goalModeNote(goal), 'First player to finish wins', 'versus note');
-  goal.mode = 'together';
-  goal.completion = 'everyone';
-  eq(phrase.goalModeNote(goal), 'Everyone must finish', 'everyone note');
+check('a preset from the goal era is refused rather than read', () => {
+  const old = JSON.stringify({
+    schemaVersion: 1,
+    name: 'From The Goal Era',
+    goal: { id: 'goal.beat_game' }
+  });
+  let message = '';
+  try {
+    preset.parse(old);
+  } catch (error) {
+    message = error.message;
+  }
+  ok(message.includes('goals'), 'the reason names goals: ' + message);
 });
 
 /* ---------- hand the result to the mod ---------- */
@@ -631,6 +633,8 @@ const fixtures = {
           block.params[param.name] = '3';
         } else if (param.type === 'DECIMAL') {
           block.params[param.name] = '2.5';
+        } else if (param.allowed) {
+          block.params[param.name] = param.allowed[0];
         } else {
           block.params[param.name] = 'minecraft:test';
         }
@@ -655,28 +659,31 @@ const fixtures = {
       challenge.modifiers.push(modifier);
     });
 
-    challenge.goal = (() => {
-      const goal = preset.assign(preset.blankBlock('goal'), 'goal.obtain_item');
-      goal.params = { item: 'minecraft:diamond' };
-      return goal;
-    })();
-
     return preset.stringify(challenge);
   })(),
-  'site-export-versus-goal.json': (() => {
+  'site-export-race.json': (() => {
+    // A race: each player wins as they finish, and the run ends on the last.
     const challenge = preset.blankChallenge();
     challenge.name = 'First To The Dragon';
-    challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.kill_mob');
-    challenge.goal.params = { mob: 'minecraft:ender_dragon' };
-    challenge.goal.mode = 'versus';
+    const rule = preset.blankRule();
+    preset.assign(rule.trigger, 'trigger.game_beaten');
+    rule.trigger.scope = 'every_player';
+    preset.assign(rule.effect, 'effect.win_challenge');
+    rule.effect.params = { end: 'after_all_complete' };
+    rule.effect.scope = 'per_player';
+    challenge.rules.push(rule);
     return preset.stringify(challenge);
   })(),
-  'site-export-everyone-goal.json': (() => {
+  'site-export-elimination.json': (() => {
+    // Death knocks one player out; the run is lost once nobody is left.
     const challenge = preset.blankChallenge();
-    challenge.name = 'Nobody Left Behind';
-    challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.obtain_item');
-    challenge.goal.params = { item: 'minecraft:elytra' };
-    challenge.goal.completion = 'everyone';
+    challenge.name = 'Last One Standing';
+    const rule = preset.blankRule();
+    preset.assign(rule.trigger, 'trigger.player_died');
+    rule.trigger.scope = 'every_player';
+    preset.assign(rule.effect, 'effect.lose_challenge');
+    rule.effect.scope = 'per_player';
+    challenge.rules.push(rule);
     return preset.stringify(challenge);
   })()
 };
@@ -693,8 +700,7 @@ check('the every-entry fixture really covers the whole catalog', () => {
     seen.add(rule.effect.id);
   });
   json.modifiers.forEach((modifier) => seen.add(modifier.id));
-  seen.add(json.goal.id);
-  eq(seen.size, entries.total() - 3, 'ids covered (all but the three unused goals)');
+  eq(seen.size, entries.total(), 'every id in the catalog is covered');
 });
 
 /* ---------- report ---------- */

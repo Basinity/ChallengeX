@@ -15,8 +15,8 @@
   var SAMPLES = [
     [['when anyone ', null], ['takes damage', 'trigger'], [', everyone gets a ', null],
       ['random effect', 'effect']],
-    [['only Basinity', null], [' keeps inventory', 'modifier'], [', and the goal is ', null],
-      ['one diamond', 'goal']],
+    [['only Basinity', null], [' keeps inventory', 'modifier'], [', and ', null],
+      ['picking up a diamond', 'trigger'], [' wins', 'effect']],
     [['every ', null], ['five minutes', 'trigger'], [', everyone ', null],
       ['swaps places', 'effect']],
     [['when anyone ', null], ['sleeps', 'trigger'], [', milknowo is ', null],
@@ -25,18 +25,18 @@
       ['hearts never regenerate', 'modifier']],
     [['when a ', null], ['mob dies', 'trigger'], [', the killer gets ', null],
       ['two baby zombies', 'effect']],
-    [['block drops are ', null], ['randomized', 'modifier'], [', and the goal is the ', null],
-      ['ender dragon', 'goal']],
-    [['jumping is disabled', 'modifier'], [', and the goal is a ', null],
-      ['full beacon', 'goal']],
+    [['block drops are ', null], ['randomized', 'modifier'], [', and ', null],
+      ['beating the dragon', 'trigger'], [' wins', 'effect']],
+    [['jumping is disabled', 'modifier'], [', and ', null],
+      ['reaching level 50', 'trigger'], [' wins', 'effect']],
     [['when anyone ', null], ['breaks a block', 'trigger'], [', they ', null],
       ['teleport somewhere random', 'effect']],
     [['whenever anyone ', null], ['crafts an item', 'trigger'], [', an ', null],
       ['anvil drops on them', 'effect']],
     [['when anyone ', null], ['catches a fish', 'trigger'], [', they get a ', null],
       ['random item', 'effect']],
-    [['hostile mobs are buffed', 'modifier'], [', and the goal is to ', null],
-      ['kill the warden', 'goal']],
+    [['hostile mobs are buffed', 'modifier'], [', and ', null],
+      ['killing the warden', 'trigger'], [' wins', 'effect']],
     [['every time anyone ', null], ['gains XP', 'trigger'], [', their ', null],
       ['hotbar shuffles', 'effect']],
     [['shields are disabled', 'modifier'], [', though ', null],
@@ -45,8 +45,8 @@
       ['launches you skyward', 'effect']],
     [['entering a ', null], ['new dimension', 'trigger'], [' gives everyone ', null],
       ['nausea', 'effect']],
-    [['there is a ', null], ['30-minute clock', 'modifier'], [', and the goal is an ', null],
-      ['elytra', 'goal']],
+    [['surviving ', null], ['twenty minutes', 'trigger'], [' ', null],
+      ['wins the run', 'effect']],
     [['when anyone ', null], ['sneaks', 'trigger'], [', they ', null],
       ['freeze in place', 'effect']]
   ];
@@ -54,7 +54,6 @@
   var KIND_COLOR = {
     trigger: 'var(--trigger)',
     effect: 'var(--effect)',
-    goal: 'var(--goal)',
     modifier: 'var(--modifier)'
   };
 
@@ -102,7 +101,6 @@
   function combinations() {
     return entries.count('trigger')
       * entries.count('effect')
-      * (entries.count('goal') + 1)
       * Math.pow(2, entries.count('modifier'));
   }
 
@@ -115,7 +113,6 @@
     [
       [entries.count('trigger'), 'TRIGGERS', 'var(--trigger)'],
       [entries.count('effect'), 'EFFECTS', 'var(--effect)'],
-      [entries.count('goal'), 'GOALS', 'var(--goal)'],
       [entries.count('modifier'), 'MODIFIERS', 'var(--modifier)'],
       [group(combinations()) + '+', 'WAYS TO PLAY', 'var(--text)']
     ].forEach(function (row) {
@@ -126,10 +123,10 @@
     });
   }
 
-  /* Deliberately small: one rule, one goal, one modifier. It is the first
-     composed challenge most visitors see, so it teaches the whole model at a
-     glance rather than showing off every field at once. Every scope is
-     every_player, so it needs no roster. */
+  /* Deliberately small: one rule that plays, one that wins, one modifier. It
+     is the first composed challenge most visitors see, so it teaches the whole
+     model at a glance rather than showing off every field at once. Every scope
+     is every_player, so it needs no roster. */
   function starterChallenge() {
     var challenge = preset.blankChallenge();
     challenge.name = 'Salt in the Wound';
@@ -142,7 +139,13 @@
     rule.effect.scope = 'per_player';
     challenge.rules.push(rule);
 
-    challenge.goal = preset.assign(preset.blankBlock('goal'), 'goal.beat_game');
+    var win = preset.blankRule();
+    preset.assign(win.trigger, 'trigger.game_beaten');
+    win.trigger.scope = 'every_player';
+    preset.assign(win.effect, 'effect.win_challenge');
+    win.effect.params = { end: 'on_first_completion' };
+    win.effect.scope = 'every_player';
+    challenge.rules.push(win);
 
     var jump = preset.assign(preset.blankBlock('modifier'), 'modifier.disable_jump');
     jump.scope = 'every_player';

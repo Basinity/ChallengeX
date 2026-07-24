@@ -55,16 +55,11 @@ public final class RunController {
             return;
         }
         if (run.state() == RunState.RUNNING) {
-            // Who is in the run right now, for an everyone-completion goal;
-            // a player leaving can itself complete it, so this runs each tick.
-            run.updateParticipants(server.getPlayerList().getPlayers().stream()
-                    .map(ServerPlayer::getScoreboardName)
-                    .toList());
             run.tick(1);
         }
         RunState state = run.state();
         if (previous != RunState.FINISHED && state == RunState.FINISHED) {
-            RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks(), run.winner());
+            RunAnnouncer.announce(server, run.outcome(), run.elapsedTicks());
             if (run.outcome() == RunOutcome.LOSS) {
                 lossSpectator.apply(server);
             }

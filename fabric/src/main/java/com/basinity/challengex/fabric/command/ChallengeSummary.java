@@ -2,8 +2,6 @@ package com.basinity.challengex.fabric.command;
 
 import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.model.Challenge;
-import com.basinity.challengex.core.model.GoalCompletion;
-import com.basinity.challengex.core.model.GoalMode;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;
 import com.basinity.challengex.core.model.Rule;
@@ -19,8 +17,8 @@ import net.minecraft.network.chat.Component;
 
 /**
  * Renders a challenge's full composition as chat lines: every rule's trigger and
- * effect with their parameters and scope, the goal, and every modifier. This is
- * what {@code /challengex info} prints, so a player can see exactly which catalog
+ * effect with their parameters and scope, and every modifier. This is what
+ * {@code /challengex info} prints, so a player can see exactly which catalog
  * building blocks the active challenge is built from and at which values.
  */
 final class ChallengeSummary {
@@ -47,15 +45,6 @@ final class ChallengeSummary {
             }
         }
 
-        Optional<com.basinity.challengex.core.model.Goal> goal = challenge.goal();
-        if (goal.isEmpty()) {
-            lines.add(dim("Goal: none"));
-        } else {
-            lines.add(Component.literal("Goal: " + goal.get().goalId() + params(goal.get().params())
-                    + modeNote(goal.get()))
-                    .withStyle(ChatFormatting.WHITE));
-        }
-
         List<Modifier> modifiers = challenge.modifiers();
         if (modifiers.isEmpty()) {
             lines.add(dim("Modifiers: none"));
@@ -72,17 +61,6 @@ final class ChallengeSummary {
 
     private static Component dim(String text) {
         return Component.literal(text).withStyle(ChatFormatting.GRAY);
-    }
-
-    /** The goal's decision mode, silent for the win-together-anyone default. */
-    private static String modeNote(com.basinity.challengex.core.model.Goal goal) {
-        if (goal.mode() == GoalMode.VERSUS) {
-            return " | versus: first to finish wins";
-        }
-        if (goal.completion() == GoalCompletion.EVERYONE) {
-            return " | everyone must finish";
-        }
-        return "";
     }
 
     private static String label(RunState state) {

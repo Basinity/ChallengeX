@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "name": "Last One Standing",
+  "rules": [
+    {
+      "trigger": {
+        "id": "trigger.player_died",
+        "scope": "every_player"
+      },
+      "effect": {
+        "id": "effect.lose_challenge",
+        "scope": "per_player"
+      }
+    }
+  ]
+}

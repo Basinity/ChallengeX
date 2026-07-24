@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * A catalog entry: a stable, namespaced id plus the parameters it takes.
- * Triggers, effects, goals, and modifiers all describe themselves this way,
+ * Triggers, effects, and modifiers all describe themselves this way,
  * which is what lets validation and the web-catalog export treat them
  * uniformly.
  */
@@ -18,7 +18,7 @@ public interface Definition {
     /**
      * Whether entries of this definition carry a scope. False means the entry
      * has no player dimension at all: a spec of it must not carry a scope,
-     * and where true, a spec of it must. Goals are scopeless in the MVP.
+     * and where true, a spec of it must.
      */
     default boolean scoped() {
         return false;

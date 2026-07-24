@@ -214,27 +214,6 @@ window.CX.phrase = (function () {
     return capitalize(opening) + ' → ' + line.effect;
   }
 
-  function goalLine(goal) {
-    var entry = entries.get(goal.id);
-    if (!entry) {
-      return goal.id || 'No goal';
-    }
-    return render(entry.phrase, goal) || entry.name;
-  }
-
-  /* The muted note beside the goal naming the decision mode; every mode gets
-     one, the default included, so a reader never has to know what silence
-     would have meant. */
-  function goalModeNote(goal) {
-    if (goal.mode === 'versus') {
-      return 'First player to finish wins';
-    }
-    if (goal.completion === 'everyone') {
-      return 'Everyone must finish';
-    }
-    return 'One finish wins for all';
-  }
-
   function modifierLine(modifier) {
     var entry = entries.get(modifier.id);
     if (!entry) {
@@ -274,8 +253,6 @@ window.CX.phrase = (function () {
     scopeNote: scopeNote,
     ruleLine: ruleLine,
     ruleSummary: ruleSummary,
-    goalLine: goalLine,
-    goalModeNote: goalModeNote,
     modifierLine: modifierLine,
     technical: technical,
     capitalize: capitalize

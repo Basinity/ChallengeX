@@ -23,7 +23,7 @@ class EngineTest {
     private final Registries registries = CoreCatalog.createRegistries();
 
     private Engine engineFor(Rule... rules) {
-        return new Engine(new Challenge(List.of(rules), Optional.empty(), List.of()), registries);
+        return new Engine(new Challenge(List.of(rules), List.of()), registries);
     }
 
     @Test
@@ -134,24 +134,33 @@ class EngineTest {
     }
 
     @Test
-    void loseChallengeEffectEndsRunAsLossWithoutDispatching() {
-        Engine engine = engineFor(new Rule(
-                TriggerSpec.of("trigger.player_died"),
-                EffectSpec.playerless("effect.lose_challenge")));
+    void loseChallengeEffectTakesAPlayerOutWithoutDispatching() {
+        Engine engine = engineFor(loseRule());
+        engine.updateRoster(List.of("alice"));
 
         assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.player_died", "alice")));
+        assertEquals(Set.of("alice"), engine.eliminated());
+
+        // The run itself is lost only once nobody is left playing.
+        engine.updateRoster(List.of());
         assertEquals(RunOutcome.LOSS, engine.outcome());
     }
 
     @Test
     void noDispatchAfterTheRunEnds() {
-        Engine engine = engineFor(
-                new Rule(TriggerSpec.of("trigger.player_died"),
-                        EffectSpec.playerless("effect.lose_challenge")),
-                Rule.of("trigger.jumped", "effect.heal"));
+        Engine engine = engineFor(loseRule(), Rule.of("trigger.jumped", "effect.heal"));
+        engine.updateRoster(List.of("alice"));
         engine.onEvent(GameEvent.of("trigger.player_died", "alice"));
+        engine.updateRoster(List.of());
 
+        assertEquals(RunOutcome.LOSS, engine.outcome());
         assertEquals(List.of(), engine.onEvent(GameEvent.of("trigger.jumped", "alice")));
+    }
+
+    private static Rule loseRule() {
+        return new Rule(TriggerSpec.of("trigger.player_died"),
+                new EffectSpec(CoreCatalog.EFFECT_LOSE_CHALLENGE, Map.of(),
+                        Optional.of(Scope.PER_PLAYER)));
     }
 
     @Test

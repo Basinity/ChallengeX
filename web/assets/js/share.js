@@ -65,18 +65,7 @@ window.CX.share = (function () {
     return el('div.line', { id: 'rule-' + (index + 1) }, [body]);
   }
 
-  /* The mode note beside the goal stays muted like a modifier's scope note:
-     a versus race reads no louder than the win-together default. */
-  function goalBlock(goal) {
-    return el('div.line', null, [
-      el('div.line__row', null, [
-        el('p.line__text', null, [el('b', { 'data-kind': 'goal', text: phrase.goalLine(goal) })]),
-        el('span.line__scope', { text: phrase.goalModeNote(goal) })
-      ])
-    ]);
-  }
-
-  /* The modifier's name carries the colour, like the trigger, effect and goal
+  /* The modifier's name carries the colour, like the trigger and effect
      names do. The parameter and scope note beside it stays muted whatever the
      scope is, so a specific-player scope reads no louder than "everyone". */
   function modifierBlock(modifier) {
@@ -144,14 +133,11 @@ window.CX.share = (function () {
       body.push(section('rules', 'THE RULES', rules));
     }
 
-    if (challenge.goal || challenge.modifiers.length) {
-      body.push(el('div.share__pair', null, [
-        challenge.goal ? section('goal', 'THE GOAL', goalBlock(challenge.goal)) : el('div'),
-        challenge.modifiers.length ? section('modifiers', 'MODIFIERS', mods) : el('div')
-      ]));
+    if (challenge.modifiers.length) {
+      body.push(section('modifiers', 'MODIFIERS', mods));
     }
 
-    if (!challenge.rules.length && !challenge.goal && !challenge.modifiers.length) {
+    if (!challenge.rules.length && !challenge.modifiers.length) {
       body.push(el('p.empty__body', {
         text: 'This challenge is completely empty. Someone shared a blank slate.'
       }));

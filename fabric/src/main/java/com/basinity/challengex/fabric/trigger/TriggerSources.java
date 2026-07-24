@@ -9,9 +9,8 @@ import java.util.List;
  * using it ever fires.
  *
  * <p>Sources register unconditionally, whatever the loaded challenge uses. A
- * source for a trigger nobody configured costs an unfired listener, and gating
- * registration on the rule list would silently starve goals, which consume
- * trigger events of their own.
+ * source for a trigger nobody configured costs an unfired listener, while
+ * gating registration on the rule list would have to be redone on every import.
  */
 public final class TriggerSources {
 
