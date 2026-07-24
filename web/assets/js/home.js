@@ -25,18 +25,18 @@
       ['hearts never regenerate', 'modifier']],
     [['when a ', null], ['mob dies', 'trigger'], [', the killer gets ', null],
       ['two baby zombies', 'effect']],
-    [['block drops are ', null], ['randomized', 'modifier'], [', and ', null],
-      ['beating the dragon', 'trigger'], [' wins', 'effect']],
-    [['jumping is disabled', 'modifier'], [', and ', null],
-      ['reaching level 50', 'trigger'], [' wins', 'effect']],
-    [['when anyone ', null], ['breaks a block', 'trigger'], [', they ', null],
-      ['teleport somewhere random', 'effect']],
+    [['block drops are ', null], ['randomized', 'modifier'], [' and ', null],
+      ['hostile mobs hit harder', 'modifier']],
+    [['when anyone ', null], ['dies', 'trigger'], [', they are ', null],
+      ['out of the run', 'effect']],
+    [['every ', null], ['block you break', 'trigger'], [' ', null],
+      ['teleports you somewhere random', 'effect']],
     [['whenever anyone ', null], ['crafts an item', 'trigger'], [', an ', null],
       ['anvil drops on them', 'effect']],
-    [['when anyone ', null], ['catches a fish', 'trigger'], [', they get a ', null],
-      ['random item', 'effect']],
-    [['hostile mobs are buffed', 'modifier'], [', and ', null],
-      ['killing the warden', 'trigger'], [' wins', 'effect']],
+    [['trading with a villager', 'trigger'], [' ', null],
+      ['swaps your inventory with someone', 'effect']],
+    [['every ', null], ['ten levels', 'trigger'], [' takes ', null],
+      ['a heart off your maximum', 'effect']],
     [['every time anyone ', null], ['gains XP', 'trigger'], [', their ', null],
       ['hotbar shuffles', 'effect']],
     [['shields are disabled', 'modifier'], [', though ', null],
@@ -47,8 +47,7 @@
       ['nausea', 'effect']],
     [['surviving ', null], ['twenty minutes', 'trigger'], [' ', null],
       ['wins the run', 'effect']],
-    [['when anyone ', null], ['sneaks', 'trigger'], [', they ', null],
-      ['freeze in place', 'effect']]
+    [['sneaking', 'trigger'], [' ', null], ['freezes you in place', 'effect']]
   ];
 
   var KIND_COLOR = {
@@ -211,7 +210,19 @@
     wireDropzone(document.getElementById('dropzone'), document.getElementById('dropfile'));
   }
 
+  /* The footer states which preset schema the site writes. It comes from the
+     generated catalog like every other number on the page, so a schema bump in
+     core reaches the footer without anybody remembering to edit it. The footer
+     is outside the landing section, so both views get it. */
+  function renderSchemaNote() {
+    var host = document.getElementById('schema-note');
+    if (host) {
+      host.textContent = 'preset schema v' + entries.schemaVersion;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    renderSchemaNote();
     var root = document.getElementById('shared');
     if (window.CX.share.renderFromUrl(root)) {
       document.getElementById('landing').hidden = true;

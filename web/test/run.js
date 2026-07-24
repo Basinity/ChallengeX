@@ -154,6 +154,16 @@ check('playerless entries are exactly the ones the mod pins', () => {
   ], 'playerless ids');
 });
 
+check('the footer fallback states the schema the catalog actually carries', () => {
+  // The footer reads its version from the catalog at runtime; the text in the
+  // HTML is only what shows before the script runs. Nothing keeps that
+  // fallback honest but this check.
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const found = html.match(/preset schema v(\d+)/);
+  ok(found, 'the footer states a schema version');
+  eq(Number(found[1]), entries.schemaVersion, 'footer fallback matches the catalog');
+});
+
 check('only effects offer per_player', () => {
   ok(entries.scopes('effect').includes('per_player'), 'effects take per_player');
   ok(!entries.scopes('trigger').includes('per_player'), 'triggers do not');
