@@ -1,7 +1,7 @@
 /* ChallengeX web builder — the whole visual system.
 
    Direction: a hard-edged console. Nothing is rounded, nothing glows, every
-   raised surface sits on a hard offset shadow instead of a blur. Colour
+   raised surface sits on a hard offset shadow instead of a blur. Color
    carries meaning and is never decorative: amber is a trigger, blue an effect,
    magenta a modifier, red a structural problem. Green is the site's own accent
    and belongs to no building block. MC Ten Lowercase
@@ -10,11 +10,11 @@
    commands) is IBM Plex Mono.
 
    The console comes in two finishes. Dark is the original: greenish blacks
-   with the piece colours bright on top. Light is the same console printed on
-   green-cast paper: the piece colours drop to ink weights that hold AA
+   with the piece colors bright on top. Light is the same console printed on
+   green-cast paper: the piece colors drop to ink weights that hold AA
    contrast both as text on the paper and under light text on solid chips, and
    the offset shadows become ink at lower alpha. Every token is a light-dark()
-   pair, so each colour lives in exactly one place; which side renders is the
+   pair, so each color lives in exactly one place; which side renders is the
    color-scheme, following the system until the topbar switch forces one. */
 
 /* ---------- tokens ---------- */
@@ -42,7 +42,7 @@
   --trigger-wash: light-dark(#f2edd8, #1c1a12);
 
   /* The site's own accent: links, focus, primary buttons, headings. Green,
-     and deliberately not any building block's colour, so the four semantic
+     and deliberately not any building block's color, so the four semantic
      hues stay information rather than decoration. */
   --accent: light-dark(#3c7a16, #9adf6a);
   --accent-bright: light-dark(#2f6410, #c2f09a);
@@ -1082,7 +1082,7 @@ code {
 }
 
 /* The two effects that decide how a run ends lead the effect list and are
-   drawn apart from it: a solid edge in the effect colour and its wash behind,
+   drawn apart from it: a solid edge in the effect color and its wash behind,
    so they read as a different sort of thing rather than a louder one. */
 .pick[data-run-control='true'] {
   border-color: var(--effect-line);
@@ -1102,7 +1102,7 @@ code {
 
 .pick:hover { background: var(--bg-strip); }
 /* The run-control pair keep their wash on hover: the brightening border is
-   feedback enough, and losing the colour would undo the whole point of it. */
+   feedback enough, and losing the color would undo the whole point of it. */
 .pick[data-run-control='true']:hover { background: var(--effect-wash); }
 .pick[data-kind='trigger']:hover { border-color: var(--trigger); }
 .pick[data-kind='effect']:hover { border-color: var(--effect); }

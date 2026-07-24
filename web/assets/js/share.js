@@ -91,7 +91,7 @@ window.CX.share = (function () {
     return rules.slice().sort(function (a, b) { return rank(a) - rank(b); });
   }
 
-  /* The modifier's name carries the colour, like the trigger and effect
+  /* The modifier's name carries the color, like the trigger and effect
      names do. The parameter and scope note beside it stays muted whatever the
      scope is, so a specific-player scope reads no louder than "everyone". */
   function modifierBlock(modifier) {

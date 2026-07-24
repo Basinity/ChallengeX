@@ -29,223 +29,223 @@ window.CX_COPY = {
 
   'trigger.block_broken': {
     name: 'Block broken',
-    blurb: 'Someone mines a block. Any block, or one in particular.',
+    blurb: 'Fires when a player breaks a block. Name a block to watch only that one, or leave it open for any.',
     phrase: 'breaks {block?a block}'
   },
   'trigger.block_placed': {
     name: 'Block placed',
-    blurb: 'A block gets placed. Any block, or one in particular.',
+    blurb: 'Fires when a player places a block. Name a block to watch only that one, or leave it open for any.',
     phrase: 'places {block?a block}'
   },
   'trigger.mob_killed': {
     name: 'Mob killed',
-    blurb: 'A mob gets killed. Any mob, or one in particular.',
+    blurb: 'Fires when a player kills a mob. Killing another player counts as Player killed instead, not as this.',
     phrase: 'kills {mob?a mob}'
   },
   'trigger.kill_player': {
     name: 'Player killed',
-    blurb: 'One player kills another. Name one, or leave it open season.',
+    blurb: 'Fires when one player kills another. Name a victim to watch only kills on them.',
     phrase: 'kills {name?another player}'
   },
   'trigger.player_died': {
     name: 'Player died',
-    blurb: 'A player dies, by any or a specific cause.',
+    blurb: 'Fires when a player dies, by any cause. Name a damage type to watch only deaths from it.',
     phrase: 'dies[ to {source}]'
   },
   'trigger.damage_taken': {
     name: 'Damage taken',
-    blurb: 'Any damage delivered counts. Shield blocks do not.',
+    blurb: 'Fires on every hit a player takes, including hits that deal no damage. A hit stopped by a shield does not count.',
     phrase: 'takes damage[ from {source}]'
   },
   'trigger.damage_dealt': {
     name: 'Damage dealt',
-    blurb: 'Any damage received counts. Shield blocks do not.',
+    blurb: 'Fires when a player damages something. A hit stopped by a shield does not count. Filter by damage type, by what was hit, or both.',
     phrase: 'deals damage[ with {source}][ to {target}]'
   },
   'trigger.item_crafted': {
     name: 'Item crafted',
-    blurb: 'Something leaves a crafting grid.',
+    blurb: 'Fires when a player takes the result out of a crafting grid.',
     phrase: 'crafts {item?anything}'
   },
   'trigger.item_picked_up': {
     name: 'Item picked up',
-    blurb: 'An item hits the inventory, however it got there.',
+    blurb: 'Fires when an item enters a player\'s inventory, however it got there.',
     phrase: 'picks up {item?an item}'
   },
   'trigger.item_dropped': {
     name: 'Item dropped',
-    blurb: 'An item leaves the inventory by getting dropped.',
+    blurb: 'Fires when a player drops an item out of their inventory.',
     phrase: 'drops {item?an item}'
   },
   'trigger.food_eaten': {
     name: 'Food eaten',
-    blurb: 'Something is consumed. Optionally a specific food.',
+    blurb: 'Fires when a player finishes eating. Covers every item the game treats as food.',
     phrase: 'eats {item?something}'
   },
   'trigger.xp_gained': {
     name: 'XP gained',
-    blurb: 'Fires on every gain, not on a total. Orbs add up fast.',
+    blurb: 'Fires each time a player picks up experience, once per pickup rather than on a total. Orbs arrive in bursts.',
     phrase: 'gains XP'
   },
   'trigger.advancement_earned': {
     name: 'Advancement earned',
-    blurb: 'Whenever an advancement is earned.',
+    blurb: 'Fires when a player earns an advancement. Only the five real trees count; recipe unlocks are ignored.',
     phrase: 'earns {advancement?an advancement}'
   },
   'trigger.dimension_changed': {
     name: 'Dimension changed',
-    blurb: 'A portal is stepped through, either way.',
+    blurb: 'Fires when a player arrives in another dimension, in either direction.',
     phrase: 'changes dimension[ to {dimension}]'
   },
   'trigger.biome_changed': {
     name: 'Biome changed',
-    blurb: 'Someone enteres a different biome.',
+    blurb: 'Fires when a player walks into a different biome.',
     phrase: 'enters {biome?a new biome}'
   },
   'trigger.height_crossed': {
     name: 'Height crossed',
-    blurb: 'A player crosses the given Y level, either way.',
+    blurb: 'Fires when a player crosses the given Y level, going up or going down.',
     phrase: 'crosses Y {y}'
   },
   'trigger.health_below': {
     name: 'Health below',
-    blurb: 'Health dips under the given hearts.',
+    blurb: 'Fires when a player\'s health drops under the given number of hearts.',
     phrase: 'drops below {hearts} hearts'
   },
   'trigger.hunger_below': {
     name: 'Hunger below',
-    blurb: 'The hunger bar drops under the given points.',
+    blurb: 'Fires when a player\'s hunger drops under the given number of points. The bar holds 20.',
     phrase: 'drops below {points} hunger'
   },
   'trigger.level_reached': {
     name: 'Level reached',
-    blurb: 'A specific XP level is hit.',
+    blurb: 'Fires when a player reaches the given experience level.',
     phrase: 'reaches level {level}'
   },
   'trigger.level_interval': {
     name: 'Level interval',
-    blurb: 'Fires every N levels instead of once.',
+    blurb: 'Fires every time a player passes another multiple of the given level, so it repeats through the run.',
     phrase: 'passes every {level} levels'
   },
   'trigger.slept': {
     name: 'Slept',
-    blurb: 'Someone lays down in bed.',
+    blurb: 'Fires when a player sleeps in a bed.',
     phrase: 'sleeps'
   },
   'trigger.jumped': {
     name: 'Jumped',
-    blurb: 'Feet leave the ground. Fires a lot. You know this.',
+    blurb: 'Fires every time a player jumps, which in normal play is constantly.',
     phrase: 'jumps'
   },
   'trigger.sneaked': {
     name: 'Sneaked',
-    blurb: 'Shift is pressed. Also fires a lot.',
+    blurb: 'Fires when a player starts sneaking, which in normal play is often.',
     phrase: 'sneaks'
   },
   'trigger.fish_caught': {
     name: 'Fish caught',
-    blurb: 'The bobber goes down and something comes up.',
+    blurb: 'Fires when a player reels something in with a fishing rod.',
     phrase: 'catches a fish'
   },
   'trigger.villager_traded': {
     name: 'Villager traded',
-    blurb: 'A trade completes. The villager remains unbothered.',
+    blurb: 'Fires when a player completes a trade with a villager.',
     phrase: 'trades with a villager'
   },
   'trigger.enchantment_applied': {
     name: 'Enchantment applied',
-    blurb: 'Something comes out of the table or the anvil enchanted.',
+    blurb: 'Fires when a player enchants an item at a table or an anvil. Filter by enchantment, by level, or both.',
     phrase: 'applies {enchantment?an enchantment}[ {level}]'
   },
   'trigger.item_smelted': {
     name: 'Item smelted',
-    blurb: 'A furnace finishes a job.',
+    blurb: 'Fires when a player takes a finished item out of a furnace.',
     phrase: 'smelts {item?something}'
   },
   'trigger.projectile_shot': {
     name: 'Projectile shot',
-    blurb: 'An arrow, a trident, a snowball. Anything that leaves the hand.',
+    blurb: 'Fires when a player launches a projectile: an arrow, a trident, a snowball, an ender pearl.',
     phrase: 'shoots {projectile?a projectile}'
   },
   'trigger.mob_tamed': {
     name: 'Mob tamed',
-    blurb: 'A new friend is made.',
+    blurb: 'Fires when a player tames a mob.',
     phrase: 'tames {mob?a mob}'
   },
   'trigger.mob_bred': {
     name: 'Mob bred',
-    blurb: 'Two mobs produce a baby mob.',
+    blurb: 'Fires when a player breeds two mobs and a baby appears.',
     phrase: 'breeds {mob?a mob}'
   },
   'trigger.container_opened': {
     name: 'Container opened',
-    blurb: 'A chest, a barrel, a shulker. Anything with a lid.',
+    blurb: 'Fires when a player opens a container screen. Chests, furnaces, anvils and every other block with an interface.',
     phrase: 'opens {container?a container}'
   },
   'trigger.item_used': {
     name: 'Item used',
-    blurb: 'Right-click with something in hand.',
+    blurb: 'Fires when a player uses the item in their hand.',
     phrase: 'uses {item?an item}'
   },
   'trigger.block_interacted': {
     name: 'Block interacted',
-    blurb: 'A block is right-clicked. Doors, buttons, crafting tables.',
+    blurb: 'Fires when a player right-clicks a block: a door, a button, a crafting table.',
     phrase: 'interacts with {block?a block}'
   },
   'trigger.started_gliding': {
     name: 'Started gliding',
-    blurb: 'Elytra deployed.',
+    blurb: 'Fires when a player opens their elytra and starts gliding.',
     phrase: 'starts gliding'
   },
   'trigger.mounted': {
     name: 'Mounted',
-    blurb: 'A horse, a boat, a pig with a saddle.',
+    blurb: 'Fires when a player starts riding something. Horses, boats and minecarts all count, so this matches any entity rather than only mobs.',
     phrase: 'mounts {vehicle?a vehicle}'
   },
   'trigger.effect_gained': {
     name: 'Effect gained',
-    blurb: 'A status effect lands, from any source at all.',
+    blurb: 'Fires when a status effect lands on a player, from a potion, a beacon, a mob or anything else.',
     phrase: 'gains {effect?a status effect}'
   },
   'trigger.tool_broke': {
     name: 'Tool broke',
-    blurb: 'Durability hits zero.',
+    blurb: 'Fires when an item in a player\'s hands runs out of durability and breaks.',
     phrase: 'breaks {item?a tool}'
   },
   'trigger.crit_landed': {
     name: 'Critical hit landed',
-    blurb: 'The jump-attack sparkle.',
+    blurb: 'Fires when a player lands a critical hit, the one that comes from attacking while falling.',
     phrase: 'lands a critical hit'
   },
   'trigger.shield_blocked': {
     name: 'Shield blocked',
-    blurb: 'A hit is absorbed by a shield.',
+    blurb: 'Fires when a player stops a hit with a shield. That hit does not count as damage taken.',
     phrase: 'blocks a hit with a shield'
   },
   'trigger.weather_changed': {
     name: 'Weather changed',
-    blurb: 'The sky changes its mind.',
+    blurb: 'Fires when the world\'s weather changes. It watches the world rather than any player, so it has no scope.',
     phrase: 'the weather changes[ to {weather}]'
   },
   'trigger.time_of_day': {
     name: 'Time of day',
-    blurb: 'The world clock reaches a set time.',
+    blurb: 'Fires when the world clock reaches the given time. It watches the world rather than any player, so it has no scope.',
     phrase: 'the world clock reaches {time}'
   },
   'trigger.fixed_interval': {
     name: 'Fixed interval',
-    blurb: 'A metronome: fires every N seconds.',
+    blurb: 'Fires once every given number of seconds, for as long as the run lasts.',
     phrase: 'Every {seconds} seconds',
     lead: ''
   },
   'trigger.chat_message': {
     name: 'Chat message',
-    blurb: 'Someone says a certain word. Or anything at all.',
+    blurb: 'Fires when a player sends a chat message. Give text to match only messages containing it.',
     phrase: 'says {message?something in chat}'
   },
   'trigger.game_beaten': {
     name: 'Game beaten',
-    blurb: 'Roll the end credits.',
+    blurb: 'Fires when a player beats the game, at the moment the end credits begin.',
     phrase: 'beats the game'
   },
 
@@ -253,189 +253,189 @@ window.CX_COPY = {
 
   'effect.apply_status_effect': {
     name: 'Apply status effect',
-    blurb: 'Grant a potion effect, a blessing or a curse.',
+    blurb: 'Applies a status effect for a set number of seconds, at a strength you choose.',
     phrase: 'gets {effect}[ {amplifier}][ for {duration}s]'
   },
   'effect.remove_item_slot': {
     name: 'Remove item slot',
-    blurb: 'The item in the hand slot gets removed.',
+    blurb: 'Deletes whatever is in the selected hotbar slot. The item is destroyed, not dropped.',
     phrase: 'loses whatever they are holding'
   },
   'effect.drop_held_item': {
     name: 'Drop held item',
-    blurb: 'Whatever is in hand hits the floor.',
+    blurb: 'Drops the held item on the ground, where anyone can pick it up.',
     phrase: 'drops whatever they are holding'
   },
   'effect.drop_inventory': {
     name: 'Drop inventory',
-    blurb: 'Everything on the floor.',
+    blurb: 'Drops the entire inventory on the ground, where anyone can pick it up.',
     phrase: 'drops their whole inventory'
   },
   'effect.give_random_item': {
     name: 'Give random item',
-    blurb: 'A gift. Quality not guaranteed.',
+    blurb: 'Gives one item picked at random from everything in the game.',
     phrase: 'gets a random item'
   },
   'effect.give_item': {
     name: 'Give item',
-    blurb: 'Hand over an item, any amount.',
+    blurb: 'Gives a specific item, in whatever amount you set.',
     phrase: 'gets {amount?1}x {item}'
   },
   'effect.teleport_random': {
     name: 'Teleport randomly',
-    blurb: 'Yeet to a random spot within a radius.',
+    blurb: 'Teleports the player to a random spot within the given radius.',
     phrase: 'is teleported somewhere random[ within {radius} blocks]'
   },
   'effect.teleport_up': {
     name: 'Teleport up',
-    blurb: 'Straight up. Gravity handles the rest.',
+    blurb: 'Teleports the player straight up by the given number of blocks. What happens on the way down is not this effect\'s problem.',
     phrase: 'is teleported {blocks?a long way} blocks upward'
   },
   'effect.spawn_mob': {
     name: 'Spawn mob',
-    blurb: 'Conjure company at the player.',
+    blurb: 'Spawns the named mob at the player\'s feet, as many times as you set. Ageable mobs can be spawned as babies.',
     phrase: 'has {count?1}[{baby} baby] {mob} spawned on them'
   },
   'effect.ignite': {
     name: 'Ignite',
-    blurb: 'Set the player alight.',
+    blurb: 'Sets the player on fire for the given number of seconds.',
     phrase: 'catches fire[ for {seconds}s]'
   },
   'effect.damage': {
     name: 'Damage',
-    blurb: 'Straight damage, in hearts.',
+    blurb: 'Deals the given number of hearts as damage. Armor still applies.',
     phrase: 'takes {hearts?1} hearts of damage'
   },
   'effect.heal': {
     name: 'Heal',
-    blurb: 'Heal the player',
+    blurb: 'Restores the given number of hearts, up to the player\'s maximum.',
     phrase: 'is healed[ {hearts} hearts]'
   },
   'effect.change_max_health': {
     name: 'Change max health',
-    blurb: 'Move the health ceiling itself, up or down. Persists across death.',
+    blurb: 'Raises or lowers the maximum number of hearts a player has. The change stays through death and rejoining.',
     phrase: 'has their maximum health changed by {hearts} hearts'
   },
   'effect.drain_hunger': {
     name: 'Drain hunger',
-    blurb: 'The bar goes down.',
+    blurb: 'Removes the given number of hunger points from the bar.',
     phrase: 'loses {amount?some} hunger'
   },
   'effect.restore_hunger': {
     name: 'Restore hunger',
-    blurb: 'The bar comes back.',
+    blurb: 'Restores the given number of hunger points, or fills the bar when left blank.',
     phrase: 'regains {amount?all their} hunger'
   },
   'effect.change_xp': {
     name: 'Change XP',
-    blurb: 'Add, remove, or set outright, in points or in levels.',
+    blurb: 'Adds, removes or sets experience, counted either in points or in whole levels.',
     phrase: 'has their XP changed by {amount}[ levels{levels}]'
   },
   'effect.shuffle_hotbar': {
     name: 'Shuffle hotbar',
-    blurb: 'Everything is still there. Nothing is where you left it.',
+    blurb: 'Reorders the hotbar at random. Nothing is lost, and nothing is where it was.',
     phrase: 'has their hotbar shuffled'
   },
   'effect.swap_inventory': {
     name: 'Swap inventory',
-    blurb: 'Trade everything with a random player, consent not required.',
+    blurb: 'Swaps the player\'s entire inventory with that of another player picked at random.',
     phrase: 'swaps inventories with a random player'
   },
   'effect.swap_position': {
     name: 'Swap position',
-    blurb: 'Two players trade places.',
+    blurb: 'Teleports the player to another player picked at random, and that player to where they were.',
     phrase: 'swaps places with a random player'
   },
   'effect.clear_effects': {
     name: 'Clear effects',
-    blurb: 'Every active effect goes, the good ones included.',
+    blurb: 'Removes every status effect the player has, helpful ones included.',
     phrase: 'loses all active effects'
   },
   'effect.lightning': {
     name: 'Lightning',
-    blurb: 'Get smited.',
+    blurb: 'Strikes the player with lightning, which sets fires and damages as real lightning does.',
     phrase: 'is struck by lightning'
   },
   'effect.falling_anvil': {
     name: 'Falling anvil',
-    blurb: 'The classics never die.',
+    blurb: 'Drops an anvil onto the player from the given height above them.',
     phrase: 'gets an anvil dropped on them[ from {height} blocks up]'
   },
   'effect.launch': {
     name: 'Launch',
-    blurb: 'Upward, at speed. Fall damage may occur.',
+    blurb: 'Throws the player upward at the given strength. The landing is left to fall damage.',
     phrase: 'is launched into the air[ at strength {strength}]'
   },
   'effect.broadcast': {
     name: 'Broadcast',
-    blurb: 'Put a line of text in the chat of every player.',
+    blurb: 'Sends a line of text to every player in the chat.',
     phrase: 'sets off the message "{text}"'
   },
   'effect.play_sound': {
     name: 'Play sound',
-    blurb: 'Any game sound. Use responsibly, or don\'t.',
+    blurb: 'Plays any sound in the game to the player.',
     phrase: 'hears {sound}'
   },
   'effect.change_time': {
     name: 'Change time',
-    blurb: 'Set the world clock.',
+    blurb: 'Sets the world clock. It changes the world rather than any player, so it has no scope.',
     phrase: 'the time is set to {value}'
   },
   'effect.change_weather': {
     name: 'Change weather',
-    blurb: 'Set the sky.',
+    blurb: 'Sets the weather. It changes the world rather than any player, so it has no scope.',
     phrase: 'the weather is set to {value}'
   },
   'effect.replace_held_random': {
     name: 'Replace held item',
-    blurb: 'Whatever is in hand becomes something else entirely.',
+    blurb: 'Replaces the held item with a random one. The original is gone.',
     phrase: 'has their held item replaced with something random'
   },
   'effect.random_effect': {
     name: 'Random effect',
-    blurb: 'Roll the dice: a random effect, good, bad.',
+    blurb: 'Applies a status effect picked at random. Restrict it to helpful ones, harmful ones, or leave it open to both.',
     phrase: 'gets a random {type?} effect[ for {seconds}s]'
   },
   'effect.freeze': {
     name: 'Freeze',
-    blurb: 'Movement stops. The mobs, notably, keep going.',
+    blurb: 'Holds the player still for the given number of seconds. Everything else in the world keeps moving.',
     phrase: 'is frozen in place[ for {seconds}s]'
   },
   'effect.knockback': {
     name: 'Knockback',
-    blurb: 'A shove in a direction nobody chose.',
+    blurb: 'Shoves the player in a random direction at the given strength.',
     phrase: 'is knocked in a random direction[ at strength {strength}]'
   },
   'effect.explode': {
     name: 'Explode',
-    blurb: 'A creeper, but on schedule.',
+    blurb: 'Sets off an explosion at the player, at the given power. It damages terrain the way a creeper does.',
     phrase: 'explodes[ at power {power}]'
   },
   'effect.clear_inventory': {
     name: 'Clear inventory',
-    blurb: 'Not dropped, gone.',
+    blurb: 'Deletes the entire inventory. Nothing drops and nothing can be recovered.',
     phrase: 'loses their entire inventory'
   },
   'effect.repair_held_item': {
     name: 'Repair held item',
-    blurb: 'Durability back, no anvil and no XP cost.',
+    blurb: 'Restores durability to the held item, with no anvil and no experience cost.',
     phrase: 'has their held item repaired[ by {amount}]'
   },
   'effect.damage_held_item': {
     name: 'Damage held item',
-    blurb: 'Durability away, no mining required.',
+    blurb: 'Takes durability off the held item, which can break it outright.',
     phrase: 'has their held item damaged[ by {amount}]'
   },
   'effect.kill': {
     name: 'Kill',
-    blurb: 'Instant, unappealable death.',
+    blurb: 'Kills the player immediately, ignoring armor and health.',
     phrase: 'dies on the spot'
   },
   'effect.lose_challenge': {
     runControl: true,
     name: 'Lose the challenge',
     blurb: 'Knocks whoever it lands on out of the run. The run itself is lost once nobody is left playing.',
-    phrase: 'is out of the run'
+    phrase: 'loses the challenge'
   },
   'effect.win_challenge': {
     runControl: true,
@@ -459,62 +459,62 @@ window.CX_COPY = {
 
   'modifier.disable_jump': {
     name: 'Disable jumping',
-    blurb: 'The ground is your home now.',
+    blurb: 'Players cannot jump for the whole run. Enforced through the jump-strength attribute, so drinking milk does not undo it.',
     detail: ''
   },
   'modifier.disable_item_use': {
     name: 'Disable item use',
-    blurb: 'One item becomes decorative. Or all of them.',
+    blurb: 'Using the named item does nothing, for the whole run. Leave it blank to disable every item.',
     detail: '{item?all items}'
   },
   'modifier.disable_interaction': {
     name: 'Disable interaction',
-    blurb: 'A block or item you simply may not touch.',
+    blurb: 'Right-clicking the named block does nothing, for the whole run.',
     detail: '{target}'
   },
   'modifier.no_natural_regen': {
     name: 'No natural regen',
-    blurb: 'Hearts no longer come back naturally.',
+    blurb: 'Health never comes back on its own. Food, potions and other healing still work.',
     detail: ''
   },
   'modifier.time_limit': {
     name: 'Time limit',
-    blurb: 'The run ends as a loss when the clock runs out.',
+    blurb: 'The run clock counts down instead of up, and the run is lost when it reaches zero.',
     detail: '{minutes} minutes'
   },
   'modifier.randomize_block_drops': {
     name: 'Randomize block drops',
-    blurb: 'Every block drops something else. Stone might be a diamond.',
+    blurb: 'Every block drops some other item instead of its own. The same seed gives the same shuffle twice, and it can be rolled separately for each player.',
     detail: 'seed {seed?random}[, per player{per_player}]'
   },
   'modifier.randomize_mob_drops': {
     name: 'Randomize mob drops',
-    blurb: 'Every mob drops something else. Rotten flesh might be a music disc.',
+    blurb: 'Every mob drops some other item instead of its own. The same seed gives the same shuffle twice, and it can be rolled separately for each player.',
     detail: 'seed {seed?random}[, per player{per_player}]'
   },
   'modifier.buff_hostile_mobs': {
     name: 'Buff hostile mobs',
-    blurb: 'Everything that wants you dead is better at it.',
+    blurb: 'Hostile mobs hit harder and take more killing, for the whole run.',
     detail: ''
   },
   'modifier.status_effect': {
     name: 'Persistent status effect',
-    blurb: 'A permanent potion effect for the whole run.',
+    blurb: 'Keeps a status effect applied for the whole run. It is reapplied if anything removes it.',
     detail: '{effect}[ {amplifier}]'
   },
   'modifier.keep_inventory': {
     name: 'Keep inventory',
-    blurb: 'Death keeps your stuff.',
+    blurb: 'Items and experience stay with the player through death instead of dropping.',
     detail: ''
   },
   'modifier.no_hunger_drain': {
     name: 'No hunger drain',
-    blurb: 'The bar stays put. One less thing to worry about.',
+    blurb: 'The hunger bar never empties, whatever the player does.',
     detail: ''
   },
   'modifier.share_inventory': {
     name: 'Share inventory',
-    blurb: 'Everyone shares the same inventory. Have fun.',
+    blurb: 'The scoped players all use one inventory: hotbar, main slots, armor and offhand. Each keeps their own selected slot, and the item on the cursor stays private.',
     detail: ''
   }
 };

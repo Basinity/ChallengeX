@@ -83,7 +83,7 @@ window.CX.phrase = (function () {
       });
       return keep ? inner : '';
     });
-    // Then substitute what survived, honouring {name?fallback}.
+    // Then substitute what survived, honoring {name?fallback}.
     out = out.replace(/\{([a-z0-9_]+)(?:\?([^}]*))?\}/g, function (_, name, fallback) {
       var value = valueOf(block, name);
       if (value.set) {
@@ -190,7 +190,7 @@ window.CX.phrase = (function () {
     return subject ? subject + ' ' + body : body;
   }
 
-  /* A rule as its two halves, so the page can colour them separately. A half
+  /* A rule as its two halves, so the page can color them separately. A half
      with nothing chosen yet says so rather than rendering blank. A playerless
      trigger has nobody who "triggers it", and the engine sends a per-player
      effect to everyone there, so the sentence says everyone too. */

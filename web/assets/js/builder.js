@@ -909,7 +909,7 @@
   function pickCard(entry) {
     var chips = el('div.pick__chips');
     // Parameters read the same whether required or optional: no asterisk, no
-    // colour split. Entries with no parameters simply show no chips.
+    // color split. Entries with no parameters simply show no chips.
     entry.params.forEach(function (param) {
       ui.append(chips, el('span.pick__chip', { text: param.name }));
     });

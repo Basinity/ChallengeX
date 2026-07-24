@@ -1,6 +1,6 @@
 /* The light/dark switch.
 
-   The site follows the system colour scheme until the visitor presses the
+   The site follows the system color scheme until the visitor presses the
    topbar switch, which forces a side by stamping data-theme on the root
    element and remembering the choice in localStorage. A small inline script
    in each page's head re-applies the stored choice before first paint, so a
