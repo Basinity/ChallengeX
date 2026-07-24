@@ -74,10 +74,6 @@ Released as v1.0.0, feature-complete and playtested: the engine, the full buildi
 The preset schema and the building-block ids are stable from this release on; presets keep working across updates.
 A Paper adapter is planned next.
 
-## Credits
-
-Playtesting: milknowo, KoalaBacon, quinmmn, m0sshy, Crypt1dK1ng, eding_, probsAghost, Phasmi.
-
 ## License
 
 [CC BY-NC-SA 4.0](LICENSE), covering the mod and the builder site.
