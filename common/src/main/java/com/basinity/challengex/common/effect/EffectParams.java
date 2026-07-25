@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.effect;
+package com.basinity.challengex.common.effect;
 
 import com.basinity.challengex.core.engine.EffectCommand;
 import com.basinity.challengex.core.model.ParamValue;

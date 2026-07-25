@@ -1,5 +1,6 @@
 package com.basinity.challengex.fabric.effect;
 
+import com.basinity.challengex.common.effect.EffectParams;
 import com.basinity.challengex.core.engine.EffectCommand;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
