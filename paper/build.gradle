@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+}
+
+group = project.maven_group
+version = project.mod_version
+
+base {
+    archivesName = 'challengex-paper'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly "io.papermc.paper:paper-api:${project.paper_api_version}"
+
+    implementation project(':core')
+    implementation project(':common')
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('paper-plugin.yml') {
+        expand 'version': project.version
+    }
+}
+
+// Paper has no jar-in-jar, so core and common ride inside the plugin jar as
+// plain classes. Gson and SLF4J stay out of it: the server bundles both
+// already, the same reason the fabric jar nests nothing extra for them.
+jar {
+    from project(':core').sourceSets.main.output
+    from project(':common').sourceSets.main.output
+}
