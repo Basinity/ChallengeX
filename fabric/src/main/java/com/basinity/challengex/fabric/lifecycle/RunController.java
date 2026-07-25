@@ -1,5 +1,8 @@
 package com.basinity.challengex.fabric.lifecycle;
 
+import com.basinity.challengex.common.lifecycle.RunClock;
+import com.basinity.challengex.common.lifecycle.RunStore;
+import com.basinity.challengex.common.lifecycle.TimerColors;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunOutcome;
 import com.basinity.challengex.core.engine.RunState;
@@ -12,6 +15,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -168,7 +172,7 @@ public final class RunController {
         if (run == null || run.challenge().isEmpty()) {
             return;
         }
-        runStore.save(server, run.snapshot());
+        runStore.save(WorldPaths.root(server), run.snapshot());
     }
 
     private void renderActionBar(MinecraftServer server, ChallengeRun run, RunState state) {
@@ -191,10 +195,25 @@ public final class RunController {
     }
 
     private ClientboundSetActionBarTextPacket bar(int[] ramp, String time, RunState state) {
-        MutableComponent bar = Component.empty().append(TimerColors.gradient(ramp, time, animTick));
+        MutableComponent bar = Component.empty().append(gradient(ramp, time));
         if (state == RunState.PAUSED) {
             bar.append(Component.literal("  (paused)").withStyle(ChatFormatting.GRAY));
         }
         return new ClientboundSetActionBarTextPacket(bar);
+    }
+
+    /**
+     * Renders text in bold with the ramp scrolled by the current animation tick:
+     * one component per character, each colored by its own sample of the ramp.
+     * The ramp and the sampling are shared; building the components is not.
+     */
+    private Component gradient(int[] ramp, String text) {
+        MutableComponent line = Component.empty();
+        for (int i = 0; i < text.length(); i++) {
+            TextColor color = TextColor.fromRgb(TimerColors.colorAt(ramp, i, animTick));
+            line.append(Component.literal(String.valueOf(text.charAt(i)))
+                    .withStyle(style -> style.withColor(color).withBold(true)));
+        }
+        return line;
     }
 }

@@ -24,6 +24,9 @@ dependencies {
 
     implementation project(':core')
     include project(':core')
+
+    implementation project(':common')
+    include project(':common')
 }
 
 processResources {

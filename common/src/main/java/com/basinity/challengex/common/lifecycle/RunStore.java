@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.lifecycle;
+package com.basinity.challengex.common.lifecycle;
 
 import com.basinity.challengex.core.engine.RunSnapshot;
 import com.basinity.challengex.core.preset.PresetFormatException;
@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 
 /**
@@ -17,9 +15,12 @@ import org.slf4j.Logger;
  * so a run belongs to the world it plays in and travels with a copied world
  * rather than being global to the instance like the config-folder presets.
  *
- * <p>A snapshot that cannot be read — missing, malformed, or written by a newer
- * build — yields an empty result, so the server starts with no run rather than
- * failing to boot on a bad file.
+ * <p>A snapshot that cannot be read, whether missing, malformed, or written by a
+ * newer build, yields an empty result, so the server starts with no run rather
+ * than failing to boot on a bad file.
+ *
+ * <p>Callers pass the world root; resolving that path is the one part of this
+ * that differs per platform, so it stays with the adapter.
  */
 public final class RunStore {
 
@@ -33,14 +34,13 @@ public final class RunStore {
         this.logger = logger;
     }
 
-    private static Path file(MinecraftServer server) {
-        return server.getWorldPath(LevelResource.ROOT)
-                .resolve("data").resolve("challengex").resolve(FILE);
+    private static Path file(Path worldRoot) {
+        return worldRoot.resolve("data").resolve("challengex").resolve(FILE);
     }
 
     /** Writes the run snapshot, creating the folder if needed. */
-    public void save(MinecraftServer server, RunSnapshot snapshot) {
-        Path path = file(server);
+    public void save(Path worldRoot, RunSnapshot snapshot) {
+        Path path = file(worldRoot);
         try {
             Files.createDirectories(path.getParent());
             Files.writeString(path, codec.toJson(snapshot));
@@ -50,8 +50,8 @@ public final class RunStore {
     }
 
     /** Reads the saved run, or empty when there is none or it cannot be read. */
-    public Optional<RunSnapshot> load(MinecraftServer server) {
-        Path path = file(server);
+    public Optional<RunSnapshot> load(Path worldRoot) {
+        Path path = file(worldRoot);
         if (!Files.isRegularFile(path)) {
             return Optional.empty();
         }

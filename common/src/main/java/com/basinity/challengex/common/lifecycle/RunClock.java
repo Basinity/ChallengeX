@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.lifecycle;
+package com.basinity.challengex.common.lifecycle;
 
 /**
  * Formats a run clock's tick count in compact unit form: the largest non-zero

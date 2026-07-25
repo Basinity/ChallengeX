@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+}
+
+group = project.maven_group
+version = project.mod_version
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Exposed in this module's own signatures (Challenge, RunSnapshot, RunState),
+    // so consumers get core transitively rather than having to restate it.
+    api project(':core')
+
+    // Adapters already log through SLF4J on both platforms: Fabric directly,
+    // Paper through JavaPlugin.getSLF4JLogger().
+    api 'org.slf4j:slf4j-api:2.0.16'
+
+    testImplementation platform('org.junit:junit-bom:6.1.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

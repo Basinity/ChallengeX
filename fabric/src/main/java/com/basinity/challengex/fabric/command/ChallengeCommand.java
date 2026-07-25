@@ -1,5 +1,8 @@
 package com.basinity.challengex.fabric.command;
 
+import com.basinity.challengex.common.command.ChallengeSummary;
+import com.basinity.challengex.common.lifecycle.TimerColors;
+import com.basinity.challengex.common.text.StyledLine;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.preset.Preset;
@@ -8,8 +11,8 @@ import com.basinity.challengex.core.preset.PresetFormatException;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.ChallengeXFabric;
 import com.basinity.challengex.fabric.lifecycle.RunController;
-import com.basinity.challengex.fabric.lifecycle.TimerColors;
 import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
+import com.basinity.challengex.fabric.text.Lines;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -252,8 +255,9 @@ public final class ChallengeCommand {
             source.sendSuccess(() -> Component.literal("No challenge loaded.").withStyle(ChatFormatting.YELLOW), false);
             return 1;
         }
-        for (Component line : ChallengeSummary.describe(run.challenge(), activePresetName, run.state())) {
-            source.sendSuccess(() -> line, false);
+        for (StyledLine line : ChallengeSummary.describe(run.challenge(), activePresetName, run.state())) {
+            Component rendered = Lines.render(line);
+            source.sendSuccess(() -> rendered, false);
         }
         return 1;
     }

@@ -1,5 +1,6 @@
 package com.basinity.challengex.fabric;
 
+import com.basinity.challengex.common.lifecycle.RunStore;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
@@ -7,8 +8,8 @@ import com.basinity.challengex.fabric.command.ChallengeCommand;
 import com.basinity.challengex.fabric.command.PresetStore;
 import com.basinity.challengex.fabric.lifecycle.RunController;
 import com.basinity.challengex.fabric.lifecycle.RunPersistenceBridge;
-import com.basinity.challengex.fabric.lifecycle.RunStore;
 import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
+import com.basinity.challengex.fabric.lifecycle.WorldPaths;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
 import com.basinity.challengex.fabric.modifier.ModifierContext;
@@ -61,7 +62,7 @@ public class ChallengeXFabric implements ModInitializer {
             server = startedServer;
             // Resume a saved run, else start empty. A restored paused run is
             // re-frozen and a finished one is not re-announced (onRestored).
-            runStore.load(startedServer).ifPresentOrElse(snapshot -> {
+            runStore.load(WorldPaths.root(startedServer)).ifPresentOrElse(snapshot -> {
                 activeRun = ChallengeRun.restore(snapshot, CoreCatalog.createRegistries(),
                         new FabricEffectExecutor(startedServer, LOGGER));
                 runController.onRestored(startedServer, snapshot.state());

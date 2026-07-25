@@ -1,18 +1,19 @@
-package com.basinity.challengex.fabric.lifecycle;
+package com.basinity.challengex.common.lifecycle;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextColor;
 
 /**
- * The palette of run-clock colors and the bold, animated gradient the action
- * bar draws in. Each named color is a short cyclic ramp of shades; a character's
+ * The palette of run-clock colors and the animated gradient the action bar
+ * draws in. Each named color is a short cyclic ramp of shades; a character's
  * color is sampled from the ramp at a position that shifts every tick, so the
  * gradient scrolls across the text as a moving band. The chosen color is stored
  * in the mod config; {@code rainbow} is the one multi-hue option.
+ *
+ * <p>The ramps and the sampling are platform-neutral and live here. Turning a
+ * sampled RGB value into a colored character is each adapter's own job, since
+ * that is where the platform's text type comes in.
  */
 public final class TimerColors {
 
@@ -92,18 +93,14 @@ public final class TimerColors {
     }
 
     /**
-     * Renders text in bold with the color ramp scrolled by {@code animTick}: one
-     * component per character, each colored by its own sample of the ramp.
+     * The packed RGB the character at {@code charIndex} is drawn in, with the
+     * ramp scrolled by {@code animTick}. An adapter walks its text once and
+     * colors each character with this.
      */
-    public static Component gradient(int[] ramp, String text, int animTick) {
-        MutableComponent line = Component.empty();
-        for (int i = 0; i < text.length(); i++) {
-            double phase = (i / (CHARS_PER_STOP * ramp.length)) - (animTick / (TICKS_PER_STOP * ramp.length));
-            TextColor color = TextColor.fromRgb(sample(ramp, phase));
-            line.append(Component.literal(String.valueOf(text.charAt(i)))
-                    .withStyle(style -> style.withColor(color).withBold(true)));
-        }
-        return line;
+    public static int colorAt(int[] ramp, int charIndex, int animTick) {
+        double phase = (charIndex / (CHARS_PER_STOP * ramp.length))
+                - (animTick / (TICKS_PER_STOP * ramp.length));
+        return sample(ramp, phase);
     }
 
     private static int sample(int[] ramp, double phase) {

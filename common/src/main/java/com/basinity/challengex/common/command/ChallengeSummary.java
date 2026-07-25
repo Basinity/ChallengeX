@@ -1,5 +1,7 @@
-package com.basinity.challengex.fabric.command;
+package com.basinity.challengex.common.command;
 
+import com.basinity.challengex.common.text.LineStyle;
+import com.basinity.challengex.common.text.StyledLine;
 import com.basinity.challengex.core.engine.RunState;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.Modifier;
@@ -12,8 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 
 /**
  * Renders a challenge's full composition as chat lines: every rule's trigger and
@@ -21,16 +21,15 @@ import net.minecraft.network.chat.Component;
  * {@code /challengex info} prints, so a player can see exactly which catalog
  * building blocks the active challenge is built from and at which values.
  */
-final class ChallengeSummary {
+public final class ChallengeSummary {
 
     private ChallengeSummary() {
     }
 
-    static List<Component> describe(Challenge challenge, String presetName, RunState state) {
-        List<Component> lines = new ArrayList<>();
+    public static List<StyledLine> describe(Challenge challenge, String presetName, RunState state) {
+        List<StyledLine> lines = new ArrayList<>();
         String name = presetName == null ? "active challenge" : "\"" + presetName + "\"";
-        lines.add(Component.literal("Challenge " + name + "  (" + label(state) + ")")
-                .withStyle(ChatFormatting.GOLD));
+        lines.add(StyledLine.of("Challenge " + name + "  (" + label(state) + ")", LineStyle.GOLD));
 
         List<Rule> rules = challenge.rules();
         if (rules.isEmpty()) {
@@ -40,8 +39,7 @@ final class ChallengeSummary {
             for (Rule rule : rules) {
                 String trigger = rule.trigger().id() + params(rule.trigger().params()) + scope(rule.trigger().scope());
                 String effect = rule.effect().id() + params(rule.effect().params()) + scope(rule.effect().scope());
-                lines.add(Component.literal("  - " + trigger + "  ->  " + effect)
-                        .withStyle(ChatFormatting.WHITE));
+                lines.add(StyledLine.of("  - " + trigger + "  ->  " + effect, LineStyle.WHITE));
             }
         }
 
@@ -51,16 +49,15 @@ final class ChallengeSummary {
         } else {
             lines.add(dim("Modifiers (" + modifiers.size() + "):"));
             for (Modifier modifier : modifiers) {
-                lines.add(Component.literal("  - " + modifier.modifierId() + params(modifier.params())
-                        + scope(modifier.scope()))
-                        .withStyle(ChatFormatting.WHITE));
+                lines.add(StyledLine.of("  - " + modifier.modifierId() + params(modifier.params())
+                        + scope(modifier.scope()), LineStyle.WHITE));
             }
         }
-        return lines;
+        return List.copyOf(lines);
     }
 
-    private static Component dim(String text) {
-        return Component.literal(text).withStyle(ChatFormatting.GRAY);
+    private static StyledLine dim(String text) {
+        return StyledLine.of(text, LineStyle.GRAY);
     }
 
     private static String label(RunState state) {
