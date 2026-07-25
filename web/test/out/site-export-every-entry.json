@@ -683,6 +683,23 @@
       "scope": "every_player"
     },
     {
+      "id": "modifier.randomize_chest_loot",
+      "params": {
+        "seed": 3,
+        "per_player": true
+      },
+      "scope": "every_player"
+    },
+    {
+      "id": "modifier.randomize_crafting",
+      "params": {
+        "seed": 3,
+        "per_player": true,
+        "hide_result": true
+      },
+      "scope": "every_player"
+    },
+    {
       "id": "modifier.scale_hostile_mobs",
       "params": {
         "multiplier": 2.5

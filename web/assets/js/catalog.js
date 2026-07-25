@@ -992,6 +992,43 @@ window.CX_CATALOG = {
       ]
     },
     {
+      "id": "modifier.randomize_chest_loot",
+      "scoped": true,
+      "params": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "required": false
+        },
+        {
+          "name": "per_player",
+          "type": "BOOL",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "modifier.randomize_crafting",
+      "scoped": true,
+      "params": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "required": false
+        },
+        {
+          "name": "per_player",
+          "type": "BOOL",
+          "required": false
+        },
+        {
+          "name": "hide_result",
+          "type": "BOOL",
+          "required": false
+        }
+      ]
+    },
+    {
       "id": "modifier.scale_hostile_mobs",
       "scoped": false,
       "params": [

@@ -6,6 +6,8 @@
     "AdvancementEarnedMixin",
     "BlockItemMixin",
     "ContainerOpenedMixin",
+    "CraftingResultMixin",
+    "CraftingTakeMixin",
     "CritLandedMixin",
     "EnchantmentAppliedMixin",
     "EntityEquipmentAccessor",

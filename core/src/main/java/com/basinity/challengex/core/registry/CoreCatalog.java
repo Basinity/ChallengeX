@@ -146,6 +146,9 @@ public final class CoreCatalog {
         modifier(registry, "time_limit", false, required("minutes", INT));
         modifier(registry, "randomize_block_drops", true, optional("seed", INT), optional("per_player", BOOL));
         modifier(registry, "randomize_mob_drops", true, optional("seed", INT), optional("per_player", BOOL));
+        modifier(registry, "randomize_chest_loot", true, optional("seed", INT), optional("per_player", BOOL));
+        modifier(registry, "randomize_crafting", true, optional("seed", INT), optional("per_player", BOOL),
+                optional("hide_result", BOOL));
         // A multiplier rather than a fixed buff, so it can weaken as well as
         // strengthen. Floored just above zero: at zero a mob has no health at
         // all and cannot exist, and below zero means nothing.
