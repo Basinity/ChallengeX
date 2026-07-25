@@ -944,6 +944,16 @@ window.CX_CATALOG = {
       ]
     },
     {
+      "id": "modifier.disable_item_drop",
+      "scoped": true,
+      "params": []
+    },
+    {
+      "id": "modifier.disable_item_pickup",
+      "scoped": true,
+      "params": []
+    },
+    {
       "id": "modifier.no_natural_regen",
       "scoped": true,
       "params": []

@@ -472,6 +472,16 @@ window.CX_COPY = {
     blurb: 'Right-clicking the named block does nothing, for the whole run.',
     detail: '{target}'
   },
+  'modifier.disable_item_drop': {
+    name: 'Disable dropping',
+    blurb: 'Items cannot be thrown away for the whole run. The drop key does nothing, and neither does throwing a stack out of an inventory screen.',
+    detail: ''
+  },
+  'modifier.disable_item_pickup': {
+    name: 'Disable picking up',
+    blurb: 'Anything lying on the ground stays there, arrows included. Items already in the inventory are untouched, and a chest still hands items over.',
+    detail: ''
+  },
   'modifier.no_natural_regen': {
     name: 'No natural regen',
     blurb: 'Health never comes back on its own. Food, potions and other healing still work.',

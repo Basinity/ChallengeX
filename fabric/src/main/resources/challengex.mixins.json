@@ -9,6 +9,8 @@
     "CraftingResultMixin",
     "CraftingTakeMixin",
     "CritLandedMixin",
+    "DisableItemDropClickMixin",
+    "DisableItemPickupMixin",
     "EnchantmentAppliedMixin",
     "EntityEquipmentAccessor",
     "FishingCatchMixin",

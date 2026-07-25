@@ -75,7 +75,7 @@ function ok(condition, message) {
 check('catalog carries the whole frozen catalog', () => {
   eq(entries.count('trigger'), 44, 'triggers');
   eq(entries.count('effect'), 38, 'effects');
-  eq(entries.count('modifier'), 16, 'modifiers');
+  eq(entries.count('modifier'), 18, 'modifiers');
   eq(entries.schemaVersion, 2, 'schema version');
 });
 
@@ -173,7 +173,7 @@ check('only effects offer per_player', () => {
 check('search finds entries by name, id and blurb', () => {
   ok(entries.search('trigger', 'damage').length >= 2, 'by name');
   ok(entries.search('effect', 'effect.lightning').length === 1, 'by id');
-  ok(entries.search('modifier', '').length === 16, 'empty query returns all');
+  ok(entries.search('modifier', '').length === 18, 'empty query returns all');
   eq(entries.search('effect', 'zzzz').length, 0, 'no match');
 });
 

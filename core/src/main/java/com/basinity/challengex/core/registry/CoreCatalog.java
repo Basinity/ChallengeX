@@ -142,6 +142,8 @@ public final class CoreCatalog {
         modifier(registry, "disable_jump", true);
         modifier(registry, "disable_item_use", true, optional("item", STRING).suggesting("item"));
         modifier(registry, "disable_interaction", true, required("target", STRING).suggesting("block"));
+        modifier(registry, "disable_item_drop", true);
+        modifier(registry, "disable_item_pickup", true);
         modifier(registry, "no_natural_regen", true);
         modifier(registry, "time_limit", false, required("minutes", INT));
         modifier(registry, "randomize_block_drops", true, optional("seed", INT), optional("per_player", BOOL));
