@@ -118,7 +118,7 @@ public final class ChallengeCommand {
         source.sendSuccess(() -> Component.literal(
                 "ChallengeX: compose your own challenges from rules and modifiers"
                         + " to play alone or with your friends."
-                        + " More than 32 million ways to play Minecraft.")
+                        + " More than 500 million ways to play Minecraft.")
                 .withStyle(ChatFormatting.GOLD), false);
         source.sendSuccess(this::builderLink, false);
         return 1;
