@@ -665,6 +665,13 @@
       "scope": "every_player"
     },
     {
+      "id": "modifier.item_lock",
+      "params": {
+        "item": "minecraft:test"
+      },
+      "scope": "every_player"
+    },
+    {
       "id": "modifier.no_natural_regen",
       "scope": "every_player"
     },

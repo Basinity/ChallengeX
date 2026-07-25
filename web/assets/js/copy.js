@@ -482,6 +482,11 @@ window.CX_COPY = {
     blurb: 'Anything lying on the ground stays there, arrows included. Items already in the inventory are untouched, and a chest still hands items over.',
     detail: ''
   },
+  'modifier.item_lock': {
+    name: 'Item lock',
+    blurb: 'Whatever one player is carrying, nobody else can have. Others cannot pick it up, craft it, or take it out of a chest until the holder no longer has it. Name an item to lock only that one, or leave it blank for every item.',
+    detail: '{item?all items}'
+  },
   'modifier.no_natural_regen': {
     name: 'No natural regen',
     blurb: 'Health never comes back on its own. Food, potions and other healing still work.',

@@ -954,6 +954,18 @@ window.CX_CATALOG = {
       "params": []
     },
     {
+      "id": "modifier.item_lock",
+      "scoped": true,
+      "params": [
+        {
+          "name": "item",
+          "type": "STRING",
+          "required": false,
+          "suggests": "item"
+        }
+      ]
+    },
+    {
       "id": "modifier.no_natural_regen",
       "scoped": true,
       "params": []

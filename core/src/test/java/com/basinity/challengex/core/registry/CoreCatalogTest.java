@@ -63,7 +63,7 @@ class CoreCatalogTest {
     void modifierIdsAreFrozen() {
         assertEquals(Set.of(
                 "modifier.disable_jump", "modifier.disable_item_use", "modifier.disable_interaction",
-                "modifier.disable_item_drop", "modifier.disable_item_pickup",
+                "modifier.disable_item_drop", "modifier.disable_item_pickup", "modifier.item_lock",
                 "modifier.no_natural_regen", "modifier.time_limit",
                 "modifier.randomize_block_drops", "modifier.randomize_mob_drops",
                 "modifier.randomize_crafting",

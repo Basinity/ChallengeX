@@ -19,6 +19,7 @@ public final class ModifierEnforcers {
         enforcers.put("modifier.disable_jump", new DisableJumpEnforcer());
         enforcers.put("modifier.status_effect", new StatusEffectEnforcer());
         enforcers.put("modifier.no_hunger_drain", new NoHungerDrainEnforcer());
+        enforcers.put("modifier.item_lock", new ItemLockEnforcer());
         enforcers.put("modifier.share_inventory", new SharedInventoryEnforcer());
         enforcers.put("modifier.share_health", new SharedHealthEnforcer());
         enforcers.put("modifier.share_hunger", new SharedHungerEnforcer());
