@@ -2,21 +2,22 @@
 
 # ChallengeX
 
-Compose your own "Minecraft, but..." challenges from rules, goals, and modifiers to play alone or with your friends. More than 32 million ways to play Minecraft.
+Compose your own "Minecraft, but..." challenges from rules and modifiers to play alone or with your friends. More than 32 million ways to play Minecraft.
 
 ![Composing a challenge in the web builder, then importing and playing it in-game](web/assets/demo.gif)
 
 ## The concept
 
 The "Minecraft, but" genre mostly runs on hand-built challenge lists: someone codes "Minecraft, but taking damage gives a random effect", and that is one challenge.
-ChallengeX ships the building blocks instead, and players assemble their own challenge from three independently optional kinds of piece.
+ChallengeX ships the building blocks instead, and players assemble their own challenge from two independently optional kinds of piece.
 
 - A rule pairs a trigger with an effect, both parametrized (which mob, which status effect, how long, how strong): "when I take damage, I get a random negative effect".
-- A goal is the win condition, at most one per challenge: beat the ender dragon, obtain an elytra. A goal can be raced (first to finish wins) or shared (one finish wins for all, or everyone must finish).
-- A modifier is a persistent condition in force for the whole run, negative or positive: no crafting table, a 30 minute timer, keep inventory. A challenge can be modifier-only.
+- A modifier is a persistent condition in force for the whole run, negative or positive: no jumping, a 30 minute timer, keep inventory. A challenge can be modifier-only.
 
-The catalog holds 44 triggers, 37 effects, 4 goals, and 12 modifiers. Triggers and effects alone compose into 1,628 distinct rules nobody had to hand-write, before parameters, goals, and modifiers multiply that further.
-Rules, effects, and modifiers carry per-player scopes, so asymmetric challenges ("one of us is blind, one is mute") and handicaps for mixed-skill groups are ordinary compositions, not special cases.
+Winning is composed the same way losing is, as a rule whose effect ends the run: beat the ender dragon, reach the End, survive an hour, hit level 30. Any trigger in the catalog can be a win condition, a challenge can carry several, and each one chooses whether the first finish ends the run or everybody has to finish.
+
+The catalog holds 44 triggers, 38 effects, and 19 modifiers. Triggers and effects alone compose into 1,672 distinct rules nobody had to hand-write, before parameters and modifiers multiply that further.
+Triggers, effects, and modifiers carry per-player scopes, so asymmetric challenges ("one of us is blind, one is mute"), handicaps for mixed-skill groups, and races between players are ordinary compositions, not special cases.
 The builder never blocks a bad idea: contradictory or unwinnable combinations export happily, by design.
 A finished challenge saves as a named preset, a plain JSON file or a shareable link with the preset encoded into it, so a creator can publish a ruleset and viewers can play it.
 
@@ -36,10 +37,10 @@ Everything works identically in singleplayer and on a dedicated server, where va
 The build is three modules around one principle: a platform-agnostic engine with thin adapters.
 
 - `core` - the challenge engine, with no Minecraft or Fabric dependency, unit-tested against fake events.
-  - `model` - `Challenge` (a rule multiset, an optional single goal, a modifier list), `Rule` (a trigger spec paired with an effect spec), `Goal`, `Modifier`, and the run clock.
-  - `registry` - the four building-block catalogs (triggers, effects, goals, modifiers) with stable namespaced ids and parameter specs.
+  - `model` - `Challenge` (a rule multiset and a modifier list), `Rule` (a trigger spec paired with an effect spec), `Modifier`, and the run clock.
+  - `registry` - the three building-block catalogs (triggers, effects, modifiers) with stable namespaced ids and parameter specs.
   - `preset` - the strict, schema-versioned preset codec: a preset carrying an unknown id or a scope mismatch is rejected whole, with every problem named, never partially imported.
-  - `engine` - receives abstract game events, matches them against rules, dispatches effect commands, evaluates modifiers and the goal, and advances the run to a win or loss.
+  - `engine` - receives abstract game events, matches them against rules, dispatches effect commands, evaluates modifiers, tracks who is still in the run, and settles it to a win or loss.
 - `fabric` - the Fabric adapter, nesting `core` via jar-in-jar.
   - `trigger` - maps Fabric/vanilla server events onto the engine's abstract events; a Mixin fills in only where no event exists.
   - `effect` - executes the engine's effect commands against the server through a handler-per-id map.
@@ -70,9 +71,12 @@ Two files in `web/assets/js/` are generated, never hand-edited: `catalog.js` (`.
 
 ## Status
 
-Released as v1.0.0, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
-The preset schema and the building-block ids are stable from this release on; presets keep working across updates.
+Released as v2.0.0, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
 A Paper adapter is planned next.
+
+v2.0.0 replaces goals with win conditions composed as rules, which is what makes it a major version: the preset schema moves to version 2 and a version 1 preset is rejected rather than silently losing its win condition, so a challenge built before this release has to be rebuilt in the builder.
+Every player now wins or loses on their own, with the run ending on the first finish or once everybody is done, and a finish announces its place and time.
+Seven modifiers arrive with it: shared health, hunger and experience, randomized crafting, no dropping, no picking up, and an item lock that gives whatever one player carries to them alone.
 
 ## License
 
