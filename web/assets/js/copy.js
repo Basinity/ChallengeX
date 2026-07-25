@@ -492,11 +492,6 @@ window.CX_COPY = {
     blurb: 'Every mob drops some other item instead of its own. The same seed gives the same shuffle twice, and it can be rolled separately for each player.',
     detail: 'seed {seed?random}[, per player{per_player}]'
   },
-  'modifier.randomize_chest_loot': {
-    name: 'Randomize chest loot',
-    blurb: 'Every naturally occurring chest fills from a different kind of chest\'s loot table, so a village chest might hold desert temple loot. The same seed gives the same shuffle twice, and it can be rolled separately for each player.',
-    detail: 'seed {seed?random}[, per player{per_player}]'
-  },
   'modifier.randomize_crafting': {
     name: 'Randomize crafting',
     blurb: 'Every recipe produces some other item, in the amount it would have made. The preview shows what you will really get, unless you hide the result, in which case you only find out once you take it. The same seed gives the same shuffle twice.',

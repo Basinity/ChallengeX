@@ -683,14 +683,6 @@
       "scope": "every_player"
     },
     {
-      "id": "modifier.randomize_chest_loot",
-      "params": {
-        "seed": 3,
-        "per_player": true
-      },
-      "scope": "every_player"
-    },
-    {
       "id": "modifier.randomize_crafting",
       "params": {
         "seed": 3,

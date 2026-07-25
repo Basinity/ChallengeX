@@ -65,7 +65,7 @@ class CoreCatalogTest {
                 "modifier.disable_jump", "modifier.disable_item_use", "modifier.disable_interaction",
                 "modifier.no_natural_regen", "modifier.time_limit",
                 "modifier.randomize_block_drops", "modifier.randomize_mob_drops",
-                "modifier.randomize_chest_loot", "modifier.randomize_crafting",
+                "modifier.randomize_crafting",
                 "modifier.scale_hostile_mobs",
                 "modifier.status_effect", "modifier.keep_inventory", "modifier.no_hunger_drain",
                 "modifier.share_inventory", "modifier.share_health",
