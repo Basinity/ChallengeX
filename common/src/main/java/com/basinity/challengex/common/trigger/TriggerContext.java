@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.trigger;
+package com.basinity.challengex.common.trigger;
 
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;

@@ -1,5 +1,6 @@
 package com.basinity.challengex.fabric.trigger;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.GameEvent;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,5 +1,6 @@
 package com.basinity.challengex.fabric.trigger;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

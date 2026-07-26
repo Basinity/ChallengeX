@@ -1,5 +1,7 @@
 package com.basinity.challengex.fabric.trigger;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
+import com.basinity.challengex.common.trigger.TriggerParams;
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;
 import java.util.HashSet;

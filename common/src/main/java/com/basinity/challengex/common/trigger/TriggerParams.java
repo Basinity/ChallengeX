@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.trigger;
+package com.basinity.challengex.common.trigger;
 
 import com.basinity.challengex.core.model.ParamValue;
 
@@ -12,13 +12,13 @@ import com.basinity.challengex.core.model.ParamValue;
  * where the source would emit {@code 5.0} is the same threshold but not an
  * equal value, so echoing the original is what makes the rule fire.
  */
-final class TriggerParams {
+public final class TriggerParams {
 
     private TriggerParams() {
     }
 
     /** A configured number as a double, whatever JSON shape it arrived in. */
-    static double decimal(ParamValue value) {
+    public static double decimal(ParamValue value) {
         return switch (value) {
             case ParamValue.OfDecimal decimal -> decimal.value();
             case ParamValue.OfInt integer -> integer.value();
@@ -27,7 +27,7 @@ final class TriggerParams {
     }
 
     /** A configured number as a long, whatever JSON shape it arrived in. */
-    static long integer(ParamValue value) {
+    public static long integer(ParamValue value) {
         return switch (value) {
             case ParamValue.OfInt integer -> integer.value();
             case ParamValue.OfDecimal decimal -> (long) decimal.value();
@@ -35,7 +35,7 @@ final class TriggerParams {
         };
     }
 
-    static String string(ParamValue value) {
+    public static String string(ParamValue value) {
         return value instanceof ParamValue.OfString text ? text.value() : null;
     }
 }

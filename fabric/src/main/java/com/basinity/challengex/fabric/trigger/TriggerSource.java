@@ -1,5 +1,7 @@
 package com.basinity.challengex.fabric.trigger;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
+
 /**
  * Watches the game for one catalog trigger and emits its abstract event. One
  * source per trigger id, the mirror of the one-handler-per-id effect side;
