@@ -25,6 +25,18 @@ dependencies {
 
     implementation project(':core')
     implementation project(':common')
+
+    testImplementation platform('org.junit:junit-bom:6.1.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // The handler-coverage test reads the registration table only; it never
+    // touches Bukkit, so the API is enough and no server is needed.
+    testCompileOnly "io.papermc.paper:paper-api:${project.paper_api_version}"
+    testRuntimeOnly "io.papermc.paper:paper-api:${project.paper_api_version}"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 processResources {
