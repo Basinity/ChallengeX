@@ -1,5 +1,6 @@
 package com.basinity.challengex.fabric.modifier;
 
+import com.basinity.challengex.common.modifier.ModifierContext;
 import com.basinity.challengex.core.model.Modifier;
 import java.util.HashMap;
 import java.util.Map;

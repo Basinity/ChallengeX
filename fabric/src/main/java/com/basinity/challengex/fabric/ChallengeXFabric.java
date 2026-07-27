@@ -1,6 +1,7 @@
 package com.basinity.challengex.fabric;
 
 import com.basinity.challengex.common.lifecycle.RunStore;
+import com.basinity.challengex.common.modifier.ModifierContext;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
@@ -13,7 +14,6 @@ import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
 import com.basinity.challengex.fabric.lifecycle.WorldPaths;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
-import com.basinity.challengex.fabric.modifier.ModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierEnforcementTickSource;
 import com.basinity.challengex.fabric.modifier.ModifierSource;
 import com.basinity.challengex.fabric.modifier.ModifierSources;

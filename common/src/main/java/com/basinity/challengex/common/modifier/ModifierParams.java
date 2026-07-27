@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.modifier;
+package com.basinity.challengex.common.modifier;
 
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.ParamValue;

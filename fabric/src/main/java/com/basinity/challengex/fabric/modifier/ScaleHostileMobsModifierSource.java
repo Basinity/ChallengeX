@@ -1,5 +1,7 @@
 package com.basinity.challengex.fabric.modifier;
 
+import com.basinity.challengex.common.modifier.ModifierContext;
+import com.basinity.challengex.common.modifier.ModifierParams;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.registry.CatalogBounds;
 import java.util.OptionalDouble;
