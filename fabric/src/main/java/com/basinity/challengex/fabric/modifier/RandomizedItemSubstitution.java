@@ -1,9 +1,8 @@
 package com.basinity.challengex.fabric.modifier;
 
-import com.basinity.challengex.common.modifier.ModifierParams;
+import com.basinity.challengex.common.modifier.RandomizedSubstitution;
 import com.basinity.challengex.core.model.Modifier;
 import java.util.List;
-import java.util.Random;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -30,15 +29,10 @@ public final class RandomizedItemSubstitution {
      * see different substitutes for the same original item.
      */
     public static Identifier substituteFor(Identifier originalId, Modifier modifier, String playerId) {
-        int seed = ModifierParams.seed(modifier);
-        boolean perPlayer = ModifierParams.bool(modifier, "per_player", false);
-        long salt = originalId.toString().hashCode();
-        if (perPlayer) {
-            salt = salt * 31 + playerId.hashCode();
-        }
         List<Item> items = pool();
-        Random random = new Random(seed * 1_000_003L + salt);
-        return BuiltInRegistries.ITEM.getKey(items.get(random.nextInt(items.size())));
+        int index = RandomizedSubstitution.substituteIndex(
+                originalId.toString(), modifier, playerId, items.size());
+        return BuiltInRegistries.ITEM.getKey(items.get(index));
     }
 
     private static List<Item> pool() {

@@ -1,9 +1,13 @@
 package com.basinity.challengex.paper;
 
+import com.basinity.challengex.common.modifier.ModifierContext;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
+import com.basinity.challengex.paper.modifier.ModifierEnforcementTickSource;
+import com.basinity.challengex.paper.modifier.ModifierSource;
+import com.basinity.challengex.paper.modifier.ModifierSources;
 import com.basinity.challengex.paper.trigger.TriggerSource;
 import com.basinity.challengex.paper.trigger.TriggerSources;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +25,7 @@ public class ChallengeXPaper extends JavaPlugin {
 
     private static ChallengeXPaper instance;
 
+    private final ModifierEnforcementTickSource tickSource = new ModifierEnforcementTickSource();
     private ChallengeRun activeRun;
 
     @Override
@@ -28,7 +33,16 @@ public class ChallengeXPaper extends JavaPlugin {
         instance = this;
         loadChallenge(Challenge.empty());
         registerTriggerSources();
+        registerModifierEnforcement();
         getSLF4JLogger().info("ChallengeX initialized.");
+    }
+
+    private void registerModifierEnforcement() {
+        ModifierContext context = new PaperModifierContext(() -> activeRun);
+        tickSource.register(context, this);
+        for (ModifierSource source : ModifierSources.byId().values()) {
+            source.register(context, this);
+        }
     }
 
     private void registerTriggerSources() {
@@ -40,6 +54,10 @@ public class ChallengeXPaper extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Enforcers hold cross-player state (pooled values, who holds which
+        // locked item); a reload has to start from a clean slate rather than
+        // inheriting the last one's.
+        tickSource.disabled();
         activeRun = null;
         instance = null;
     }
