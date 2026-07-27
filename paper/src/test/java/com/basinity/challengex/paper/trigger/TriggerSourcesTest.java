@@ -18,12 +18,12 @@ import org.junit.jupiter.api.Test;
 class TriggerSourcesTest {
 
     /**
-     * Catalog triggers Bukkit has no clean event for, still to be settled one
-     * way or the other. Listed rather than ignored so the gap is visible here
-     * and has to be closed deliberately, by wiring or by recording a cut.
+     * Catalog triggers this adapter does not source, whether still undecided or
+     * deliberately cut. Empty: every catalog trigger reaches the Paper adapter.
+     * Listed rather than assumed away, so a future trigger that Bukkit cannot
+     * express has to be recorded here instead of quietly going missing.
      */
-    private static final Set<String> NOT_YET_SOURCED = Set.of(
-            "trigger.game_beaten", "trigger.container_opened");
+    private static final Set<String> NOT_YET_SOURCED = Set.of();
 
     private static Set<String> catalogTriggers() {
         Set<String> ids = new TreeSet<>();

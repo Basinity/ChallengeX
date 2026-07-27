@@ -49,6 +49,8 @@ public final class TriggerSources {
         sources.put("trigger.item_used", new ItemUsedTriggerSource());
         sources.put("trigger.block_interacted", new BlockInteractedTriggerSource());
         sources.put("trigger.effect_gained", new EffectGainedTriggerSource());
+        sources.put("trigger.container_opened", new ContainerOpenedTriggerSource());
+        sources.put("trigger.game_beaten", new GameBeatenTriggerSource());
         sources.put("trigger.advancement_earned", new AdvancementEarnedTriggerSource());
         sources.put("trigger.item_crafted", new ItemCraftedTriggerSource());
         sources.put("trigger.item_smelted", new ItemSmeltedTriggerSource());
