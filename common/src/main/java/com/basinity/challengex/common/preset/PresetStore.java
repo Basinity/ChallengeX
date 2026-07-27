@@ -1,4 +1,4 @@
-package com.basinity.challengex.fabric.command;
+package com.basinity.challengex.common.preset;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,11 +6,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 
 /**
- * Locates and reads preset JSON files from the mod's own config folder, the
+ * Locates and reads preset JSON files from the adapter's own config folder, the
  * single import source. The mod never fetches a preset over the network; a
  * preset arrives here by the host dropping the file the website exported into
  * {@code config/challengex/presets}. Reading only lists and loads {@code .json}
@@ -23,8 +22,8 @@ public final class PresetStore {
     private final Path dir;
     private final Logger logger;
 
-    public PresetStore(Logger logger) {
-        this.dir = FabricLoader.getInstance().getConfigDir().resolve("challengex").resolve("presets");
+    public PresetStore(Path dir, Logger logger) {
+        this.dir = dir;
         this.logger = logger;
     }
 

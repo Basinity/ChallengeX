@@ -24,6 +24,11 @@ dependencies {
     // Paper through JavaPlugin.getSLF4JLogger().
     api 'org.slf4j:slf4j-api:2.0.16'
 
+    // Reading and writing the per-player display config. Not exposed in the
+    // public API, and both platforms bundle Gson at runtime, so neither jar
+    // carries a copy.
+    implementation 'com.google.code.gson:gson:2.13.1'
+
     testImplementation platform('org.junit:junit-bom:6.1.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

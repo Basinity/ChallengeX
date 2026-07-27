@@ -1,16 +1,16 @@
 package com.basinity.challengex.fabric;
 
 import com.basinity.challengex.common.lifecycle.RunStore;
+import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.common.modifier.ModifierContext;
+import com.basinity.challengex.common.preset.PresetStore;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.command.ChallengeCommand;
-import com.basinity.challengex.fabric.command.PresetStore;
 import com.basinity.challengex.fabric.lifecycle.RunController;
 import com.basinity.challengex.fabric.lifecycle.RunPersistenceBridge;
-import com.basinity.challengex.fabric.lifecycle.TimerPreferences;
 import com.basinity.challengex.fabric.lifecycle.WorldPaths;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
@@ -20,8 +20,10 @@ import com.basinity.challengex.fabric.modifier.ModifierSources;
 import com.basinity.challengex.fabric.trigger.MixinTriggerBridge;
 import com.basinity.challengex.fabric.trigger.TriggerSource;
 import com.basinity.challengex.fabric.trigger.TriggerSources;
+import java.nio.file.Path;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,8 @@ public class ChallengeXFabric implements ModInitializer {
         instance = this;
         registerTriggerSources();
         registerModifierEnforcement();
-        TimerPreferences preferences = new TimerPreferences(LOGGER);
+        Path configDir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);
+        TimerPreferences preferences = new TimerPreferences(configDir.resolve("config.json"), LOGGER);
         preferences.load();
         RunStore runStore = new RunStore(LOGGER);
         RunController runController = new RunController(() -> activeRun, preferences, runStore);
@@ -73,7 +76,7 @@ public class ChallengeXFabric implements ModInitializer {
             activeRun = null;
             server = null;
         });
-        PresetStore presetStore = new PresetStore(LOGGER);
+        PresetStore presetStore = new PresetStore(configDir.resolve("presets"), LOGGER);
         presetStore.ensureDir();
         new ChallengeCommand(presetStore, runController, preferences).register();
         LOGGER.info("ChallengeX initialized.");

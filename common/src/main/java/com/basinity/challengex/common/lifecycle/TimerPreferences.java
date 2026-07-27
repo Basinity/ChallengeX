@@ -1,6 +1,5 @@
-package com.basinity.challengex.fabric.lifecycle;
+package com.basinity.challengex.common.lifecycle;
 
-import com.basinity.challengex.common.lifecycle.TimerColors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -12,11 +11,10 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 
 /**
- * Each player's own run-clock settings, held in {@code config/challengex/config.json}
+ * Each player's own run-clock settings, held in a {@code config.json}
  * alongside the presets folder and keyed by player UUID: the color the clock
  * draws in, and whether they see it at all. These are personal display
  * preferences rather than host settings, so every player sets their own through
@@ -43,8 +41,8 @@ public final class TimerPreferences {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final Map<UUID, Prefs> byPlayer = new HashMap<>();
 
-    public TimerPreferences(Logger logger) {
-        this.file = FabricLoader.getInstance().getConfigDir().resolve("challengex").resolve("config.json");
+    public TimerPreferences(Path file, Logger logger) {
+        this.file = file;
         this.logger = logger;
     }
 
