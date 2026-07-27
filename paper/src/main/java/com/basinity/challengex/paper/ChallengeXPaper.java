@@ -1,8 +1,11 @@
 package com.basinity.challengex.paper;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
+import com.basinity.challengex.paper.trigger.TriggerSource;
+import com.basinity.challengex.paper.trigger.TriggerSources;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -24,7 +27,15 @@ public class ChallengeXPaper extends JavaPlugin {
     public void onEnable() {
         instance = this;
         loadChallenge(Challenge.empty());
+        registerTriggerSources();
         getSLF4JLogger().info("ChallengeX initialized.");
+    }
+
+    private void registerTriggerSources() {
+        TriggerContext context = new PaperTriggerContext(() -> activeRun);
+        for (TriggerSource source : TriggerSources.byId().values()) {
+            source.register(context, this);
+        }
     }
 
     @Override

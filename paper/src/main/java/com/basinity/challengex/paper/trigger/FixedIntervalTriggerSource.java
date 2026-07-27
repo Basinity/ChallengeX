@@ -1,0 +1,43 @@
+package com.basinity.challengex.paper.trigger;
+
+import com.basinity.challengex.common.trigger.TriggerContext;
+import com.basinity.challengex.common.trigger.TriggerParams;
+import com.basinity.challengex.core.engine.GameEvent;
+import com.basinity.challengex.core.model.ParamValue;
+import com.basinity.challengex.core.registry.CatalogBounds;
+import java.util.Map;
+import org.bukkit.plugin.Plugin;
+
+/**
+ * {@code trigger.fixed_interval}: fires every N seconds, over and over. The
+ * {@code seconds} parameter is the period watched rather than a fact about an
+ * event, so the source reads the configured periods and schedules them itself.
+ * Playerless: a clock ticking over is nobody's doing.
+ *
+ * <p>It schedules off the run's own elapsed clock rather than server uptime, so
+ * the period is anchored to when the run actually started and freezes along
+ * with it while paused, instead of carrying forward whatever gap sat between
+ * server start and {@code /challengex start} as a permanent offset from the
+ * action-bar clock.
+ */
+public final class FixedIntervalTriggerSource implements TriggerSource {
+
+    private static final String TRIGGER_ID = "trigger.fixed_interval";
+    private static final int TICKS_PER_SECOND = 20;
+
+    @Override
+    public void register(TriggerContext context, Plugin plugin) {
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            long ticks = context.elapsedTicks();
+            if (ticks == 0) {
+                return;
+            }
+            for (ParamValue configured : context.configured(TRIGGER_ID, "seconds")) {
+                long period = CatalogBounds.clampLong(TRIGGER_ID, "seconds", TriggerParams.integer(configured));
+                if (ticks % (period * TICKS_PER_SECOND) == 0) {
+                    context.emit(GameEvent.playerless(TRIGGER_ID, Map.of("seconds", configured)));
+                }
+            }
+        }, 1L, 1L);
+    }
+}
