@@ -34,13 +34,14 @@ sandbox.window.location = { href: 'https://challengexmc.com/index.html', hash: '
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 
-for (const file of ['catalog.js', 'gamedata.js', 'copy.js', 'entries.js', 'suggest.js', 'preset.js', 'phrase.js', 'link.js']) {
+for (const file of ['catalog.js', 'gamedata.js', 'copy.js', 'support.js', 'entries.js', 'platform.js',
+  'suggest.js', 'preset.js', 'phrase.js', 'link.js']) {
   const source = fs.readFileSync(path.join(ROOT, 'assets', 'js', file), 'utf8');
   vm.runInContext(source, sandbox, { filename: file });
 }
 
 const CX = sandbox.window.CX;
-const { entries, preset, phrase, link } = CX;
+const { entries, preset, phrase, link, platform } = CX;
 
 /* ---------- a tiny assertion harness ---------- */
 
@@ -607,6 +608,65 @@ check('a preset from the goal era is refused rather than read', () => {
     message = error.message;
   }
   ok(message.includes('goals'), 'the reason names goals: ' + message);
+});
+
+/* ---------- platform availability ---------- */
+
+/* Nothing here may ever stop an export. The site's rule is that only structural
+   problems do that, and a challenge that will not travel is a fact about it
+   rather than a fault in it. */
+
+check('every id named unsupported is a real catalog entry', () => {
+  Object.keys(sandbox.window.CX_SUPPORT.unsupported).forEach((name) => {
+    sandbox.window.CX_SUPPORT.unsupported[name].forEach((id) => {
+      ok(entries.get(id) !== null, name + ' names an unknown id: ' + id);
+    });
+  });
+});
+
+check('judging against both platforms flags what one of them lacks', () => {
+  platform.choose(platform.BOTH);
+  eq(platform.runs('modifier.share_inventory'), false, 'share inventory does not run everywhere');
+  eq(platform.noteFor('modifier.share_inventory'), 'Not on Paper', 'note names the platform');
+  eq(platform.runs('modifier.share_health'), true, 'shared health runs everywhere');
+  eq(platform.noteFor('modifier.share_health'), null, 'no note for a portable entry');
+});
+
+check('choosing one platform judges against that one alone', () => {
+  platform.choose('fabric');
+  eq(platform.runs('modifier.share_inventory'), true, 'fabric runs it');
+  eq(platform.noteFor('modifier.share_inventory'), null, 'so it carries no note');
+
+  platform.choose('paper');
+  eq(platform.runs('modifier.share_inventory'), false, 'paper does not');
+  eq(platform.noteFor('modifier.share_inventory'), 'Not on Paper', 'and says so');
+  platform.choose(platform.BOTH);
+});
+
+check('a challenge reports the pieces that will not travel, once each', () => {
+  const challenge = {
+    rules: [{ trigger: { id: 'trigger.jumped' }, effect: { id: 'effect.heal' } }],
+    modifiers: [{ id: 'modifier.share_inventory' }, { id: 'modifier.share_inventory' },
+      { id: 'modifier.share_health' }]
+  };
+  eq(platform.gapIn(challenge), ['modifier.share_inventory'], 'deduplicated');
+  eq(platform.missingPlatformsFor(challenge), ['paper'], 'which platform falls short');
+  eq(platform.runningPlatformsFor(challenge), ['fabric'], 'and which does not');
+});
+
+check('a portable challenge reports nothing at all', () => {
+  const challenge = {
+    rules: [{ trigger: { id: 'trigger.mob_killed' }, effect: { id: 'effect.lightning' } }],
+    modifiers: [{ id: 'modifier.keep_inventory' }]
+  };
+  eq(platform.gapIn(challenge), [], 'no gap');
+  eq(platform.missingPlatformsFor(challenge), [], 'no platform falls short');
+  eq(platform.runningPlatformsFor(challenge).length, 2, 'both run it');
+});
+
+check('an unfinished rule half is not mistaken for an unsupported one', () => {
+  const challenge = { rules: [{ trigger: {}, effect: {} }], modifiers: [] };
+  eq(platform.gapIn(challenge), [], 'an empty half names no id');
 });
 
 /* ---------- hand the result to the mod ---------- */

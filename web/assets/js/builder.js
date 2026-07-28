@@ -19,6 +19,16 @@
   var phrase = window.CX.phrase;
   var link = window.CX.link;
   var suggest = window.CX.suggest;
+  var platform = window.CX.platform;
+
+  /* A muted note when an entry will not run everywhere the builder is judging
+     against. Neutral on purpose: yellow, green and purple already mean trigger,
+     effect and modifier on this site, and a fourth meaning competing with them
+     would break that. */
+  function platformNote(id) {
+    var note = platform.noteFor(id);
+    return note ? el('span.platform-note', { text: note }) : null;
+  }
 
   var challenge = preset.blankChallenge();
 
@@ -540,6 +550,7 @@
       el('div.half__head', null, [
         el('span.tag', { class: 'tag tag--' + (side === 'trigger' ? 'when' : 'then'), text: HALF_TAG[side] }),
         el('b.half__name', { text: entry.name }),
+        platformNote(entry.id),
         el('button.icon-btn', {
           type: 'button',
           title: 'Choose a different ' + side,
@@ -648,6 +659,7 @@
     }, [
       el('div.mod-card__head', null, [
         el('b.mod-card__name', { text: entry ? entry.name : modifier.id }),
+        platformNote(modifier.id),
         el('span.badge', {
           hidden: !bad,
           text: ui.plural(bad ? problems[modifier.uid].length : 0, 'PROBLEM', 'PROBLEMS')
@@ -784,8 +796,46 @@
     });
   }
 
+  /* The platform this challenge is being judged against. Kept out of the preset
+     entirely, exactly as the player roster is: it changes what the builder
+     tells you, never what a challenge is. */
+  function platformControl() {
+    var row = el('div.seg');
+    var options = [[platform.BOTH, 'BOTH']].concat(platform.all().map(function (name) {
+      return [name, platform.displayName(name).toUpperCase()];
+    }));
+    options.forEach(function (option) {
+      ui.append(row, el('button.seg__opt', {
+        type: 'button',
+        'aria-pressed': platform.chosen() === option[0] ? 'true' : 'false',
+        text: option[1],
+        onclick: function () { platform.choose(option[0]); render(); }
+      }));
+    });
+    return el('div.stack.stack--tight', null, [
+      el('label.meta', { text: 'PLAYING ON' }),
+      row
+    ]);
+  }
+
+  /* The aggregate, beside the export button. It never disables anything: a
+     challenge that will not travel still exports, the same as a doubled
+     modifier or an unwinnable one does. */
+  function platformSummary() {
+    var gap = platform.gapIn(challenge);
+    if (!gap.length) {
+      return null;
+    }
+    return el('span.note', {
+      text: gap.length + ' piece' + (gap.length === 1 ? '' : 's')
+        + ' will not run on your selection. It still exports.'
+    });
+  }
+
   function renderRail(problems) {
     var panel = ui.clear(dom.rail);
+
+    ui.append(panel, platformControl());
 
     if (problems.length) {
       var list = el('div.problems', null, [
@@ -812,6 +862,8 @@
       disabled: problems.length > 0,
       onclick: goToShare
     }));
+
+    ui.append(panel, platformSummary());
   }
 
   function jumpTo(uid) {
@@ -928,7 +980,8 @@
     }, [
       el('span.pick__name', null, [
         entry.name,
-        entry.runControl ? el('span.pick__tag', { text: 'OUTCOME' }) : null
+        entry.runControl ? el('span.pick__tag', { text: 'OUTCOME' }) : null,
+        platformNote(entry.id)
       ]),
       entry.blurb ? el('span.pick__blurb', { text: entry.blurb }) : null,
       chips

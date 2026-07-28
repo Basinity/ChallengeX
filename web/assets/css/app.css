@@ -159,6 +159,19 @@ code {
   color: var(--text-faint);
 }
 
+/* "Not on Paper", beside an entry that will not run everywhere. Deliberately
+   colorless: yellow, green and purple already mean trigger, effect and
+   modifier here, and a fourth meaning competing with them would undo that. It
+   sits at the weight of the parameter and scope notes for the same reason,
+   since it states a fact about the entry rather than a problem with it. */
+.platform-note {
+  font: 400 10px var(--mono);
+  color: var(--text-mute);
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
 /* The caret that ends the wordmark and the empty-state headline. */
 .caret { color: var(--accent); }
 

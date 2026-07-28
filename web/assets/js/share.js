@@ -18,6 +18,32 @@ window.CX.share = (function () {
   var preset = window.CX.preset;
   var phrase = window.CX.phrase;
   var link = window.CX.link;
+  var platform = window.CX.platform;
+
+  /* One quiet line when a challenge will not travel, and nothing at all when it
+     will. Whoever opened this arrived from somebody else's link, so their
+     platform is unknown and nothing is filtered: the page just says which
+     version falls short and what it would lose. */
+  function compatibilityLine(challenge) {
+    var short = platform.missingPlatformsFor(challenge);
+    if (!short.length) {
+      return null;
+    }
+    var runs = platform.runningPlatformsFor(challenge).map(platform.displayName);
+    var parts = [];
+    if (runs.length) {
+      parts.push('Runs on ' + runs.join(' and ') + '.');
+    }
+    short.forEach(function (name) {
+      var pieces = platform.gapOn(challenge, name).map(function (id) {
+        var entry = entries.get(id);
+        return entry ? entry.name : id;
+      });
+      parts.push(pieces.join(', ') + ' ' + (pieces.length === 1 ? 'does' : 'do')
+        + ' not run on ' + platform.displayName(name) + '.');
+    });
+    return el('p.note', { text: parts.join(' ') });
+  }
 
   function actionRow(challenge) {
     var filename = preset.slug(challenge.name) + '.json';
@@ -167,6 +193,11 @@ window.CX.share = (function () {
       body.push(el('p.empty__body', {
         text: 'This challenge is completely empty. Someone shared a blank slate.'
       }));
+    }
+
+    var compatibility = compatibilityLine(challenge);
+    if (compatibility) {
+      body.push(compatibility);
     }
 
     body.push(howTo(challenge));
