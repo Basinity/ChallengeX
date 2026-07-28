@@ -62,15 +62,17 @@ abstract class SharedPoolEnforcer implements ModifierEnforcer {
         if (!pool.claimTick(group, server.getCurrentTick())) {
             return;
         }
-        List<Player> living = livingMembers(group, server);
-        List<SharedPool.Member> members = new ArrayList<>(living.size());
-        for (Player member : living) {
-            members.add(new SharedPool.Member(member.getUniqueId(), read(member), ceiling(member)));
+        List<Player> online = onlineMembers(group, server);
+        List<SharedPool.Member> members = new ArrayList<>(online.size());
+        for (Player member : online) {
+            members.add(new SharedPool.Member(member.getUniqueId(), read(member),
+                    ceiling(member), !member.isDead()));
         }
         OptionalDouble settled = pool.settle(group, members);
         if (settled.isEmpty()) {
             return;
         }
+        List<Player> living = online.stream().filter(member -> !member.isDead()).toList();
         for (Player member : living) {
             write(member, settled.getAsDouble());
             // Read back rather than trusting the write: the game may clamp it,
@@ -90,21 +92,25 @@ abstract class SharedPoolEnforcer implements ModifierEnforcer {
     }
 
     /**
-     * The members who are online and alive. A dead one is forgotten as well as
-     * skipped, so that when they respawn they read as having just arrived and
-     * adopt the pool instead of contributing the whole of their restored value.
+     * The members who are online, dead ones included: the pool has to be told
+     * somebody went down, and it cannot learn that from an absence. A dead one
+     * is still forgotten from the change tracking, so that when they respawn
+     * they read as having just arrived and adopt the pool instead of
+     * contributing the whole of their restored value to it.
      */
-    private List<Player> livingMembers(String group, Server server) {
-        List<Player> living = new ArrayList<>();
+    private List<Player> onlineMembers(String group, Server server) {
+        List<Player> online = new ArrayList<>();
         Set<UUID> stillLiving = new HashSet<>();
         for (UUID id : pool.members(group)) {
             Player player = server.getPlayer(id);
-            if (player != null && player.isOnline() && !player.isDead()) {
-                living.add(player);
-                stillLiving.add(id);
+            if (player != null && player.isOnline()) {
+                online.add(player);
+                if (!player.isDead()) {
+                    stillLiving.add(id);
+                }
             }
         }
         pool.forgetAbsent(group, stillLiving);
-        return living;
+        return online;
     }
 }

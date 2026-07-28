@@ -24,7 +24,6 @@ public final class ModifierSources {
 
     public static Map<String, ModifierSource> byId() {
         Map<String, ModifierSource> sources = new LinkedHashMap<>();
-        sources.put("modifier.disable_jump", new DisableJumpModifierSource());
         sources.put("modifier.disable_item_use", new DisableItemUseModifierSource());
         sources.put("modifier.disable_interaction", new DisableInteractionModifierSource());
         sources.put("modifier.disable_item_drop", new DisableItemDropModifierSource());

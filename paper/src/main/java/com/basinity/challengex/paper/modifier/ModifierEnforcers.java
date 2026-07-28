@@ -16,6 +16,7 @@ public final class ModifierEnforcers {
 
     public static Map<String, ModifierEnforcer> byId() {
         Map<String, ModifierEnforcer> enforcers = new LinkedHashMap<>();
+        enforcers.put("modifier.disable_jump", new DisableJumpEnforcer());
         enforcers.put("modifier.status_effect", new StatusEffectEnforcer());
         enforcers.put("modifier.no_hunger_drain", new NoHungerDrainEnforcer());
         enforcers.put("modifier.item_lock", new ItemLockEnforcer());

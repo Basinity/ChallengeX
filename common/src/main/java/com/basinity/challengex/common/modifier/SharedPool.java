@@ -40,8 +40,12 @@ public final class SharedPool {
 
     private static final String EVERY_PLAYER_GROUP = "*";
 
-    /** One member's state as the adapter currently sees it. */
-    public record Member(UUID id, double value, double ceiling) {
+    /**
+     * One member's state as the adapter currently sees it. A member who is down
+     * is still reported: the pool has to know their life ran out, and finding
+     * that out by their absence loses the very change that killed them.
+     */
+    public record Member(UUID id, double value, double ceiling, boolean alive) {
     }
 
     private final boolean gainsAddUp;
@@ -50,6 +54,8 @@ public final class SharedPool {
     private final Map<String, Integer> settledAtTick = new HashMap<>();
     /** What each member's value was when the group last settled, to spot their change since. */
     private final Map<UUID, Double> lastSettled = new HashMap<>();
+    /** Who is currently down, so a death registers once rather than every tick they lie there. */
+    private final Map<String, Set<UUID>> downByGroup = new HashMap<>();
 
     /**
      * @param gainsAddUp whether several members gaining at once add up. Losses
@@ -120,6 +126,7 @@ public final class SharedPool {
             membersByGroup.remove(group);
             poolByGroup.remove(group);
             settledAtTick.remove(group);
+            downByGroup.remove(group);
         }
     }
 
@@ -152,7 +159,18 @@ public final class SharedPool {
      * in which case the pool is forgotten so the next member to arrive seeds a
      * fresh one rather than being handed back the zero that emptied it.
      */
-    public OptionalDouble settle(String group, List<Member> living) {
+    public OptionalDouble settle(String group, List<Member> members) {
+        // Who has just gone down, as opposed to who is still lying there. A
+        // player waiting on the respawn screen stays dead for as long as they
+        // like, and treating that as a fresh death would empty the pool again
+        // every tick, killing whoever had already got back up.
+        Set<UUID> down = new HashSet<>();
+        members.stream().filter(member -> !member.alive()).map(Member::id).forEach(down::add);
+        Set<UUID> alreadyDown = downByGroup.getOrDefault(group, Set.of());
+        boolean justWentDown = down.stream().anyMatch(id -> !alreadyDown.contains(id));
+        downByGroup.put(group, down);
+
+        List<Member> living = members.stream().filter(Member::alive).toList();
         if (living.isEmpty()) {
             poolByGroup.remove(group);
             return OptionalDouble.empty();
@@ -164,6 +182,13 @@ public final class SharedPool {
             // Nobody was left a moment ago, so this member starts the pool over
             // rather than inheriting whatever emptied it.
             pool = living.getFirst().value();
+        } else if (justWentDown) {
+            // The pool is what ran out. That final loss never reaches the
+            // arithmetic below, because the value that killed them is gone by
+            // the time anyone looks; taking the death itself as the signal is
+            // what makes one shared bar mean one shared life. Writing zero to
+            // the rest ends it for them too.
+            pool = 0.0;
         } else {
             pool = pooled + change(living);
         }
@@ -173,11 +198,23 @@ public final class SharedPool {
         return OptionalDouble.of(value);
     }
 
-    /** Every member's change since the last settle, gathered before any of it is written back. */
+    /**
+     * Every member's change since the last settle, gathered before any of it is
+     * written back.
+     *
+     * <p>Losses always come from everyone. Gains depend on the pool: food and
+     * experience are collected, so collecting in two places credits both, while
+     * health comes back on its own for every member and must not.
+     *
+     * <p>Taking the largest gain of a tick is not enough for that, because two
+     * members regenerate on their own staggered timers and each lands on a
+     * different tick, where each is separately the largest. One nominated
+     * member's gains count instead, which is the only thing that holds the pool
+     * to a single player's rate however many are sharing it.
+     */
     private double change(List<Member> living) {
-        double losses = 0.0;
-        double gains = 0.0;
-        double largestGain = 0.0;
+        UUID pacer = gainsAddUp ? null : pacerOf(living);
+        double total = 0.0;
         for (Member member : living) {
             Double before = lastSettled.get(member.id());
             if (before == null) {
@@ -186,14 +223,25 @@ public final class SharedPool {
                 continue;
             }
             double delta = member.value() - before;
-            if (delta < 0) {
-                losses += delta;
-            } else {
-                gains += delta;
-                largestGain = Math.max(largestGain, delta);
+            if (delta < 0 || gainsAddUp || member.id().equals(pacer)) {
+                total += delta;
             }
         }
-        return losses + (gainsAddUp ? gains : largestGain);
+        return total;
+    }
+
+    /**
+     * The member whose gains move the pool, chosen so it stays the same member
+     * from tick to tick rather than following whoever happened to heal.
+     */
+    private static UUID pacerOf(List<Member> living) {
+        UUID pacer = null;
+        for (Member member : living) {
+            if (pacer == null || member.id().compareTo(pacer) < 0) {
+                pacer = member.id();
+            }
+        }
+        return pacer;
     }
 
     /** The pool held within zero and the smallest ceiling among these players. */
@@ -211,6 +259,7 @@ public final class SharedPool {
         membersByGroup.clear();
         settledAtTick.clear();
         lastSettled.clear();
+        downByGroup.clear();
     }
 
     /** The ids in a group that the adapter reported as gone, so they can be forgotten in one pass. */

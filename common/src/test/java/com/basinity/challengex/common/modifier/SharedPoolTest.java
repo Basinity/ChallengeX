@@ -23,7 +23,11 @@ class SharedPoolTest {
     private final UUID bob = UUID.randomUUID();
 
     private static SharedPool.Member member(UUID id, double value) {
-        return new SharedPool.Member(id, value, FULL);
+        return new SharedPool.Member(id, value, FULL, true);
+    }
+
+    private static SharedPool.Member down(UUID id) {
+        return new SharedPool.Member(id, 0.0, FULL, false);
     }
 
     /** Seeds a two-member group both sitting at {@code start}. */
@@ -63,7 +67,7 @@ class SharedPoolTest {
     }
 
     @Test
-    @DisplayName("gains take the largest alone for a pool that regenerates, like health")
+    @DisplayName("only one member's gains move a pool that regenerates, like health")
     void gainsDoNotStackWhenRegenerated() {
         SharedPool pool = groupOfTwo(false, 10.0);
         pool.claimTick(GROUP, 1);
@@ -71,9 +75,99 @@ class SharedPoolTest {
         OptionalDouble settled = pool.settle(GROUP,
                 List.of(member(alice, 13.0), member(bob, 12.0)));
 
-        // Both regenerated on their own; a shared bar comes back at the rate of
-        // the quickest, not at the sum, or a pair would heal twice as fast.
+        // One nominated member's gain counts. Both regenerated on their own, and
+        // a shared bar has to come back at one player's rate however many share it.
         assertEquals(13.0, settled.getAsDouble());
+    }
+
+    @Test
+    @DisplayName("staggered regeneration does not double the rate over successive ticks")
+    void regenerationStaysAtOnePlayersRateAcrossTicks() {
+        SharedPool pool = groupOfTwo(false, 10.0);
+
+        // Members regenerate on their own timers, so their gains land on
+        // different ticks. Taking the largest gain of each tick separately
+        // counts both, which is what healed a pair twice as fast in play.
+        pool.claimTick(GROUP, 1);
+        double afterAlice = pool.settle(GROUP,
+                List.of(member(alice, 11.0), member(bob, 10.0))).getAsDouble();
+        pool.recordSettled(alice, afterAlice);
+        pool.recordSettled(bob, afterAlice);
+
+        pool.claimTick(GROUP, 2);
+        double afterBob = pool.settle(GROUP,
+                List.of(member(alice, afterAlice), member(bob, afterAlice + 1.0))).getAsDouble();
+
+        assertEquals(11.0, afterAlice, "the first regeneration counts");
+        assertEquals(11.0, afterBob, "the second, from the other member, does not");
+    }
+
+    @Test
+    @DisplayName("a member going down empties the pool, so one shared bar is one shared life")
+    void aDeathEmptiesThePool() {
+        SharedPool pool = groupOfTwo(true, 4.0);
+        pool.claimTick(GROUP, 1);
+
+        // The blow that killed them took their value with it, so the loss can
+        // never be read back. The death itself has to be the signal.
+        OptionalDouble settled = pool.settle(GROUP, List.of(member(alice, 4.0), down(bob)));
+
+        assertEquals(0.0, settled.getAsDouble());
+    }
+
+    @Test
+    @DisplayName("a member lying on the respawn screen does not empty the pool again")
+    void lyingThereIsNotAFreshDeath() {
+        SharedPool pool = groupOfTwo(true, 4.0);
+
+        // Bob goes down and takes the pool with him.
+        pool.claimTick(GROUP, 1);
+        assertEquals(0.0, pool.settle(GROUP, List.of(member(alice, 4.0), down(bob))).getAsDouble());
+
+        // Both down: the pool is forgotten.
+        pool.claimTick(GROUP, 2);
+        assertTrue(pool.settle(GROUP, List.of(down(alice), down(bob))).isEmpty());
+
+        // Alice gets back up while Bob is still choosing to respawn. Counting
+        // him as freshly dead here is what killed her again the instant she
+        // clicked respawn.
+        pool.claimTick(GROUP, 3);
+        double seeded = pool.settle(GROUP, List.of(member(alice, FULL), down(bob))).getAsDouble();
+        assertEquals(FULL, seeded, "she comes back on a full bar");
+        pool.recordSettled(alice, seeded);
+
+        pool.claimTick(GROUP, 4);
+        double next = pool.settle(GROUP, List.of(member(alice, FULL), down(bob))).getAsDouble();
+        assertEquals(FULL, next, "and stays up while he lies there");
+    }
+
+    @Test
+    @DisplayName("a second, later death empties the pool again")
+    void dyingAgainStillCounts() {
+        SharedPool pool = groupOfTwo(true, FULL);
+
+        pool.claimTick(GROUP, 1);
+        assertEquals(0.0, pool.settle(GROUP, List.of(member(alice, FULL), down(bob))).getAsDouble());
+
+        // Everybody back up, pool reseeded.
+        pool.claimTick(GROUP, 2);
+        double back = pool.settle(GROUP, List.of(member(alice, FULL), member(bob, FULL))).getAsDouble();
+        pool.recordSettled(alice, back);
+        pool.recordSettled(bob, back);
+
+        pool.claimTick(GROUP, 3);
+        assertEquals(0.0, pool.settle(GROUP, List.of(member(alice, FULL), down(bob))).getAsDouble(),
+                "going down a second time is a fresh death");
+    }
+
+    @Test
+    @DisplayName("once everybody is down the pool is forgotten rather than held at zero")
+    void everybodyDownForgetsThePool() {
+        SharedPool pool = groupOfTwo(true, 4.0);
+        pool.claimTick(GROUP, 1);
+
+        assertTrue(pool.settle(GROUP, List.of(down(alice), down(bob))).isEmpty());
+        assertFalse(pool.hasPool(GROUP));
     }
 
     @Test
@@ -105,8 +199,8 @@ class SharedPoolTest {
         pool.claimTick(GROUP, 1);
 
         OptionalDouble settled = pool.settle(GROUP, List.of(
-                new SharedPool.Member(alice, FULL, FULL),
-                new SharedPool.Member(bob, FULL, 6.0)));
+                new SharedPool.Member(alice, FULL, FULL, true),
+                new SharedPool.Member(bob, FULL, 6.0, true)));
 
         assertEquals(6.0, settled.getAsDouble());
     }

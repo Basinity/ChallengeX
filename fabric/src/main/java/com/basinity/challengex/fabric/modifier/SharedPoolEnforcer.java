@@ -62,15 +62,17 @@ abstract class SharedPoolEnforcer implements ModifierEnforcer {
         if (!pool.claimTick(group, server.getTickCount())) {
             return;
         }
-        List<ServerPlayer> living = livingMembers(group, server);
-        List<SharedPool.Member> members = new ArrayList<>(living.size());
-        for (ServerPlayer member : living) {
-            members.add(new SharedPool.Member(member.getUUID(), read(member), ceiling(member)));
+        List<ServerPlayer> online = onlineMembers(group, server);
+        List<SharedPool.Member> members = new ArrayList<>(online.size());
+        for (ServerPlayer member : online) {
+            members.add(new SharedPool.Member(member.getUUID(), read(member),
+                    ceiling(member), member.isAlive()));
         }
         OptionalDouble settled = pool.settle(group, members);
         if (settled.isEmpty()) {
             return;
         }
+        List<ServerPlayer> living = online.stream().filter(ServerPlayer::isAlive).toList();
         for (ServerPlayer member : living) {
             write(member, settled.getAsDouble());
             // Read back rather than trusting the write: the game may clamp it,
@@ -90,21 +92,25 @@ abstract class SharedPoolEnforcer implements ModifierEnforcer {
     }
 
     /**
-     * The members who are online and alive. A dead one is forgotten as well as
-     * skipped, so that when they respawn they read as having just arrived and
-     * adopt the pool instead of contributing the whole of their restored value.
+     * The members who are online, dead ones included: the pool has to be told
+     * somebody went down, and it cannot learn that from an absence. A dead one
+     * is still forgotten from the change tracking, so that when they respawn
+     * they read as having just arrived and adopt the pool instead of
+     * contributing the whole of their restored value to it.
      */
-    private List<ServerPlayer> livingMembers(String group, MinecraftServer server) {
-        List<ServerPlayer> living = new ArrayList<>();
+    private List<ServerPlayer> onlineMembers(String group, MinecraftServer server) {
+        List<ServerPlayer> online = new ArrayList<>();
         Set<UUID> stillLiving = new HashSet<>();
         for (UUID id : pool.members(group)) {
             ServerPlayer player = server.getPlayerList().getPlayer(id);
-            if (player != null && player.isAlive()) {
-                living.add(player);
-                stillLiving.add(id);
+            if (player != null) {
+                online.add(player);
+                if (player.isAlive()) {
+                    stillLiving.add(id);
+                }
             }
         }
         pool.forgetAbsent(group, stillLiving);
-        return living;
+        return online;
     }
 }
