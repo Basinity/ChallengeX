@@ -57,7 +57,7 @@ public class ChallengeXPaper extends JavaPlugin implements Listener {
         runStore.load(worldRoot).ifPresentOrElse(snapshot -> {
             activeRun = ChallengeRun.restore(snapshot, CoreCatalog.createRegistries(),
                     new PaperEffectExecutor(getServer(), getSLF4JLogger()));
-            runController.onRestored(snapshot.state());
+            runController.onRestored(getServer(), snapshot.state());
             getSLF4JLogger().info("Restored {} run at {} ticks.", snapshot.state(), snapshot.elapsedTicks());
         }, () -> loadChallenge(Challenge.empty()));
 

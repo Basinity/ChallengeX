@@ -229,13 +229,8 @@ public final class ChallengeCommand {
             fail(source, "No running challenge to pause.");
             return 0;
         }
-        controller.pause();
+        controller.pause(source.getSender().getServer());
         source.getSender().sendMessage(Component.text("Challenge paused.", NamedTextColor.YELLOW));
-        // The clock stops, but the world does not: freezing it is not supported
-        // on this platform yet, so say so rather than let it look broken.
-        source.getSender().sendMessage(Component.text(
-                "The run clock is paused, but the world keeps running: freezing it is not supported"
-                        + " on Paper yet.", NamedTextColor.GRAY));
         return 1;
     }
 
@@ -246,7 +241,7 @@ public final class ChallengeCommand {
             fail(source, "No paused challenge to resume.");
             return 0;
         }
-        controller.resume();
+        controller.resume(source.getSender().getServer());
         source.getSender().sendMessage(Component.text("Challenge resumed.", NamedTextColor.GREEN));
         return 1;
     }

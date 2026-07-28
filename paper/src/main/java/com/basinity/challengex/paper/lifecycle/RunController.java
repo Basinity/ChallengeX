@@ -31,10 +31,6 @@ import org.bukkit.plugin.Plugin;
  *
  * <p>It holds a supplier rather than the run itself because it registers once at
  * plugin enable while runs are swapped on import.
- *
- * <p>Pausing is not here: the freeze is its own research spike on this platform
- * and has not landed yet, so the run state exists but nothing holds the world
- * still for it.
  */
 public final class RunController {
 
@@ -45,6 +41,7 @@ public final class RunController {
     private final TimerPreferences preferences;
     private final RunStore runStore;
     private final Path worldRoot;
+    private final PauseControl pause = new PauseControl();
     private final OutcomeSpectator outcomeSpectator = new OutcomeSpectator();
     private RunState previous = RunState.NOT_STARTED;
     private int animTick;
@@ -87,6 +84,9 @@ public final class RunController {
             }
             save();
         }
+        if (state == RunState.PAUSED) {
+            pause.holdPlayers(server);
+        }
         animTick = (animTick + 1) % ANIMATION_PERIOD_TICKS;
         renderActionBar(server, run, state);
         previous = state;
@@ -114,26 +114,29 @@ public final class RunController {
         }
     }
 
-    /** Pauses a running run. The world itself is not frozen on this platform yet. */
-    public void pause() {
+    /** Pauses a running run and freezes the world around it. */
+    public void pause(Server server) {
         ChallengeRun run = activeRun.get();
         if (run != null) {
             run.pause();
+            pause.freeze(server);
             save();
         }
     }
 
-    /** Resumes a paused run. */
-    public void resume() {
+    /** Resumes a paused run and unfreezes the world. */
+    public void resume(Server server) {
         ChallengeRun run = activeRun.get();
         if (run != null) {
             run.resume();
+            pause.unfreeze(server);
             save();
         }
     }
 
-    /** Rebuilds the run fresh. */
+    /** Rebuilds the run fresh and lifts any freeze it left behind. */
     public void reset(Server server) {
+        pause.unfreeze(server);
         outcomeSpectator.restore(server);
         ChallengeRun run = activeRun.get();
         if (run != null) {
@@ -143,19 +146,24 @@ public final class RunController {
         save();
     }
 
-    /** A freshly imported challenge starts not-started. */
+    /** A freshly imported challenge starts not-started; lift any freeze from the last run. */
     public void onChallengeReplaced(Server server) {
+        pause.unfreeze(server);
         outcomeSpectator.restore(server);
         previous = RunState.NOT_STARTED;
         save();
     }
 
     /**
-     * Syncs the controller to a run restored from disk on startup: marking the
+     * Syncs the controller to a run restored from disk on startup: a paused run
+     * is re-frozen (the tick freeze itself does not persist), and marking the
      * previous state as the restored one keeps a finished run from re-announcing.
      */
-    public void onRestored(RunState state) {
+    public void onRestored(Server server, RunState state) {
         previous = state;
+        if (state == RunState.PAUSED) {
+            pause.freeze(server);
+        }
     }
 
     /**
