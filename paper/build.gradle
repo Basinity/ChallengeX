@@ -40,10 +40,15 @@ test {
 }
 
 processResources {
-    inputs.property 'version', project.version
+    // Read here rather than inside the closure below. Reaching for the project
+    // from a task at execution time is deprecated, fails outright in Gradle 10,
+    // and rules out the configuration cache.
+    def pluginVersion = project.version
+
+    inputs.property 'version', pluginVersion
 
     filesMatching('paper-plugin.yml') {
-        expand 'version': project.version
+        expand 'version': pluginVersion
     }
 }
 

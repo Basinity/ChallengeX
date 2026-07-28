@@ -798,8 +798,14 @@
 
   /* The platform this challenge is being judged against. Kept out of the preset
      entirely, exactly as the player roster is: it changes what the builder
-     tells you, never what a challenge is. */
-  function platformControl() {
+     tells you, never what a challenge is.
+
+     It sits in its own rail box rather than in the summary panel, because the
+     panel is desktop-only and the boxes ride to the top of the board on a
+     phone. A setting you cannot reach on the device most people open a shared
+     link on is not a setting. */
+  function renderPlatform() {
+    var box = ui.clear(dom.platform);
     var row = el('div.seg');
     var options = [[platform.BOTH, 'BOTH']].concat(platform.all().map(function (name) {
       return [name, platform.displayName(name).toUpperCase()];
@@ -812,10 +818,10 @@
         onclick: function () { platform.choose(option[0]); render(); }
       }));
     });
-    return el('div.stack.stack--tight', null, [
+    ui.append(box, el('div.stack.stack--tight', null, [
       el('label.meta', { text: 'PLAYING ON' }),
       row
-    ]);
+    ]));
   }
 
   /* The aggregate, beside the export button. It never disables anything: a
@@ -837,8 +843,6 @@
 
   function renderRail(problems) {
     var panel = ui.clear(dom.rail);
-
-    ui.append(panel, platformControl());
 
     if (problems.length) {
       var list = el('div.problems', null, [
@@ -1028,6 +1032,7 @@
   function render() {
     dom.name.value = challenge.name;
     renderRoster();
+    renderPlatform();
     if (isEmptyChallenge()) {
       renderEmpty();
     } else {
@@ -1054,6 +1059,7 @@
   function bind() {
     dom.name = document.getElementById('challenge-name');
     dom.roster = document.getElementById('roster');
+    dom.platform = document.getElementById('platform-box');
     dom.main = document.getElementById('board-main');
     dom.rail = document.getElementById('rail-panel');
     dom.tabs = document.getElementById('tabbar');
