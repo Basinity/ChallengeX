@@ -826,9 +826,12 @@
     if (!gap.length) {
       return null;
     }
+    var where = platform.chosen() === platform.BOTH
+      ? 'on every version'
+      : 'on ' + platform.displayName(platform.chosen());
     return el('span.note', {
       text: gap.length + ' piece' + (gap.length === 1 ? '' : 's')
-        + ' will not run on your selection. It still exports.'
+        + ' will not run ' + where + '. It still exports.'
     });
   }
 

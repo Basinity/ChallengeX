@@ -3,6 +3,7 @@ package com.basinity.challengex.fabric;
 import com.basinity.challengex.common.lifecycle.RunStore;
 import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.common.modifier.ModifierContext;
+import com.basinity.challengex.common.modifier.ModifierParams;
 import com.basinity.challengex.common.preset.PresetStore;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
@@ -84,6 +85,9 @@ public class ChallengeXFabric implements ModInitializer {
 
     /** Swaps the active run to a fresh run of the given challenge. */
     public void loadChallenge(Challenge challenge) {
+        // The modifiers the old challenge was built from are unreachable now,
+        // so the seeds rolled for them are only holding on to memory.
+        ModifierParams.forgetRolledSeeds();
         activeRun = new ChallengeRun(challenge, CoreCatalog.createRegistries(),
                 new FabricEffectExecutor(server, LOGGER));
     }

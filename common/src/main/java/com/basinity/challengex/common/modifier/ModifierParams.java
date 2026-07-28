@@ -12,7 +12,16 @@ import java.util.Random;
  */
 public final class ModifierParams {
 
-    /** Seeds rolled for modifiers that were given none, held for the life of the activation. */
+    /**
+     * Seeds rolled for modifiers that were given none, held for the life of the
+     * activation. Keyed by identity rather than by value, so two structurally
+     * identical modifiers from different imports each get their own mapping.
+     *
+     * <p>Identity keys also mean an entry can never be looked up again once its
+     * modifier is unreachable, so {@link #forgetRolledSeeds()} drops the lot
+     * whenever a new challenge replaces the old one. Without that this grows
+     * for the life of the server and holds on to every challenge ever imported.
+     */
     private static final Map<Modifier, Integer> rolledSeeds = new IdentityHashMap<>();
 
     private ModifierParams() {
@@ -32,6 +41,17 @@ public final class ModifierParams {
             return integer(modifier, "seed", 0);
         }
         return rolledSeeds.computeIfAbsent(modifier, ignored -> new Random().nextInt());
+    }
+
+    /**
+     * Forgets every rolled seed, for an adapter swapping in a new challenge.
+     *
+     * <p>Called when the challenge itself is replaced, not on a run reset: a
+     * reset keeps the same modifier objects, and re-rolling their seeds would
+     * change what a randomizer maps to partway through a challenge.
+     */
+    public static void forgetRolledSeeds() {
+        rolledSeeds.clear();
     }
 
     public static String string(Modifier modifier, String name) {
