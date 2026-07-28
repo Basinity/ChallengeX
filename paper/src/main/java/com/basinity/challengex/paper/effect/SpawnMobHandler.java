@@ -32,6 +32,14 @@ public final class SpawnMobHandler implements EffectHandler {
             LOGGER.warn("Unknown mob {}; skipping.", mobId);
             return;
         }
+        // Suggestions never restrict what can be typed, so this id can name
+        // something that is not spawnable. Bukkit throws for those where the
+        // mod's spawn call simply returns nothing, and an exception here would
+        // escape into the event that set the effect off.
+        if (!type.isSpawnable()) {
+            LOGGER.warn("{} cannot be spawned; skipping.", mobId);
+            return;
+        }
         int count = CatalogBounds.clampInt(command.effectId(), "count",
                 EffectParams.integer(command, "count", 1));
         boolean baby = EffectParams.bool(command, "baby", false);

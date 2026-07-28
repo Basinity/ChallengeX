@@ -2,6 +2,7 @@ package com.basinity.challengex.common.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.basinity.challengex.core.registry.CoreCatalog;
@@ -40,6 +41,26 @@ class PlatformSupportTest {
         assertEquals(Set.of(PlatformSupport.FABRIC, PlatformSupport.PAPER),
                 new TreeSet<>(PlatformSupport.platforms()));
         assertTrue(PlatformSupport.unsupportedOn(PlatformSupport.FABRIC).isEmpty());
+    }
+
+    @Test
+    @DisplayName("the platform order is fixed, so the generated file does not churn between builds")
+    void platformOrderIsStable() {
+        // It was read off an immutable map's keys, whose iteration order is
+        // unspecified and salted per JVM: harmless with two platforms and a
+        // rewrite of the committed file on every build with a third.
+        assertEquals(java.util.List.of(PlatformSupport.FABRIC, PlatformSupport.PAPER),
+                PlatformSupport.platforms());
+        assertEquals(SupportJson.write(), SupportJson.write());
+    }
+
+    @Test
+    @DisplayName("every declared platform has a set, and every set has a declared platform")
+    void platformsAndSetsAgree() {
+        PlatformSupport.platforms().forEach(name ->
+                assertNotNull(PlatformSupport.unsupportedOn(name), name + " has no set"));
+        assertTrue(SupportJson.write().contains("\"fabric\""), "fabric is exported");
+        assertTrue(SupportJson.write().contains("\"paper\""), "paper is exported");
     }
 
     @Test

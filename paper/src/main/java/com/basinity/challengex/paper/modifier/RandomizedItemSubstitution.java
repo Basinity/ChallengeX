@@ -21,8 +21,10 @@ import org.bukkit.Registry;
 final class RandomizedItemSubstitution {
 
     private static final class Pool {
+        // Air is excluded for the same reason the mod excludes it: substituting
+        // it would delete the drop rather than randomize it.
         private static final List<Material> ALL = Registry.MATERIAL.stream()
-                .filter(Material::isItem)
+                .filter(material -> material.isItem() && !material.isAir())
                 .sorted(Comparator.comparing(material -> material.getKey().toString()))
                 .toList();
     }

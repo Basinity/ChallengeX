@@ -1,5 +1,6 @@
 package com.basinity.challengex.paper.trigger;
 
+import com.basinity.challengex.common.log.WarnOnce;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.common.trigger.TriggerParams;
 import com.basinity.challengex.core.engine.GameEvent;
@@ -36,6 +37,9 @@ public final class TimeOfDayTriggerSource implements TriggerSource {
             "midnight", 18000L);
 
     private final Set<String> atMarker = new HashSet<>();
+    // The poll runs every tick, so an unknown value would otherwise be
+    // reported twenty times a second for as long as the challenge is loaded.
+    private final WarnOnce warned = new WarnOnce();
 
     @Override
     public void register(TriggerContext context, Plugin plugin) {
@@ -53,7 +57,8 @@ public final class TimeOfDayTriggerSource implements TriggerSource {
             }
             Long marker = MARKERS.get(name.toLowerCase(Locale.ROOT));
             if (marker == null) {
-                LOGGER.warn("Unknown time value {}; expected day, noon, night, or midnight.", name);
+                warned.warn(LOGGER, name,
+                        "Unknown time value {}; expected day, noon, night, or midnight.", name);
                 continue;
             }
             boolean now = time == marker;

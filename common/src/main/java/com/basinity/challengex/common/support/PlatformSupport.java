@@ -4,6 +4,7 @@ import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.model.Rule;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -40,6 +41,14 @@ public final class PlatformSupport {
      */
     public static final int SUPPORT_VERSION = 1;
 
+    /**
+     * The platforms, in the order the website offers them. Declared as a list
+     * rather than taken from the map's keys: {@code Map.copyOf} leaves its
+     * iteration order unspecified and salts it per JVM, which would make the
+     * generated file churn between builds for no reason.
+     */
+    private static final List<String> PLATFORMS = List.of(FABRIC, PAPER);
+
     private static final Map<String, Set<String>> UNSUPPORTED = unsupported();
 
     private PlatformSupport() {
@@ -56,9 +65,9 @@ public final class PlatformSupport {
         return Map.copyOf(byPlatform);
     }
 
-    /** The platforms, in the order the website should offer them. */
-    public static Set<String> platforms() {
-        return UNSUPPORTED.keySet();
+    /** The platforms, in the order the website offers them. */
+    public static List<String> platforms() {
+        return PLATFORMS;
     }
 
     /** The catalog ids this platform does not run. Empty for a platform running all of it. */

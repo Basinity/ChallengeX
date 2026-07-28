@@ -25,8 +25,10 @@ public final class GameIds {
      * and walking it per player per trigger would be wasteful.
      */
     private static final class ItemPool {
+        // Air is an item id like any other and would otherwise be drawn, which
+        // reads as the effect having done nothing at all.
         private static final java.util.List<Material> ALL = Registry.MATERIAL.stream()
-                .filter(Material::isItem)
+                .filter(material -> material.isItem() && !material.isAir())
                 .toList();
     }
 

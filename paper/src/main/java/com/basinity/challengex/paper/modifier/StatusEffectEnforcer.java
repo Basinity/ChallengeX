@@ -1,5 +1,6 @@
 package com.basinity.challengex.paper.modifier;
 
+import com.basinity.challengex.common.log.WarnOnce;
 import com.basinity.challengex.common.modifier.ModifierParams;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.core.registry.CatalogBounds;
@@ -23,6 +24,11 @@ public final class StatusEffectEnforcer implements ModifierEnforcer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusEffectEnforcer.class);
     private static final int DEFAULT_AMPLIFIER = 1;
+    private static final String MISSING = "";
+
+    // resolve() runs from tick(), so a bad effect id would otherwise be
+    // reported once per player per tick for as long as the modifier is active.
+    private final WarnOnce warned = new WarnOnce();
 
     @Override
     public void start(Player player, Modifier modifier, Server server) {
@@ -58,12 +64,12 @@ public final class StatusEffectEnforcer implements ModifierEnforcer {
     private PotionEffectType resolve(Modifier modifier) {
         String effectId = ModifierParams.string(modifier, "effect");
         if (effectId == null) {
-            LOGGER.warn("status_effect is missing its effect id; skipping.");
+            warned.warn(LOGGER, MISSING, "status_effect is missing its effect id; skipping.");
             return null;
         }
         PotionEffectType effect = GameIds.effect(effectId);
         if (effect == null) {
-            LOGGER.warn("Unknown status effect {}; skipping.", effectId);
+            warned.warn(LOGGER, effectId, "Unknown status effect {}; skipping.", effectId);
         }
         return effect;
     }

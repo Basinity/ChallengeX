@@ -98,9 +98,14 @@ public final class ScaleHostileMobsModifierSource extends EventModifierSource {
         instance.getModifiers().stream()
                 .filter(existing -> existing.getKey().equals(key))
                 .forEach(instance::removeModifier);
-        // ADD_MULTIPLIED_TOTAL takes the change rather than the multiplier, so a
-        // multiplier of 1 adds nothing and one of 0.5 halves.
+        // MULTIPLY_SCALAR_1 is Bukkit's name for the operation the mod uses
+        // (ADD_MULTIPLIED_TOTAL), which scales the running total rather than the
+        // base. ADD_SCALAR is the other one, ADD_MULTIPLIED_BASE, and the two
+        // agree only on a mob carrying no other modifiers, so a mob with any
+        // equipment or difficulty bonus would have scaled differently here than
+        // it does on Fabric. It takes the change rather than the multiplier, so
+        // a multiplier of 1 adds nothing and one of 0.5 halves.
         instance.addTransientModifier(new AttributeModifier(key, multiplier - 1.0,
-                AttributeModifier.Operation.ADD_SCALAR));
+                AttributeModifier.Operation.MULTIPLY_SCALAR_1));
     }
 }
