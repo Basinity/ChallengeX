@@ -1,9 +1,9 @@
 package com.basinity.challengex.fabric.lifecycle;
 
-import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.common.lifecycle.RunClock;
 import com.basinity.challengex.common.lifecycle.RunStore;
 import com.basinity.challengex.common.lifecycle.TimerColors;
+import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunOutcome;
 import com.basinity.challengex.core.engine.RunState;

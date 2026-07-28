@@ -5,10 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.basinity.challengex.core.model.Challenge;
+import com.basinity.challengex.core.model.EffectSpec;
+import com.basinity.challengex.core.model.Modifier;
+import com.basinity.challengex.core.model.Rule;
+import com.basinity.challengex.core.model.Scope;
+import com.basinity.challengex.core.model.TriggerSpec;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.core.registry.Definition;
 import com.basinity.challengex.core.registry.Registries;
 import com.basinity.challengex.core.registry.Registry;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import org.junit.jupiter.api.DisplayName;
@@ -78,6 +87,46 @@ class PlatformSupportTest {
         assertFalse(PlatformSupport.supports(PlatformSupport.PAPER, "modifier.share_inventory"));
         assertTrue(PlatformSupport.supports(PlatformSupport.FABRIC, "modifier.share_inventory"));
         assertTrue(PlatformSupport.supports(PlatformSupport.PAPER, "modifier.share_health"));
+    }
+
+    @Test
+    @DisplayName("a challenge reports the pieces its platform cannot run, once each")
+    void unsupportedUsedByNamesEachPieceOnce() {
+        Challenge challenge = new Challenge(List.of(),
+                List.of(shareInventory(), shareInventory(), shareHealth()));
+
+        assertEquals(Set.of("modifier.share_inventory"),
+                PlatformSupport.unsupportedUsedBy(challenge, PlatformSupport.PAPER));
+    }
+
+    @Test
+    @DisplayName("the same challenge reports nothing on a platform that runs all of it")
+    void unsupportedUsedBySaysNothingWhenEverythingRuns() {
+        Challenge challenge = new Challenge(List.of(),
+                List.of(shareInventory(), shareHealth()));
+
+        assertEquals(Set.of(),
+                PlatformSupport.unsupportedUsedBy(challenge, PlatformSupport.FABRIC));
+    }
+
+    @Test
+    @DisplayName("a challenge using nothing missing reports nothing, whatever the platform")
+    void aPortableChallengeReportsNothing() {
+        Challenge challenge = new Challenge(List.of(
+                new Rule(TriggerSpec.of("trigger.mob_killed"),
+                        new EffectSpec("effect.lightning", Map.of(), Optional.of(Scope.EVERY_PLAYER)))),
+                List.of(shareHealth()));
+
+        assertEquals(Set.of(),
+                PlatformSupport.unsupportedUsedBy(challenge, PlatformSupport.PAPER));
+    }
+
+    private static Modifier shareInventory() {
+        return new Modifier("modifier.share_inventory", Map.of(), Optional.of(Scope.EVERY_PLAYER));
+    }
+
+    private static Modifier shareHealth() {
+        return new Modifier("modifier.share_health", Map.of(), Optional.of(Scope.EVERY_PLAYER));
     }
 
     @Test

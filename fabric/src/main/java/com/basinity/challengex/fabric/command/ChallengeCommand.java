@@ -1,18 +1,20 @@
 package com.basinity.challengex.fabric.command;
 
-import com.basinity.challengex.common.preset.PresetStore;
 import com.basinity.challengex.common.command.ChallengeSummary;
 import com.basinity.challengex.common.lifecycle.TimerColors;
+import com.basinity.challengex.common.lifecycle.TimerPreferences;
+import com.basinity.challengex.common.preset.PresetStore;
+import com.basinity.challengex.common.support.PlatformSupport;
 import com.basinity.challengex.common.text.StyledLine;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunState;
+import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.preset.Preset;
 import com.basinity.challengex.core.preset.PresetCodec;
 import com.basinity.challengex.core.preset.PresetFormatException;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.ChallengeXFabric;
 import com.basinity.challengex.fabric.lifecycle.RunController;
-import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.fabric.text.Lines;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -23,6 +25,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -184,7 +187,30 @@ public final class ChallengeCommand {
         source.sendSuccess(() -> Component.literal(
                 "Imported '" + preset.name() + "'. Run /challengex start to begin.")
                 .withStyle(ChatFormatting.GREEN), true);
+        reportUnsupported(source, preset.challenge());
         return 1;
+    }
+
+    /**
+     * Names the pieces this challenge uses that this platform does not run.
+     * Import cannot reject them: {@code core} is shared by every adapter, so an
+     * id only one of them runs is still a known id here and parses clean.
+     *
+     * <p>Fabric runs the whole catalog today, so this says nothing. It is here
+     * so that it starts saying something the day that stops being true, rather
+     * than the miss showing up as a piece quietly doing nothing.
+     */
+    private static void reportUnsupported(CommandSourceStack source, Challenge challenge) {
+        Set<String> gap = PlatformSupport.unsupportedUsedBy(challenge, PlatformSupport.FABRIC);
+        if (gap.isEmpty()) {
+            return;
+        }
+        source.sendSuccess(() -> Component.literal("This challenge uses " + gap.size() + " piece"
+                + (gap.size() == 1 ? "" : "s") + " this version does not run."
+                + " The rest of it plays normally.").withStyle(ChatFormatting.YELLOW), false);
+        for (String id : gap) {
+            source.sendSuccess(() -> Component.literal("  - " + id).withStyle(ChatFormatting.GRAY), false);
+        }
     }
 
     /** A run wrapping the empty starting challenge: nothing has been imported yet. */

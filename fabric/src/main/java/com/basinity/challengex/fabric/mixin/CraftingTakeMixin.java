@@ -1,8 +1,8 @@
 package com.basinity.challengex.fabric.mixin;
 
+import com.basinity.challengex.common.modifier.ModifierParams;
 import com.basinity.challengex.core.model.Modifier;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
-import com.basinity.challengex.common.modifier.ModifierParams;
 import com.basinity.challengex.fabric.modifier.RandomizedItemSubstitution;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;

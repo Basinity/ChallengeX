@@ -669,6 +669,28 @@ check('an unfinished rule half is not mistaken for an unsupported one', () => {
   eq(platform.gapIn(challenge), [], 'an empty half names no id');
 });
 
+check('what a shared link reports does not depend on who is reading it', () => {
+  const challenge = {
+    rules: [],
+    modifiers: [{ id: 'modifier.share_inventory' }]
+  };
+  /* The share page has no idea what the visitor plays on, so its three
+     questions must ignore the stored choice entirely. If they did not, the same
+     link would describe itself differently to two people. */
+  const answers = [];
+  ['both', 'fabric', 'paper'].forEach((choice) => {
+    platform.choose(choice);
+    answers.push(JSON.stringify([
+      platform.missingPlatformsFor(challenge),
+      platform.runningPlatformsFor(challenge),
+      platform.gapOn(challenge, 'paper')
+    ]));
+  });
+  platform.choose(platform.BOTH);
+  eq(answers[1], answers[0], 'fabric reader sees what a both reader sees');
+  eq(answers[2], answers[0], 'paper reader sees what a both reader sees');
+});
+
 /* ---------- hand the result to the mod ---------- */
 
 fs.mkdirSync(OUT, { recursive: true });

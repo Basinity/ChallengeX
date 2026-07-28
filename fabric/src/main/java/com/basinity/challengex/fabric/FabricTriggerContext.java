@@ -1,9 +1,9 @@
 package com.basinity.challengex.fabric;
 
+import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.GameEvent;
 import com.basinity.challengex.core.model.ParamValue;
-import com.basinity.challengex.common.trigger.TriggerContext;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;

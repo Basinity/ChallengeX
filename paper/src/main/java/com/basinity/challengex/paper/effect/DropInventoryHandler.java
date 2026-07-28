@@ -4,8 +4,8 @@ import com.basinity.challengex.core.engine.EffectCommand;
 import java.util.List;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 /** {@code effect.drop_inventory}: drops each target's entire inventory on the ground. */
 public final class DropInventoryHandler implements EffectHandler {

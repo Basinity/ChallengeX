@@ -13,7 +13,9 @@ window.CX.platform = (function () {
   /* The default: judge a challenge against every platform, so the builder
      tells you when something will not travel before you share it. */
   var BOTH = 'both';
-  var STORAGE_KEY = 'cx-platform';
+  // Named to match the theme switch's key, since they are the only two things
+  // this site keeps between visits and the privacy policy names both.
+  var STORAGE_KEY = 'challengex-platform';
 
   var names = { fabric: 'Fabric', paper: 'Paper' };
 
