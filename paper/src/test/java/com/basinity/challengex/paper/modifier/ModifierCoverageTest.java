@@ -3,6 +3,7 @@ package com.basinity.challengex.paper.modifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.basinity.challengex.common.support.PlatformSupport;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.core.registry.ModifierDefinition;
 import java.util.Set;
@@ -21,17 +22,11 @@ class ModifierCoverageTest {
     private static final Set<String> ENGINE_HANDLED = Set.of(CoreCatalog.MODIFIER_TIME_LIMIT);
 
     /**
-     * Deliberately not supported on Paper. Recorded rather than ignored, so the
-     * availability export has something to read and the site can say so.
-     *
-     * <p>{@code share_inventory} points every member's inventory at one object
-     * on Fabric, through a Mixin. Bukkit backs a player's inventory with its own
-     * object and offers no way to swap it, so the only route left is copying one
-     * inventory onto everybody every tick, which invites exactly the item
-     * duplication and loss a shared inventory must not have. Cut rather than
-     * hacked.
+     * Deliberately not supported on Paper. Read from the shared declaration the
+     * website and the in-game report both use, rather than restated here, so
+     * this test is what proves that declaration matches the adapter.
      */
-    private static final Set<String> CUT = Set.of("modifier.share_inventory");
+    private static final Set<String> CUT = PlatformSupport.unsupportedOn(PlatformSupport.PAPER);
 
     private static Set<String> catalogModifiers() {
         Set<String> ids = new TreeSet<>();

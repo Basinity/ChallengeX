@@ -37,3 +37,18 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// The website reads this to mark the pieces a platform does not run. Re-run
+// after changing what any adapter supports; the result is committed alongside
+// the site, like the catalog and the game data.
+def webSupport = rootProject.file('web/assets/js/support.js')
+
+tasks.register('exportSupport', JavaExec) {
+    group = 'build'
+    description = 'Regenerates the web builder platform-support file.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.basinity.challengex.common.support.SupportExportMain'
+    args webSupport.absolutePath
+    inputs.files(sourceSets.main.output)
+    outputs.file(webSupport)
+}

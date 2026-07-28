@@ -4,6 +4,7 @@ import com.basinity.challengex.common.lifecycle.RunStore;
 import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.common.modifier.ModifierContext;
 import com.basinity.challengex.common.preset.PresetStore;
+import com.basinity.challengex.common.support.PlatformSupport;
 import com.basinity.challengex.common.trigger.TriggerContext;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.model.Challenge;
@@ -16,6 +17,7 @@ import com.basinity.challengex.paper.modifier.ModifierSources;
 import com.basinity.challengex.paper.trigger.TriggerSource;
 import com.basinity.challengex.paper.trigger.TriggerSources;
 import java.nio.file.Path;
+import java.util.Set;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
@@ -59,6 +61,14 @@ public class ChallengeXPaper extends JavaPlugin implements Listener {
                     new PaperEffectExecutor(getServer(), getSLF4JLogger()));
             runController.onRestored(getServer(), snapshot.state());
             getSLF4JLogger().info("Restored {} run at {} ticks.", snapshot.state(), snapshot.elapsedTicks());
+            // A run saved by the mod can carry pieces this adapter does not run,
+            // so a restore has to say so as an import does.
+            Set<String> gap = PlatformSupport.unsupportedUsedBy(
+                    snapshot.challenge(), PlatformSupport.PAPER);
+            if (!gap.isEmpty()) {
+                getSLF4JLogger().warn("This run uses {} the Paper version does not run;"
+                        + " the rest of it plays normally.", gap);
+            }
         }, () -> loadChallenge(Challenge.empty()));
 
         registerTriggerSources();

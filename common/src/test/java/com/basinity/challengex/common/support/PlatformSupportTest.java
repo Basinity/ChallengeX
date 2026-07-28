@@ -1,0 +1,71 @@
+package com.basinity.challengex.common.support;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.basinity.challengex.core.registry.CoreCatalog;
+import com.basinity.challengex.core.registry.Definition;
+import com.basinity.challengex.core.registry.Registries;
+import com.basinity.challengex.core.registry.Registry;
+import java.util.Set;
+import java.util.TreeSet;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class PlatformSupportTest {
+
+    private static Set<String> catalog() {
+        Registries registries = CoreCatalog.createRegistries();
+        Set<String> ids = new TreeSet<>();
+        for (Registry<? extends Definition> registry :
+                java.util.List.of(registries.triggers(), registries.effects(), registries.modifiers())) {
+            registry.all().forEach(definition -> ids.add(definition.id()));
+        }
+        return ids;
+    }
+
+    @Test
+    @DisplayName("every id named as unsupported is a real catalog id")
+    void namedIdsAreReal() {
+        Set<String> unknown = new TreeSet<>(SupportJson.allNamedIds());
+        unknown.removeAll(catalog());
+
+        assertTrue(unknown.isEmpty(), "not in the catalog: " + unknown);
+    }
+
+    @Test
+    @DisplayName("both platforms are offered, and a platform running everything says so with an empty set")
+    void bothPlatformsAreDeclared() {
+        assertEquals(Set.of(PlatformSupport.FABRIC, PlatformSupport.PAPER),
+                new TreeSet<>(PlatformSupport.platforms()));
+        assertTrue(PlatformSupport.unsupportedOn(PlatformSupport.FABRIC).isEmpty());
+    }
+
+    @Test
+    @DisplayName("an unknown platform is treated as running everything rather than nothing")
+    void unknownPlatformSupportsEverything() {
+        // The site could ask about a platform this build predates; refusing
+        // every entry would read as a broken challenge rather than an unknown.
+        assertTrue(PlatformSupport.unsupportedOn("nonesuch").isEmpty());
+        assertTrue(PlatformSupport.supports("nonesuch", "modifier.share_inventory"));
+    }
+
+    @Test
+    @DisplayName("supports() answers per platform")
+    void supportsIsPerPlatform() {
+        assertFalse(PlatformSupport.supports(PlatformSupport.PAPER, "modifier.share_inventory"));
+        assertTrue(PlatformSupport.supports(PlatformSupport.FABRIC, "modifier.share_inventory"));
+        assertTrue(PlatformSupport.supports(PlatformSupport.PAPER, "modifier.share_health"));
+    }
+
+    @Test
+    @DisplayName("the exported file is a script assigning a global, so it opens off disk")
+    void exportIsAScript() {
+        String written = SupportJson.write();
+
+        assertTrue(written.contains("window.CX_SUPPORT ="), written);
+        assertTrue(written.contains("\"supportVersion\": 1"), written);
+        assertTrue(written.contains("modifier.share_inventory"), written);
+    }
+}

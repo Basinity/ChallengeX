@@ -4,9 +4,11 @@ import com.basinity.challengex.common.command.ChallengeSummary;
 import com.basinity.challengex.common.lifecycle.TimerColors;
 import com.basinity.challengex.common.lifecycle.TimerPreferences;
 import com.basinity.challengex.common.preset.PresetStore;
+import com.basinity.challengex.common.support.PlatformSupport;
 import com.basinity.challengex.common.text.StyledLine;
 import com.basinity.challengex.core.engine.ChallengeRun;
 import com.basinity.challengex.core.engine.RunState;
+import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.preset.Preset;
 import com.basinity.challengex.core.preset.PresetCodec;
 import com.basinity.challengex.core.preset.PresetFormatException;
@@ -26,6 +28,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -181,7 +184,28 @@ public final class ChallengeCommand {
         activePresetName = name;
         source.getSender().sendMessage(Component.text(
                 "Imported '" + preset.name() + "'. Run /challengex start to begin.", NamedTextColor.GREEN));
+        reportUnsupported(source.getSender(), preset.challenge());
         return 1;
+    }
+
+    /**
+     * Names the pieces this challenge uses that Paper does not run. Import
+     * cannot reject them: {@code core} is shared, so an id only the mod runs is
+     * still a known id here and parses clean. Without this the host would only
+     * find out by noticing the piece never doing anything.
+     */
+    private static void reportUnsupported(CommandSender sender, Challenge challenge) {
+        Set<String> gap = PlatformSupport.unsupportedUsedBy(challenge, PlatformSupport.PAPER);
+        if (gap.isEmpty()) {
+            return;
+        }
+        sender.sendMessage(Component.text(
+                "This challenge uses " + gap.size() + " piece" + (gap.size() == 1 ? "" : "s")
+                        + " the Paper version does not run. The rest of it plays normally.",
+                NamedTextColor.YELLOW));
+        for (String id : gap) {
+            sender.sendMessage(Component.text("  - " + id, NamedTextColor.GRAY));
+        }
     }
 
     /** A run wrapping the empty starting challenge: nothing has been imported yet. */
