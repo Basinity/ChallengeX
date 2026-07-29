@@ -79,9 +79,9 @@ Three files in `web/assets/js/` are generated, never hand-edited: `catalog.js` (
 
 ## Status
 
-Released as v2.0.0 on Fabric, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
+Released as v2.1.0 on Fabric and Paper, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
 
-The Paper adapter is built and not yet released. It runs the whole catalog bar one modifier: the shared inventory, which Fabric implements by pointing every member's inventory at a single object through a Mixin, and which Bukkit gives no way to express without copying inventories every tick and inviting the duplication a shared inventory must not have. Cut rather than hacked. Everything else is there, pause and per-world persistence included.
+The Paper adapter runs the whole catalog bar one modifier: the shared inventory, which Fabric implements by pointing every member's inventory at a single object through a Mixin, and which Bukkit gives no way to express without copying inventories every tick and inviting the duplication a shared inventory must not have. Cut rather than hacked. Everything else is there, pause and per-world persistence included.
 
 v2.0.0 replaces goals with win conditions composed as rules, which is what makes it a major version: the preset schema moves to version 2 and a version 1 preset is rejected rather than silently losing its win condition, so a challenge built before this release has to be rebuilt in the builder.
 Every player now wins or loses on their own, with the run ending on the first finish or once everybody is done, and a finish announces its place and time.
