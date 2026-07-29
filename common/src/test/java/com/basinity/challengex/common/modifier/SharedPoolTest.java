@@ -19,8 +19,11 @@ class SharedPoolTest {
     private static final String GROUP = "*";
     private static final double FULL = 20.0;
 
-    private final UUID alice = UUID.randomUUID();
-    private final UUID bob = UUID.randomUUID();
+    // Fixed rather than random, and in order: a pool that does not add gains up
+    // nominates the lowest id among the living as its pacer, so random ids left
+    // it to chance which of these two the regeneration tests were describing.
+    private final UUID alice = new UUID(0L, 1L);
+    private final UUID bob = new UUID(0L, 2L);
 
     private static SharedPool.Member member(UUID id, double value) {
         return new SharedPool.Member(id, value, FULL, true);
