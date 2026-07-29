@@ -1104,13 +1104,11 @@ code {
 }
 
 .pick__tag {
-  margin-left: 8px;
   padding: 1px 5px;
   border: 1px solid var(--effect-line);
   color: var(--effect);
   font: 600 9px var(--mono);
   letter-spacing: .08em;
-  vertical-align: middle;
 }
 
 .pick:hover { background: var(--bg-strip); }
@@ -1121,7 +1119,21 @@ code {
 .pick[data-kind='effect']:hover { border-color: var(--effect); }
 .pick[data-kind='modifier']:hover { border-color: var(--modifier); }
 
-.pick__name { font-size: 13.5px; font-weight: 700; }
+/* The name row also carries whatever tag the entry needs: OUTCOME on the two
+   run controls, the platform note on an entry a platform will not run. Those
+   sit flush against the right edge rather than trailing the name, so they read
+   as a mark on the box instead of part of what the entry is called. The name
+   itself is a bare text node, so the first element child is always the first
+   tag, and giving it the slack keeps a pair of tags together at the edge. */
+.pick__name {
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.pick__name > :first-child { margin-left: auto; }
 .pick__blurb { font: 400 11.5px/1.45 var(--body); color: var(--text-mute); }
 
 .pick__chips {
