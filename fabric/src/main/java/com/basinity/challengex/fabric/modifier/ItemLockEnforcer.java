@@ -196,7 +196,7 @@ public final class ItemLockEnforcer implements ModifierEnforcer {
                 //? if >=26.3 {
                 player.drop(stack, false, Prediction.SERVER_ONLY);
                 //?} else
-                /*player.drop(stack, false);*/
+                //player.drop(stack, false);
             }
         }
     }

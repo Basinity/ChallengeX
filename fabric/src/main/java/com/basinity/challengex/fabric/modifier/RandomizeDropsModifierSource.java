@@ -51,7 +51,7 @@ public final class RandomizeDropsModifierSource implements ModifierSource {
         //? if >=26.3 {
         return lootContext.getOptional(key) instanceof ServerPlayer player ? player : null;
         //?} else
-        /*return lootContext.getOptionalParameter(key) instanceof ServerPlayer player ? player : null;*/
+        //return lootContext.getOptionalParameter(key) instanceof ServerPlayer player ? player : null;
     }
 
     /** Randomizes the drops when this player is in a run with the modifier in force. */

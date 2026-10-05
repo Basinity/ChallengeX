@@ -22,7 +22,7 @@ public final class LaunchHandler implements EffectHandler {
             //? if >=26.3 {
             target.syncVelocity = true;
             //?} else
-            /*target.hurtMarked = true;*/
+            //target.hurtMarked = true;
         }
     }
 }

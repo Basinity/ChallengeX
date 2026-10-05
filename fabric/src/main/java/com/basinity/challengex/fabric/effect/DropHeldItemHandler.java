@@ -16,7 +16,7 @@ public final class DropHeldItemHandler implements EffectHandler {
             //? if >=26.3 {
             target.drop(target.getInventory().removeFromSelected(true), false, Prediction.SERVER_ONLY);
             //?} else
-            /*target.drop(target.getInventory().removeFromSelected(true), false);*/
+            //target.drop(target.getInventory().removeFromSelected(true), false);
         }
     }
 }

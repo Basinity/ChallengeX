@@ -29,7 +29,7 @@ public class ToolBrokeMixin {
     private void challengex$onBroken(ItemStack broken, EquipmentSlot slot, CallbackInfo info) {
         Item item = broken.getItem();
     //?} else
-    /*private void challengex$onBroken(Item item, EquipmentSlot slot, CallbackInfo info) {*/
+    //private void challengex$onBroken(Item item, EquipmentSlot slot, CallbackInfo info) {
         if ((Object) this instanceof ServerPlayer player) {
             String itemId = BuiltInRegistries.ITEM.getKey(item).toString();
             MixinTriggerBridge.emit(GameEvent.of("trigger.tool_broke", player.getScoreboardName(),

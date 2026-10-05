@@ -75,7 +75,7 @@ public final class GameDataExportMain {
         //? if >=26.3 {
         HolderLookup.Provider vanilla = VanillaRegistries.createWorldLookup();
         //?} else
-        /*HolderLookup.Provider vanilla = VanillaRegistries.createLookup();*/
+        //HolderLookup.Provider vanilla = VanillaRegistries.createLookup();
         // Item components are bound through the data-component initializer
         // pipeline at server load, not at bootstrap; the food source reads
         // components, so run the same binding here.
