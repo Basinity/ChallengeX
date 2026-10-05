@@ -30,7 +30,7 @@ import net.minecraft.world.item.ItemStack;
  * every way an item can leave an inventory releases it without being handled
  * separately: dropped, eaten, burned as fuel, stored in a chest, lost on death,
  * or the holder disconnecting. Only loose stacks in a player's own inventory
- * count, which is the hotbar, the main grid, the armour slots and the offhand.
+ * count, which is the hotbar, the main grid, the armor slots and the offhand.
  * The contents of a bundle do not, so stashing an item inside one gives up the
  * lock, and neither does a stack sitting on the cursor mid-click.
  *
