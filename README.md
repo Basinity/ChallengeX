@@ -82,7 +82,7 @@ Three files in `web/assets/js/` are generated, never hand-edited: `catalog.js` (
 
 ## Status
 
-Released as v2.1.0 on Fabric and Paper, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
+Released as v2.1.1 on Fabric and Paper for Minecraft 26.2 and 26.3, feature-complete and playtested: the engine, the full building-block catalog, the command surface, the run lifecycle with pause and per-world persistence, and the web builder at https://challengexmc.com.
 
 The Paper adapter runs the whole catalog bar one modifier: the shared inventory, which Fabric implements by pointing every member's inventory at a single object through a Mixin, and which Bukkit gives no way to express without copying inventories every tick and inviting the duplication a shared inventory must not have. Cut rather than hacked. Everything else is there, pause and per-world persistence included.
 
