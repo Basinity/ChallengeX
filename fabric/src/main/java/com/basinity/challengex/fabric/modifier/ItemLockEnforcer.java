@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=26.3
 import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
@@ -192,7 +193,10 @@ public final class ItemLockEnforcer implements ModifierEnforcer {
             ItemStack stack = inventory.getItem(slot);
             if (!stack.isEmpty() && ItemLocks.idOf(stack).equals(itemId)) {
                 inventory.setItem(slot, ItemStack.EMPTY);
+                //? if >=26.3 {
                 player.drop(stack, false, Prediction.SERVER_ONLY);
+                //?} else
+                /*player.drop(stack, false);*/
             }
         }
     }

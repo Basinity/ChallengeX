@@ -20,8 +20,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ShieldBlockedMixin {
 
     @Inject(method = "blockUsingItem", at = @At("HEAD"))
+    //? if >=26.3 {
     private void challengex$onBlock(ServerLevel level, LivingEntity attacker, DamageSource source,
             float amount, boolean fullyBlocked, CallbackInfo info) {
+    //?} else {
+    /*private void challengex$onBlock(ServerLevel level, LivingEntity attacker, DamageSource source,
+            float amount, CallbackInfo info) {
+    *///?}
         if ((Object) this instanceof ServerPlayer player) {
             MixinTriggerBridge.emit(GameEvent.of("trigger.shield_blocked", player.getScoreboardName()));
         }

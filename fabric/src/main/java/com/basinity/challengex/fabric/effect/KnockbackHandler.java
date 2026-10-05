@@ -25,7 +25,10 @@ public final class KnockbackHandler implements EffectHandler {
             double angle = target.getRandom().nextDouble() * 2.0 * Math.PI;
             target.setDeltaMovement(Math.cos(angle) * strength, UPWARD, Math.sin(angle) * strength);
             // Forces a velocity packet so the client actually moves.
+            //? if >=26.3 {
             target.syncVelocity = true;
+            //?} else
+            /*target.hurtMarked = true;*/
         }
     }
 }

@@ -6,7 +6,7 @@ group = project.maven_group
 version = project.mod_version
 
 base {
-    archivesName = "challengex-paper-${project.minecraft_version}"
+    archivesName = "challengex-paper-${sc.current.version}"
 }
 
 java {
@@ -44,11 +44,13 @@ processResources {
     // from a task at execution time is deprecated, fails outright in Gradle 10,
     // and rules out the configuration cache.
     def pluginVersion = project.version
+    def minecraftVersion = sc.current.version
 
     inputs.property 'version', pluginVersion
+    inputs.property 'minecraft', minecraftVersion
 
     filesMatching('paper-plugin.yml') {
-        expand 'version': pluginVersion
+        expand 'version': pluginVersion, 'minecraft': minecraftVersion
     }
 }
 

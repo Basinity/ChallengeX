@@ -6,7 +6,7 @@ group = project.maven_group
 version = project.mod_version
 
 base {
-    archivesName = "challengex-fabric-${project.minecraft_version}"
+    archivesName = "challengex-fabric-${sc.current.version}"
 }
 
 java {
@@ -17,7 +17,7 @@ java {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft "com.mojang:minecraft:${sc.current.version}"
 
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
@@ -34,30 +34,36 @@ processResources {
     // from a task at execution time is deprecated, fails outright in Gradle 10,
     // and rules out the configuration cache.
     def modVersion = project.version
+    def minecraftVersion = sc.current.version
 
     inputs.property 'version', modVersion
+    inputs.property 'minecraft', minecraftVersion
 
     filesMatching('fabric.mod.json') {
-        expand 'version': modVersion
+        expand 'version': modVersion, 'minecraft': minecraftVersion
     }
 }
 
 // The web builder suggests game ids by their display names out of this file, so
 // the game jar stays the single source of truth for what exists and what it is
 // called. Re-run after a game-version bump; the result is committed alongside
-// the site, like the catalog.
+// the site, like the catalog. Every version would write the same file, so only
+// the newest one registers the task: newer versions add ids, so its data covers
+// the older ones.
 def webGameData = rootProject.file('web/assets/js/gamedata.js')
 
-tasks.register('exportGameData', JavaExec) {
-    group = 'build'
-    description = 'Regenerates the web builder game data (ids and display names) from the game registries.'
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.basinity.challengex.fabric.export.GameDataExportMain'
-    args webGameData.absolutePath, project.minecraft_version
-    // The game's logging writes a logs/ folder relative to the working
-    // directory; point it into build/ so the module root stays clean.
-    workingDir = layout.buildDirectory.dir('exportGameData').get().asFile
-    doFirst { workingDir.mkdirs() }
-    inputs.files(sourceSets.main.output)
-    outputs.file(webGameData)
+if (sc.versions.max { it.parsed }.version == sc.current.version) {
+    tasks.register('exportGameData', JavaExec) {
+        group = 'build'
+        description = 'Regenerates the web builder game data (ids and display names) from the game registries.'
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'com.basinity.challengex.fabric.export.GameDataExportMain'
+        args webGameData.absolutePath, sc.current.version
+        // The game's logging writes a logs/ folder relative to the working
+        // directory; point it into build/ so the module root stays clean.
+        workingDir = layout.buildDirectory.dir('exportGameData').get().asFile
+        doFirst { workingDir.mkdirs() }
+        inputs.files(sourceSets.main.output)
+        outputs.file(webGameData)
+    }
 }

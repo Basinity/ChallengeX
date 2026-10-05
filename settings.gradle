@@ -6,9 +6,25 @@ pluginManagement {
     }
 }
 
+plugins {
+    id 'dev.kikugie.stonecutter' version '0.9.8'
+}
+
 rootProject.name = 'ChallengeX'
 
 include 'core'
 include 'common'
-include 'fabric'
-include 'paper'
+
+stonecutter {
+    kotlinController = false
+    centralScript = 'build.gradle'
+
+    create(getRootProject()) {
+        branch('fabric') {
+            versions '26.2', '26.3'
+        }
+        branch('paper') {
+            versions '26.2', '26.3'
+        }
+    }
+}

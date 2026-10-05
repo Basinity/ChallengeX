@@ -4,7 +4,7 @@ main: com.basinity.challengex.paper.ChallengeXPaper
 description: Compose your own Minecraft challenge from rules and modifiers.
 author: Basinity
 website: https://challengexmc.com
-api-version: '26.3'
+api-version: '${minecraft}'
 permissions:
   challengex.admin:
     description: Import, start, reset, pause and resume challenges.

@@ -43,21 +43,21 @@ jobs:
       - name: Web builder checks
         run: node web/test/run.js
 
-      # Runs every module's unit tests and assembles both the remapped fabric
-      # jar and the paper plugin jar.
+      # Runs every module's unit tests and assembles a fabric jar and a paper
+      # plugin jar for each supported game version.
       - name: Build and test
         run: ./gradlew build --stacktrace
 
-      - name: Upload mod jar
+      - name: Upload mod jars
         uses: actions/upload-artifact@v4
         with:
-          name: challengex-fabric-jar
-          path: fabric/build/libs/*.jar
+          name: challengex-fabric-jars
+          path: fabric/versions/*/build/libs/*.jar
           if-no-files-found: error
 
-      - name: Upload plugin jar
+      - name: Upload plugin jars
         uses: actions/upload-artifact@v4
         with:
-          name: challengex-paper-jar
-          path: paper/build/libs/*.jar
+          name: challengex-paper-jars
+          path: paper/versions/*/build/libs/*.jar
           if-no-files-found: error

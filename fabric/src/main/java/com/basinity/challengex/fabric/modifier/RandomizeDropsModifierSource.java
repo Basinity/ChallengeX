@@ -36,12 +36,22 @@ public final class RandomizeDropsModifierSource implements ModifierSource {
     public void register(ModifierContext context) {
         LootTableEvents.MODIFY_DROPS.register((table, lootContext, drops) -> {
             if (lootContext.hasParameter(LootContextParams.BLOCK_STATE)) {
+                //? if >=26.3 {
                 ServerPlayer player = lootContext.getOptional(LootContextParams.THIS_ENTITY)
                         instanceof ServerPlayer breaker ? breaker : null;
+                //?} else {
+                /*ServerPlayer player = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY)
+                        instanceof ServerPlayer breaker ? breaker : null;
+                *///?}
                 randomizeFor(context, player, "modifier.randomize_block_drops", drops);
             } else if (lootContext.hasParameter(LootContextParams.DAMAGE_SOURCE)) {
+                //? if >=26.3 {
                 ServerPlayer player = lootContext.getOptional(LootContextParams.LAST_DAMAGE_PLAYER)
                         instanceof ServerPlayer killer ? killer : null;
+                //?} else {
+                /*ServerPlayer player = lootContext.getOptionalParameter(LootContextParams.LAST_DAMAGE_PLAYER)
+                        instanceof ServerPlayer killer ? killer : null;
+                *///?}
                 randomizeFor(context, player, "modifier.randomize_mob_drops", drops);
             }
         });
