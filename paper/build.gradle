@@ -3,10 +3,10 @@ plugins {
 }
 
 group = project.maven_group
-version = "${project.mod_version}+${project.minecraft_version}"
+version = project.mod_version
 
 base {
-    archivesName = 'challengex-paper'
+    archivesName = "challengex-paper-${project.minecraft_version}"
 }
 
 java {
