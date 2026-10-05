@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -191,7 +192,7 @@ public final class ItemLockEnforcer implements ModifierEnforcer {
             ItemStack stack = inventory.getItem(slot);
             if (!stack.isEmpty() && ItemLocks.idOf(stack).equals(itemId)) {
                 inventory.setItem(slot, ItemStack.EMPTY);
-                player.drop(stack, false);
+                player.drop(stack, false, Prediction.SERVER_ONLY);
             }
         }
     }

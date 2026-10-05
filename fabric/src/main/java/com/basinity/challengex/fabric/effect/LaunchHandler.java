@@ -19,7 +19,7 @@ public final class LaunchHandler implements EffectHandler {
         for (ServerPlayer target : targets) {
             target.setDeltaMovement(0.0, strength, 0.0);
             // Forces a velocity packet so the client actually moves.
-            target.hurtMarked = true;
+            target.syncVelocity = true;
         }
     }
 }

@@ -21,7 +21,7 @@ public class ShieldBlockedMixin {
 
     @Inject(method = "blockUsingItem", at = @At("HEAD"))
     private void challengex$onBlock(ServerLevel level, LivingEntity attacker, DamageSource source,
-            float amount, CallbackInfo info) {
+            float amount, boolean fullyBlocked, CallbackInfo info) {
         if ((Object) this instanceof ServerPlayer player) {
             MixinTriggerBridge.emit(GameEvent.of("trigger.shield_blocked", player.getScoreboardName()));
         }

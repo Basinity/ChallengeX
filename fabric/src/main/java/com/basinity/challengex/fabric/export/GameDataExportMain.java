@@ -71,7 +71,7 @@ public final class GameDataExportMain {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         Language language = Language.getInstance();
-        HolderLookup.Provider vanilla = VanillaRegistries.createLookup();
+        HolderLookup.Provider vanilla = VanillaRegistries.createWorldLookup();
         // 26.2 binds item components through the data-component initializer
         // pipeline at server load, not at bootstrap; the food source reads
         // components, so run the same binding here.
