@@ -23,14 +23,15 @@ import java.util.stream.Stream;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentInitializers;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.core.component.DataComponentInitializers;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 
 /**
@@ -75,7 +76,7 @@ public final class GameDataExportMain {
         HolderLookup.Provider vanilla = VanillaRegistries.createWorldLookup();
         //?} else
         /*HolderLookup.Provider vanilla = VanillaRegistries.createLookup();*/
-        // 26.2 binds item components through the data-component initializer
+        // Item components are bound through the data-component initializer
         // pipeline at server load, not at bootstrap; the food source reads
         // components, so run the same binding here.
         BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(vanilla)
@@ -93,12 +94,12 @@ public final class GameDataExportMain {
         sources.put("mob", entries(BuiltInRegistries.ENTITY_TYPE.stream()
                 .filter(DefaultAttributes::hasSupplier)
                 .filter(type -> !NOT_MOBS.contains(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath()))
-                .map(type -> named(BuiltInRegistries.ENTITY_TYPE.getKey(type), langName(language, type.getDescriptionId())))));
+                .map(type -> new Entry(BuiltInRegistries.ENTITY_TYPE.getKey(type), langName(language, type.getDescriptionId())))));
         // Exactly the set the food-eaten trigger fires for: items carrying the
         // game's own food component, not a hand-picked list.
         sources.put("food", entries(BuiltInRegistries.ITEM.stream()
                 .filter(item -> item.components().has(DataComponents.FOOD))
-                .map(item -> named(BuiltInRegistries.ITEM.getKey(item), langName(language, item.getDescriptionId())))));
+                .map(item -> new Entry(BuiltInRegistries.ITEM.getKey(item), langName(language, item.getDescriptionId())))));
         sources.put("effect", fromRegistry(BuiltInRegistries.MOB_EFFECT, language, effect -> effect.getDescriptionId()));
         sources.put("sound", fromRegistry(BuiltInRegistries.SOUND_EVENT, language, sound -> null));
         sources.put("container", fromRegistry(BuiltInRegistries.MENU, language, menu -> null));
@@ -108,7 +109,7 @@ public final class GameDataExportMain {
                 langName(language, "enchantment." + id.getNamespace() + "." + id.getPath())));
         sources.put("damage_type", fromLookup(vanilla, Registries.DAMAGE_TYPE, id -> null));
         sources.put("dimension", entries(Stream.of("overworld", "the_nether", "the_end")
-                .map(path -> named(Identifier.withDefaultNamespace(path), null))));
+                .map(path -> new Entry(Identifier.withDefaultNamespace(path), null))));
         sources.put("advancement", advancements(language));
         sources.put("weather", keywords("clear", "rain", "thunder"));
         sources.put("time", keywords("day", "noon", "night", "midnight"));
@@ -128,14 +129,14 @@ public final class GameDataExportMain {
     private static <T> JsonArray fromRegistry(Registry<T> registry, Language language, Function<T, String> descriptionId) {
         return entries(registry.stream().map(value -> {
             String key = descriptionId.apply(value);
-            return named(registry.getKey(value), key == null ? null : langName(language, key));
+            return new Entry(registry.getKey(value), key == null ? null : langName(language, key));
         }));
     }
 
-    private static JsonArray fromLookup(HolderLookup.Provider vanilla, net.minecraft.resources.ResourceKey<? extends Registry<?>> registry, Function<Identifier, String> name) {
+    private static JsonArray fromLookup(HolderLookup.Provider vanilla, ResourceKey<? extends Registry<?>> registry, Function<Identifier, String> name) {
         return entries(vanilla.lookupOrThrow(registry).listElements()
                 .map(holder -> holder.key().identifier())
-                .map(id -> named(id, name.apply(id))));
+                .map(id -> new Entry(id, name.apply(id))));
     }
 
     /**
@@ -175,7 +176,7 @@ public final class GameDataExportMain {
                 return null;
             }
             String key = titleObject.get("translate").getAsString();
-            return language.has(key) ? language.getOrDefault(key) : null;
+            return langName(language, key);
         }
     }
 
@@ -186,10 +187,6 @@ public final class GameDataExportMain {
     /* ---------- entry shaping ---------- */
 
     private record Entry(Identifier id, String name) {
-    }
-
-    private static Entry named(Identifier id, String name) {
-        return new Entry(id, name);
     }
 
     /** The language file's name for a key, or null (derive from the id) when it has none. */
@@ -245,8 +242,8 @@ public final class GameDataExportMain {
 
     private static String render(String gameVersion, Map<String, JsonArray> sources, List<String> keywordSources) {
         StringBuilder out = new StringBuilder();
-        out.append("// Generated by the :fabric:exportGameData Gradle task from the game registries.\n");
-        out.append("// Do not edit by hand: rerun the task after a game-version bump.\n");
+        out.append("// Generated by the exportGameData Gradle task from the game registries.\n");
+        out.append("// Do not edit by hand: rerun the task after adding a game version.\n");
         out.append("window.CX_GAMEDATA = {\n");
         out.append("\"gameVersion\": ").append(GSON.toJson(gameVersion)).append(",\n");
         out.append("\"keywords\": ").append(GSON.toJson(keywordSources)).append(",\n");
