@@ -11,7 +11,6 @@ import com.basinity.challengex.core.model.Challenge;
 import com.basinity.challengex.core.registry.CoreCatalog;
 import com.basinity.challengex.fabric.command.ChallengeCommand;
 import com.basinity.challengex.fabric.lifecycle.RunController;
-import com.basinity.challengex.fabric.lifecycle.RunPersistenceBridge;
 import com.basinity.challengex.fabric.lifecycle.WorldPaths;
 import com.basinity.challengex.fabric.modifier.FabricModifierContext;
 import com.basinity.challengex.fabric.modifier.ModifierBridge;
@@ -59,9 +58,10 @@ public class ChallengeXFabric implements ModInitializer {
         RunStore runStore = new RunStore(LOGGER);
         RunController runController = new RunController(() -> activeRun, preferences, runStore);
         runController.register();
-        // Autosave and shutdown write the run through the same routine the
-        // lifecycle transitions use, so run.json stays current between them.
-        RunPersistenceBridge.arm(runController::save);
+        // Every world save, autosave and shutdown included, writes the run through
+        // the same routine the lifecycle transitions use, so run.json stays
+        // current between them.
+        ServerLifecycleEvents.BEFORE_SAVE.register((savingServer, flush, force) -> runController.save(savingServer));
         ServerLifecycleEvents.SERVER_STARTED.register(startedServer -> {
             server = startedServer;
             // Resume a saved run, else start empty. A restored paused run is
