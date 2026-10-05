@@ -71,11 +71,14 @@ Two things keep it honest. The site renders its forms from `catalog.js`, generat
 
 Requires Java 25 (via Gradle toolchains).
 
-Checks run from both sides of the JSON contract: `./gradlew :core:test` runs the engine and codec suite, including the contract test that parses the site's committed export fixtures with the mod's real codec, and `node web/test/run.js` runs the site's dependency-free checks and regenerates those fixtures.
-`./gradlew :common:test` covers the shared adapter logic, and `./gradlew :paper:test` holds each adapter's registration tables to the catalog, so an entry nobody wired fails the build rather than silently doing nothing in play.
-`./gradlew :fabric:runServer` boots a headless dedicated server to confirm the mod initializes cleanly; the plugin is checked by dropping its jar into a Paper server's `plugins/` folder.
+Both adapters build once per supported game version through [Stonecutter](https://stonecutter.kikugie.dev): the source stays shared, `fabric/versions/<version>/` and `paper/versions/<version>/` hold each version's dependency pins, and the few lines that differ between game versions sit in `//? if` conditionals, written in the newest version's form.
+`./gradlew build` produces one jar per adapter per game version, named `challengex-{loader}-{minecraft-version}-{mod-version}.jar`, so a fix lands in every supported version at once.
 
-Three files in `web/assets/js/` are generated, never hand-edited: `catalog.js` (`./gradlew :core:exportCatalog`, rerun after changing a catalog entry), `gamedata.js` (`./gradlew :fabric:exportGameData`, rerun after a game-version bump), and `support.js` (`./gradlew :common:exportSupport`, rerun after changing what a platform runs).
+Checks run from both sides of the JSON contract: `./gradlew :core:test` runs the engine and codec suite, including the contract test that parses the site's committed export fixtures with the mod's real codec, and `node web/test/run.js` runs the site's dependency-free checks and regenerates those fixtures.
+`./gradlew :common:test` covers the shared adapter logic, and `./gradlew :paper:26.3:test` (one per game version) holds each adapter's registration tables to the catalog, so an entry nobody wired fails the build rather than silently doing nothing in play.
+`./gradlew :fabric:26.3:runServer` (one per game version) boots a headless dedicated server to confirm the mod initializes cleanly; the plugin is checked by dropping its jar into a Paper server's `plugins/` folder.
+
+Three files in `web/assets/js/` are generated, never hand-edited: `catalog.js` (`./gradlew :core:exportCatalog`, rerun after changing a catalog entry), `gamedata.js` (`./gradlew exportGameData`, which reads the newest supported game version, rerun after adding one), and `support.js` (`./gradlew :common:exportSupport`, rerun after changing what a platform runs).
 
 ## Status
 
