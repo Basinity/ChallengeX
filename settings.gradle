@@ -20,6 +20,7 @@ stonecutter {
     centralScript = 'build.gradle'
 
     create(getRootProject()) {
+        vcsVersion = '26.3'
         ['fabric', 'paper'].each { loader ->
             branch(loader) {
                 versions '26.2', '26.3'
