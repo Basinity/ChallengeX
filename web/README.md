@@ -49,7 +49,7 @@ Nothing about an individual entry is hardcoded in a screen. A new trigger appear
 The suggestion fields draw from `assets/js/gamedata.js`, generated out of the real game registries and the game's own English names. After a game-version bump:
 
 ```
-./gradlew :fabric:exportGameData
+./gradlew exportGameData
 ```
 
 ## Tests
