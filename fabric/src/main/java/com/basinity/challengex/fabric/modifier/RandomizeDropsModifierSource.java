@@ -7,8 +7,10 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 /**
@@ -36,25 +38,20 @@ public final class RandomizeDropsModifierSource implements ModifierSource {
     public void register(ModifierContext context) {
         LootTableEvents.MODIFY_DROPS.register((table, lootContext, drops) -> {
             if (lootContext.hasParameter(LootContextParams.BLOCK_STATE)) {
-                //? if >=26.3 {
-                ServerPlayer player = lootContext.getOptional(LootContextParams.THIS_ENTITY)
-                        instanceof ServerPlayer breaker ? breaker : null;
-                //?} else {
-                /*ServerPlayer player = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY)
-                        instanceof ServerPlayer breaker ? breaker : null;
-                *///?}
-                randomizeFor(context, player, "modifier.randomize_block_drops", drops);
+                randomizeFor(context, findPlayer(lootContext, LootContextParams.THIS_ENTITY),
+                        "modifier.randomize_block_drops", drops);
             } else if (lootContext.hasParameter(LootContextParams.DAMAGE_SOURCE)) {
-                //? if >=26.3 {
-                ServerPlayer player = lootContext.getOptional(LootContextParams.LAST_DAMAGE_PLAYER)
-                        instanceof ServerPlayer killer ? killer : null;
-                //?} else {
-                /*ServerPlayer player = lootContext.getOptionalParameter(LootContextParams.LAST_DAMAGE_PLAYER)
-                        instanceof ServerPlayer killer ? killer : null;
-                *///?}
-                randomizeFor(context, player, "modifier.randomize_mob_drops", drops);
+                randomizeFor(context, findPlayer(lootContext, LootContextParams.LAST_DAMAGE_PLAYER),
+                        "modifier.randomize_mob_drops", drops);
             }
         });
+    }
+
+    private ServerPlayer findPlayer(LootContext lootContext, ContextKey<?> key) {
+        //? if >=26.3 {
+        return lootContext.getOptional(key) instanceof ServerPlayer player ? player : null;
+        //?} else
+        /*return lootContext.getOptionalParameter(key) instanceof ServerPlayer player ? player : null;*/
     }
 
     /** Randomizes the drops when this player is in a run with the modifier in force. */
