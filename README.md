@@ -23,7 +23,7 @@ A finished challenge saves as a named preset, a plain JSON file or a shareable l
 
 ## Try it
 
-Install the ChallengeX jar into a Fabric Minecraft 26.2 instance's mods folder alongside Fabric API; that covers singleplayer, and on a dedicated server it is a server-side install only.
+Install the ChallengeX jar built for your game version, 26.2 or 26.3, into a Fabric instance's mods folder alongside Fabric API; that covers singleplayer, and on a dedicated server it is a server-side install only.
 
 1. Compose a challenge in the web builder at https://challengexmc.com and download the preset JSON, or hand-write one.
 2. Put the file into `config/challengex/presets/`.
