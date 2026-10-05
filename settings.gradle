@@ -20,11 +20,10 @@ stonecutter {
     centralScript = 'build.gradle'
 
     create(getRootProject()) {
-        branch('fabric') {
-            versions '26.2', '26.3'
-        }
-        branch('paper') {
-            versions '26.2', '26.3'
+        ['fabric', 'paper'].each { loader ->
+            branch(loader) {
+                versions '26.2', '26.3'
+            }
         }
     }
 }

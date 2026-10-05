@@ -46,10 +46,9 @@ processResources {
 
 // The web builder suggests game ids by their display names out of this file, so
 // the game jar stays the single source of truth for what exists and what it is
-// called. Re-run after a game-version bump; the result is committed alongside
-// the site, like the catalog. Every version would write the same file, so only
-// the newest one registers the task: newer versions add ids, so its data covers
-// the older ones.
+// called. Re-run after adding a game version; the result is committed alongside
+// the site, like the catalog. Only the newest version registers the task: newer
+// versions add ids, so its data covers the older ones.
 def webGameData = rootProject.file('web/assets/js/gamedata.js')
 
 if (sc.versions.max { it.parsed }.version == sc.current.version) {
@@ -63,7 +62,6 @@ if (sc.versions.max { it.parsed }.version == sc.current.version) {
         // directory; point it into build/ so the module root stays clean.
         workingDir = layout.buildDirectory.dir('exportGameData').get().asFile
         doFirst { workingDir.mkdirs() }
-        inputs.files(sourceSets.main.output)
         outputs.file(webGameData)
     }
 }
