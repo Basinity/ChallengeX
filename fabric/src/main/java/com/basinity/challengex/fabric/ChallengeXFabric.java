@@ -30,12 +30,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The Fabric adapter's entrypoint. It owns the active run, registers every
- * trigger source against it, and executes the effects the engine fires back.
+ * trigger source against it, and hands each run a {@code FabricEffectExecutor}.
  *
  * <p>The active challenge starts empty; a preset imported through the
- * {@code /challengex} command tree swaps it in without a restart. Until the
- * run-lifecycle phase adds explicit start/reset, a loaded challenge simply
- * counts as active.
+ * {@code /challengex} command tree swaps it in without a restart. The run is
+ * started, paused, resumed and reset through {@code RunController}, restored
+ * from the world's saved run at server start, and written back on every world
+ * save, autosave and shutdown included.
  */
 public class ChallengeXFabric implements ModInitializer {
 
@@ -58,9 +59,6 @@ public class ChallengeXFabric implements ModInitializer {
         RunStore runStore = new RunStore(LOGGER);
         RunController runController = new RunController(() -> activeRun, preferences, runStore);
         runController.register();
-        // Every world save, autosave and shutdown included, writes the run through
-        // the same routine the lifecycle transitions use, so run.json stays
-        // current between them.
         ServerLifecycleEvents.BEFORE_SAVE.register((savingServer, flush, force) -> runController.save(savingServer));
         ServerLifecycleEvents.SERVER_STARTED.register(startedServer -> {
             server = startedServer;
